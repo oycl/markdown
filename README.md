@@ -2,10 +2,10 @@ Building a Module
 构建模块
 ===================================
 
-    Warning
-    This tutorial requires having installed Odoo
-    警告
-    本教程需要安装Odoo
+>   Warning
+>   This tutorial requires having installed Odoo
+>   警告
+>   本教程需要安装Odoo
 
 Start/Stop the Odoo server 启动/停止Odoo服务
 -----------------------------------
@@ -17,12 +17,12 @@ Start/Stop the Odoo server 启动/停止Odoo服务
     although supporting client features (e.g. new data representation such 
     as interactive maps) can be added to the client.
     业务逻辑和扩展通常在服务端执行，而只有在添加客户端支持的新特征才会在
-客户端添加代码（例如，在交互映射中新数据的表示）
+    客户端添加代码（例如，在交互映射中新数据的表示）
 
     In order to start the server, simply invoke the command odoo-bin 
     in the shell, adding the full path to the file if necessary:
     为了启动服务器，只需要在shell中调用命令odoo-bin，如果需要则加入完整的路径名。
-    odoo-bin
+    `odoo-bin`
 
     The server is stopped by hitting Ctrl-C twice from the terminal, 
     or by killing the corresponding OS process.
