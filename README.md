@@ -1,11 +1,13 @@
 Building a Module
 构建模块
+===================================
 
     Warning
     This tutorial requires having installed Odoo
+    警告
+    本教程需要安装Odoo
 
-===================================
-Start/Stop the Odoo server
+Start/Stop the Odoo server 启动/停止Odoo服务
 -----------------------------------
 
 
