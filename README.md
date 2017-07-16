@@ -9,86 +9,86 @@ Start/Stop the Odoo server
 
 
 
-Build an Odoo module
+Build an Odoo module 构建模块
 -----------------------------------
 
 
 
 
-Basic views
+Basic views 基本视图
 -----------------------------------
 
 
 
 
-Relations between models
+Relations between models 模型关联
 -----------------------------------
 
 
 
-Inheritance
------------------------------------
-
-
-
-
-Computed fields and default values
+Inheritance 继承
 -----------------------------------
 
 
 
 
-Onchange
+Computed fields and default values 计算字段和默认值
 -----------------------------------
 
 
 
 
-
-Model constraints
------------------------------------
-
-
-
-
-Advanced Views
------------------------------------
-
-
-
-
-Workflows
+Onchange 
 -----------------------------------
 
 
 
 
 
-Security
+Model constraints 模型约束
+-----------------------------------
+
+
+
+
+Advanced Views 高级视图
+-----------------------------------
+
+
+
+
+Workflows 工作流
 -----------------------------------
 
 
 
 
 
-Wizards
------------------------------------
-
-
-
-Internationalization
+Security 安全
 -----------------------------------
 
 
 
 
 
-Reporting
+Wizards 向导
 -----------------------------------
 
 
 
-WebServices
+Internationalization 国际化
+-----------------------------------
+
+
+
+
+
+Reporting 报告
+-----------------------------------
+
+
+
+WebServices Web服务
 -----------------------------------
 
 
