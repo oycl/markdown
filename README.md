@@ -1,11 +1,16 @@
 Building a Module
 ¹¹½¨Ä£¿é
+
+    Warning
+    This tutorial requires having installed Odoo
+
 ===================================
-
-
-  
 Start/Stop the Odoo server
 -----------------------------------
+
+
+
+
 
 
 
