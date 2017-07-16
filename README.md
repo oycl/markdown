@@ -3,8 +3,11 @@ Building a Module
 ===================================
 
 > Warning
+>
 > This tutorial requires having installed Odoo
+>
 > 警告
+>
 > 本教程需要安装Odoo
 
 Start/Stop the Odoo server 启动/停止Odoo服务
@@ -22,8 +25,8 @@ Start/Stop the Odoo server 启动/停止Odoo服务
     In order to start the server, simply invoke the command odoo-bin 
     in the shell, adding the full path to the file if necessary:
     为了启动服务器，只需要在shell中调用命令odoo-bin，如果需要则加入完整的路径名。
-    `odoo-bin`
-
+    `odoo-bin`,`You`
+		`You`
     The server is stopped by hitting Ctrl-C twice from the terminal, 
     or by killing the corresponding OS process.
     通过连发两次 Ctrl-C 命令或杀死相应的系统进程来停止Odoo服务。
