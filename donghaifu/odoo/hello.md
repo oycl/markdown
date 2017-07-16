@@ -5,8 +5,13 @@ Welcome to StackEdit!
 Hey! I'm your first Markdown document in **StackEdit**[^stackedit]. Don't delete me, I'm very helpful! I can be recovered anyway in the **Utils** tab of the <i class="icon-cog"></i> **Settings** dialog.
 
 ----------
-
-
+> This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet,
+> consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.
+> Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.
+>  你好
+> Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse
+> id sem consectetuer libero luctus adipiscing.
+		`You`
 Documents
 -------------
 
@@ -88,6 +93,8 @@ Once you are happy with your document, you can publish it on different websites 
 #### <i class="icon-upload"></i> Publish a document
 
 You can publish your document by opening the <i class="icon-upload"></i> **Publish** sub-menu and by choosing a website. In the dialog box, you can choose the publication format:
+
+    enter code here
 
 - Markdown, to publish the Markdown text on a website that can interpret it (**GitHub** for instance),
 - HTML, to publish the document converted into HTML (on a blog for example),
