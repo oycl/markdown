@@ -3,8 +3,8 @@ layout: default
 ---
 
 # [](#header-1)Building a Module 构建模块
-
-
+    
+    
 > Warning
 > 
 > This tutorial requires having installed Odoo
@@ -23,10 +23,100 @@ Business logic and extension is generally performed on the server side, although
 
 In order to start the server, simply invoke the command odoo-bin in the shell, adding the full path to the file if necessary:
 为了启动服务器，只需要在shell中调用命令odoo-bin，如果需要则加入完整的路径名。
+
 `odoo-bin`
 
 The server is stopped by hitting Ctrl-C twice from the terminal, or by killing the corresponding OS process.
 通过连发两次 Ctrl-C 命令或杀死相应的系统进程来停止Odoo服务
+
+## [](#header-2)Build an Odoo module 构建模块
+
+Both server and client extensions are packaged as modules which are optionally loaded in a database.
+
+Odoo modules can either add brand new business logic to an Odoo system, or alter and extend existing business logic: a module can be created to add your country's accounting rules to Odoo's generic accounting support, while the next module adds support for real-time visualisation of a bus fleet.
+
+Everything in Odoo thus starts and ends with modules.
+
+
+## [](#header-2)Basic views 基本视图
+
+
+
+
+
+
+## [](#header-2)Relations between models 模型关联
+
+
+
+
+
+## [](#header-2)Inheritance 继承
+
+
+
+
+
+
+## [](#header-2)Computed fields and default values 计算字段和默认值
+
+
+
+
+
+
+## [](#header-2)Onchange 
+
+
+
+
+
+
+## [](#header-2)Model constraints 模型约束
+
+
+
+
+
+## [](#header-2)Advanced Views 高级视图
+
+
+
+
+
+## [](#header-2)Workflows 工作流
+
+
+
+
+
+
+## [](#header-2)Security 安全
+
+
+
+
+
+
+## [](#header-2)Wizards 向导
+
+
+
+
+## [](#header-2)Internationalization 国际化
+
+
+
+
+
+
+## [](#header-2)Reporting 报告
+
+
+
+
+## [](#header-2)WebServices Web服务
+
 
 
 
