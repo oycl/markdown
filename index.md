@@ -2,19 +2,22 @@
 layout: default
 ---
 
-#Building a Module 构建模块
+# [](#header-1)Building a Module 构建模块
 
 
 > Warning
+> 
 > This tutorial requires having installed Odoo
+> 
 > 警告
+> 
 > 本教程需要安装Odoo
 
 ##Start/Stop the Odoo server 启动/停止Odoo服务
 
-    Odoo uses a client/server architecture in which clients are 
-    web browsers accessing the Odoo server via RPC.
-    Odoo 使用 C/S架构，客户端即Web浏览器通过RPC协议访问Odoo服务器。
+Odoo uses a client/server architecture in which clients are web browsers accessing the Odoo server via RPC.
+
+Odoo 使用 C/S架构，客户端即Web浏览器通过RPC协议访问Odoo服务器。
 
     Business logic and extension is generally performed on the 
     server side, although supporting client features (e.g. new 
@@ -26,7 +29,8 @@ layout: default
     In order to start the server, simply invoke the command odoo-bin 
     in the shell, adding the full path to the file if necessary:
     为了启动服务器，只需要在shell中调用命令odoo-bin，如果需要则加入完整的路径名。
-    `odoo-bin`
+    
+`odoo-bin`
 
     The server is stopped by hitting Ctrl-C twice from the terminal, 
     or by killing the corresponding OS process.
