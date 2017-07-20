@@ -111,13 +111,72 @@ For instance, if the module has a single `mymodule.py` file `__init__.py` might 
 例如，如果模块中包含`mymodule.py`文件，`__init__.py`应该这样写：
 
 ```python
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
 from . import mymodule
+```
+
+Odoo provides a mechanism to help set up a new module, `odoo-bin` has a subcommand `scaffold` to create an empty module:
+
+Odoo提供了脚手架机制来快速创建新模块，`odoo-bin`子命令`scaffold`用来创建一个空模块
+
+```
+$ odoo-bin scaffold <module name> <where to put it>
+
+$ odoo-bin scaffold <模块名> <模块放置路径>
+```
+
+The command creates a subdirectory for your module, and automatically creates a bunch of standard files for a module. Most of them simply contain commented code or XML. The usage of most of those files will be explained along this tutorial.
+
+该命令为模块创建一个子目录，并自动为模块创建一些标准文件。这些文件大多只包含被注释的代码和XML元素。后面将解释这些文件的含义。
+
+
+> Exercise
+> 
+> Module creation
+Use the command line above to create an empty module Open Academy, and install it in Odoo.
+
+1.Invoke the command odoo-bin scaffold openacademy addons.
+2.Adapt the manifest file to your module.
+3.Don't bother about the other files.
+
+```python
+# -*- coding: utf-8 -*-
+{
+    'name': "Open Academy",
+
+    'summary': """Manage trainings""",
+
+    'description': """
+        Open Academy module for managing trainings:
+            - training courses
+            - training sessions
+            - attendees registration
+    """,
+
+    'author': "My Company",
+    'website': "http://www.yourcompany.com",
+
+    # Categories can be used to filter modules in modules listing
+    # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
+    # for the full list
+    'category': 'Test',
+    'version': '0.1',
+
+    # any module necessary for this one to work correctly
+    'depends': ['base'],
+
+    # always loaded
+    'data': [
+        # 'security/ir.model.access.csv',
+        'templates.xml',
+    ],
+    # only loaded in demonstration mode
+    'demo': [
+        'demo.xml',
+    ],
 }
 ```
+
+
 
 
 
