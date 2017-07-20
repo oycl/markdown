@@ -6,9 +6,11 @@ layout: default
     
     
 > **Warning**
+>
 > **警告**
-> 
+>
 > This tutorial requires having installed Odoo
+>
 > 本教程需要安装Odoo
 
 ## [](#header-2)Start/Stop the Odoo server 启动/停止Odoo服务
@@ -40,45 +42,61 @@ Odoo中的所有功能都是包含在模块中。
 
 
 ### [](#header-3)Composition of a module 模块的组成
-
 An Odoo module can contain a number of elements:
+
 Odoo模块包含多个部分：
 
 **Business objects**
+
 业务对象
+
 Declared as Python classes, these resources are automatically persisted by Odoo based on their configuration
 Python类，这些类会被Odoo框架自动持久化，持久化的方式决定于类的定义。
 
 **Data files**
+
 数据文件
+
 XML or CSV files declaring metadata (views or workflows), configuration data (modules parameterization), demonstration data and more
+
 包括元数据（视图或工作流）、配置数据（模块参数）、演示数据等，以XML或CSV文件定义。
 
 **Web controllers**
+
 Web控制器
+
 Handle requests from web browsers
+
 处理Web浏览器的请求
 
 **Static web data**
+
 静态页面数据
+
 Images, CSS or javascript files used by the web interface or website
+
 网站或界面使用的图片、CSS或JavaScript文件
 
 ### [](#header-3)Module structure 模块的结构
-Each module is a directory within a module directory. Module directories are specified by using the ·--addons-path· option.
-每个模块都是模块目录中的一个子目录。可以通过·--addons-path·选项指定模块目录的路径。
+Each module is a directory within a module directory. Module directories are specified by using the `--addons-path` option.
+
+每个模块都是模块目录中的一个子目录。可以通过 `--addons-path` 选项指定模块目录的路径。
 
 > **Tip**
+>
 > **提示**
+>
 > most command-line options can also be set using a configuration file
+>
 > 大多数命令行选项可以通过配置文件进行设置
 
 An Odoo module is declared by its manifest. See the manifest documentation about it.
+
 Odoo模块由清单文件进行声明。查看清单文件文档了解详细信息。
 
-A module is also a Python package with a __init__.py file, containing import instructions for various Python files in the module.
+A module is also a Python package with a `__init__.py` file, containing import instructions for various Python files in the module.
 
-For instance, if the module has a single mymodule.py file __init__.py might contain:
+For instance, if the module has a single `mymodule.py` file `__init__.py` might contain:
 
 
 
