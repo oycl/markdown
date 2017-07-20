@@ -135,10 +135,11 @@ The command creates a subdirectory for your module, and automatically creates a 
 >
 > Use the command line above to create an empty module Open Academy, and install it in Odoo.
 
-1.  Invoke the command odoo-bin scaffold openacademy addons.
+> - 1.  Invoke the command odoo-bin scaffold openacademy addons.
 2.  Adapt the manifest file to your module.
 3.  Don't bother about the other files.
 
+_openacademy/__manifest__.py_
 ```python
 # -*- coding: utf-8 -*-
 {
