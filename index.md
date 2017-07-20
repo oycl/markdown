@@ -16,28 +16,35 @@ layout: default
 ## [](#header-2)Start/Stop the Odoo server 启动/停止Odoo服务
 
 Odoo uses a client/server architecture in which clients are web browsers accessing the Odoo server via RPC.
+
 Odoo 使用 C/S架构，客户端即Web浏览器通过RPC协议访问Odoo服务器。
 
 Business logic and extension is generally performed on the server side, although supporting client features (e.g. new data representation such as interactive maps) can be added to the client.
+
 业务逻辑和扩展通常在服务端执行，而只有在添加客户端支持的新特征才会在客户端添加代码（例如，在交互映射中新数据的表示）
 
 In order to start the server, simply invoke the command odoo-bin in the shell, adding the full path to the file if necessary:
+
 为了启动服务器，只需要在shell中调用命令odoo-bin，如果需要则加入完整的路径名。
 
 `odoo-bin`
 
 The server is stopped by hitting Ctrl-C twice from the terminal, or by killing the corresponding OS process.
+
 通过连发两次 Ctrl-C 命令或杀死相应的系统进程来停止Odoo服务
 
 ## [](#header-2)Build an Odoo module 构建模块
 
 Both server and client extensions are packaged as modules which are optionally loaded in a database.
+
 服务端扩展和客户端扩展都被封装为模块，这些模块可选择性的被安装，安装完成后通过数据库来加载。
 
 Odoo modules can either add brand new business logic to an Odoo system, or alter and extend existing business logic: a module can be created to add your country's accounting rules to Odoo's generic accounting support, while the next module adds support for real-time visualisation of a bus fleet.
+
 模块即可以是全新的业务逻辑，也可以是更改和扩展已有的业务逻辑。比如创建一个中国会计模块，将中国的会计准则添加到Odoo的通用会计中，也可以创建一个全新的实时可视化管理车队的模块。
 
 Everything in Odoo thus starts and ends with modules.
+
 Odoo中的所有功能都是包含在模块中。
 
 
@@ -51,6 +58,7 @@ Odoo模块包含多个部分：
 业务对象
 
 Declared as Python classes, these resources are automatically persisted by Odoo based on their configuration
+
 Python类，这些类会被Odoo框架自动持久化，持久化的方式决定于类的定义。
 
 **Data files**
@@ -96,11 +104,20 @@ Odoo模块由清单文件进行声明。查看清单文件文档了解详细信�
 
 A module is also a Python package with a `__init__.py` file, containing import instructions for various Python files in the module.
 
+模块是一个包含`__init__.py`文件的的Python包，`__init__.py`文件包含了模块需要的导入的各Python文件。
+
 For instance, if the module has a single `mymodule.py` file `__init__.py` might contain:
 
+例如，如果模块中包含`mymodule.py`文件，`__init__.py`应该这样写：
 
-
-
+```python
+// Javascript code with syntax highlighting.
+var fun = function lang(l) {
+  dateformat.i18n = require('./lang/' + l)
+  return true;
+from . import mymodule
+}
+```
 
 
 
