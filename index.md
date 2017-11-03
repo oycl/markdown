@@ -3,7 +3,7 @@
 
 ## [](#header-2)系统安装
 
-[Link to another page](another-page).
+[001Ubuntu分区方案](/article/UbuntuHardDiskPartition.md).
 
 
 
