@@ -160,6 +160,6 @@ swap        8G
 /boot       200M (启动分区，最多只要100M左右)
 /tmp        20G
 /home       600G
-/usr        100G
-/var        183G
+/usr        80G
+/var        200G
 ```
