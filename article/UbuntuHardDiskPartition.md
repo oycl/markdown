@@ -159,7 +159,7 @@ Linux桌面分区方案
 swap        8G
 /boot       200M (启动分区，最多只要100M左右)
 /tmp        20G
-/home       600G
+/home       300G
 /usr        80G
-/var        200G
+/var        500G
 ```
