@@ -20,8 +20,8 @@
 
 内容
 
-```
-代码
+```sh
+shell get 'var'
 ```
 
 ```yml
