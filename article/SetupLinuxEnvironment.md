@@ -1,7 +1,8 @@
-Linux环境配置
-===
+#Linux系统环境配置
+
+
 一，开启root用户
----
+----
 有了root用户比较方便，可以少输入好多'sudo'，避免普通用户不在sudor名单的问题。
 但是在做删除的时候头脑一定要清醒
 
@@ -86,4 +87,4 @@ TZ='Asia/Shanghai';export TZ
 
 
 
-[back](./)
+[back](./index.md)
