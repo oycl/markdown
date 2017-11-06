@@ -1,5 +1,7 @@
-一，开启root用户
+Linux环境配置
 ===
+一，开启root用户
+---
 有了root用户比较方便，可以少输入好多'sudo'，避免普通用户不在sudor名单的问题。
 但是在做删除的时候头脑一定要清醒
 
@@ -11,13 +13,13 @@ sudo passwd root
 测试`su root`
 
 二，安装vim
-===
+---
 ```
 # apt-get install vim
 ```
 
 三，安装openssh server
-===
+---
 1，管理服务器需要远程连接，有的服务器已经装好就不需要这一步
 ```
 # apt-get install openssh-server
@@ -33,7 +35,7 @@ sudo passwd root
 ```
 
 四，给出固定IP地址
-===
+---
 ```
 # vim /etc/network/interfaces
 ```
@@ -48,7 +50,7 @@ dns-nameservers 202.97.224.69
 ```
 
 五，update
-=== 
+--- 
 开始前先update ，是同步 /etc/apt/sources.list 和 /etc/apt/sources.list.d 中列出的源的索引，这样才能获取到最新的软件包
 ```
 # apt-get update
@@ -60,7 +62,7 @@ dns-nameservers 202.97.224.69
 
 
 六，设置时区，时间
-===
+---
 ```
 # vim .profile
 ```
@@ -80,4 +82,8 @@ TZ='Asia/Shanghai';export TZ
 ```
 # hwclock --systohc
 ```
-[关于时区参考]: http://os.51cto.com/art/201205/336643.htm"参考"
+[关于时区参考](http://os.51cto.com/art/201205/336643.htm)
+
+
+
+[back](./)
