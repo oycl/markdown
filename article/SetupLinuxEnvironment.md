@@ -8,29 +8,34 @@ sudo passwd -u root
 sudo passwd root
 ```
 然后输入密码
-测试su root
+测试`su root`
 
+二，安装vim
+===
+```
+# apt-get install vim
+```
 
-二，安装openssh server
+三，安装openssh server
 ===
 1，管理服务器需要远程连接，有的服务器已经装好就不需要这一步
 ```
 # apt-get install openssh-server
 ```
-2，允许root登录，可以对 openssh server进行配置
+2，允许root用户登录，可以对 openssh server进行配置
 ```
-$ sudo vi /etc/ssh/sshd_config
+# vi /etc/ssh/sshd_config
 ```
-找到PermitRootLogin no一行，改为PermitRootLogin yes
+找到`PermitRootLogin no`一行，改为`PermitRootLogin yes`
 然后重启 openssh server
 ```
-$ sudo service ssh restart
+# service ssh restart
 ```
 
-三，编辑IP地址上网
+四，给出固定IP地址
 ===
 ```
-vim /etc/network/interfaces
+# vim /etc/network/interfaces
 ```
 加入
 ```
@@ -42,7 +47,7 @@ dns-nameservers 202.97.224.68
 dns-nameservers 202.97.224.69
 ```
 
-四，update
+五，update
 === 
 开始前先update ，是同步 /etc/apt/sources.list 和 /etc/apt/sources.list.d 中列出的源的索引，这样才能获取到最新的软件包
 ```
@@ -53,11 +58,6 @@ dns-nameservers 202.97.224.69
 # apt-get upgrade 
 ```
 
-五，安装vim
-===
-```
-# apt-get install vim
-```
 
 六，设置时区，时间
 ===
@@ -80,5 +80,4 @@ TZ='Asia/Shanghai';export TZ
 ```
 # hwclock --systohc
 ```
-关于时区参考 http://os.51cto.com/art/201205/336643.htm
-6，
+[关于时区参考]: http://os.51cto.com/art/201205/336643.htm"参考"
