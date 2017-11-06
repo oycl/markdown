@@ -6,7 +6,7 @@
 有了root用户比较方便，可以少输入好多'sudo'，避免普通用户不在sudor名单的问题。
 但是在做删除的时候头脑一定要清醒
 
-```yml
+```Shell
 $ sudo passwd -u root
 $ sudo passwd root
 ```
@@ -15,33 +15,33 @@ $ sudo passwd root
 
 二，安装vim
 ---
-```yml
+```Shell
 # apt-get install vim
 ```
 
 三，安装openssh server
 ---
 1，管理服务器需要远程连接，有的服务器已经装好就不需要这一步
-```yml
+```Shell
 # apt-get install openssh-server
 ```
 2，允许root用户登录，可以对 openssh server进行配置
-```yml
+```Shell
 # vi /etc/ssh/sshd_config
 ```
 找到`PermitRootLogin no`一行，改为`PermitRootLogin yes`
 然后重启 openssh server
-```yml
+```Shell
 # service ssh restart
 ```
 
 四，给出固定IP地址
 ---
-```yml
+```Shell
 # vim /etc/network/interfaces
 ```
 加入
-```yml
+```Shell
 iface ens33 inet static  
 address 192.168.5.55
 gateway 192.168.4.1
