@@ -1,8 +1,8 @@
 # Linux系统环境配置
 
 
-一，开启root用户
-----
+## 一，开启root用户
+
 有了root用户比较方便，可以少输入好多'sudo'，避免普通用户不在sudor名单的问题。
 但是在做删除的时候头脑一定要清醒
 
@@ -13,8 +13,8 @@ $ sudo passwd root
 然后输入密码
 测试`su root`
 
-二，安装vim
----
+## 二，安装vim
+
 ```sh
 # apt-get install vim
 ```

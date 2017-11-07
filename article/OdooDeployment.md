@@ -1,4 +1,4 @@
-# 题目
+# Odoo部署
 
 ## 一，标题
 ### 三，标题
@@ -19,6 +19,12 @@
 > **强调注释**
 
 内容
+
+开始前先update ，是同步 /etc/apt/sources.list 和 /etc/apt/sources.list.d 中列出的源的索引，这样才能获取到最新的软件包
+```sh
+# apt-get update 
+```
+更新一下系统源。upgrade 是升级已安装的所有软件包，升级之后的版本就是本地索引里的，因此，在执行 upgrade 之前一定要执行
 
 ```sh
 shell get 'var'
