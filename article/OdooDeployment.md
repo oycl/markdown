@@ -24,12 +24,15 @@
 ```
 #### python编译依赖
 > 不推荐使用deb方式安装python依赖包，可能会因为依赖库版本问题导致一些bug。
+
 ```sh
 # apt-get install build-essential python-dev python-setuptools -y
 ```
 #### 如果没有pip使用easy_install安装pip
+
 > python-pip版本比较老，所以这里使用easy_install安装。
 > 如果是阿里云，系统镜像自动安装了pip，可跳过此步骤，否则可能导致No module named urllib3问题。
+
 ```sh
 # easy_install pip
 ```
@@ -54,12 +57,16 @@ apt-get install libpq-dev -y
 # pip install virtualenv
 ```
 ### 3，安装postgresql数据库
+
 > ubuntu16.04的postgresql是9.5的, 建议开发和部署使用相同版本。
 > 需要安装不同版本的postgresql可以参考https://devecho.com/v/postgresql-basic/
+
 ```sh
 # apt-get install postgresql-9.5 postgresql-server-dev-9.5
 ```
+
 > 安装完postgresql数据库后，数据库会自动创建postgres系统用户，在数据库内也会有同名的数据库用户，可以更改这个用户的密码
+
 ```sh
 # passwd postgres
 ```
@@ -81,8 +88,10 @@ postgres=# \q
 
 ### 5，安装打印程序wkhtmltopdf和中文字体
 #### wkhtmltopdf
+
 > ubuntu 14~16 （trusty代表1404的版本号）
 > 由于wkhtmltopdf没有提供1604的deb安装包，我们可以用1404的替代
+
 ```shell
 # wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.2.1/wkhtmltox-0.12.2.1_linux-trusty-amd64.deb
 # dpkg -i wkhtmltox-0.12.2.1_linux-trusty-amd64.deb
@@ -118,21 +127,27 @@ odoo@$ virtualenv venv
 source venv/bin/activate
 ```
 #### 下载odoo nightly包
+
 > 因为odoo10的版本已经稳定，改动不大，所以就使用一个固定包：odoo_10.0.20171108.tar.gz（11月8日下载）
 > 也可以在Windows里面下载，然后使用odoo用户名登录WinSCP软件传入 odoo_10.0.20171108.tar.gz，解压缩
+
 ```shell
 (venv) odoo@$ wget https://nightly.odoo.com/10.0/nightly/src/odoo_10.0.20171108.tar.gz
 (venv) odoo@$ tar xf odoo_10.0.20171108.tar.gz
 (venv) odoo@$ cd odoo-10.0-20171108
 ```
 #### 安装odoo python模块
+
 > 这里必须先安装requirements.txt，因为odoo的源码中，setup.py依赖没有版本号，导致安装的python依赖和odoo requirements.txt里版本不一致。
+
 ```shell
 (venv) pip install -r requirements.txt -i https://pypi.douban.com/simple
 ```
 #### 安装odoo包
+
 > 这里把odoo src包作为python的包安装到venv的lib里去，安装完成后删除整个目录。此时多出一个odoo命令，你可以通过这个命令来启动odoo项目。
 > nightly的src包和github的目录结构略有不同(根目录无odoo-bin等脚本)，适合部署安装用，开发仍然推荐使用git的。
+
 
 ```shell
 (venv) odoo@$ python setup.py install 
