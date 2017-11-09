@@ -10,6 +10,8 @@
 ```sh
 # passwd odoo
 ```
+暂定odoo***1
+
 ## 2，安装python及依赖库
 ### python2.7
 ```sh
@@ -37,13 +39,14 @@
 ```sh
 # apt-get install libsasl2-dev libldap2-dev libssl-dev -y
 ```
+
 ### pillow 依赖库
 ```sh
 # apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev -y
 ```
 ### postgresql 依赖库
 ```sh
-apt-get install libpq-dev -y
+# apt-get install libpq-dev -y
 ```
 ### virtualenv
 ```sh
@@ -59,15 +62,17 @@ apt-get install libpq-dev -y
 ```
 
 > 安装完postgresql数据库后，数据库会自动创建postgres系统用户，密码为未知，可以不用设置
-> 在数据库内也会创建postgres数据库用户，可以更改这个用户的密码，然后创建用户odoo并设置密码
+> 在数据库内也会创建postgres数据库用户，可以更改这个用户的密码，然后创建数据库用户odoo并设置密码
 
 ```sh
-# su postgres psql
+# su postgres 
+$ psql
 //修改密码
-postgres=# ALTER USER postgres WITH PASSWORD 'pg***1';
+postgres=# ALTER USER postgres WITH PASSWORD 'pgdb***1';
 //建立用户
-postgres=# create user "odoo" with password 'odoo***1' createdb;
+postgres=# create user "odoo" with password 'odoodb***1' createdb;
 postgres=# \q
+$ exit
 ```
 ## 4，安装nodejs
 ```sh
@@ -117,7 +122,7 @@ https://stackoverflow.com/questions/9604625/wkhtmltopdf-cannot-connect-to-x-serv
 和开发用的源码相同，包含git相关记录。打开网页后，看好分支，点击DownloadZIP下载
 [github包下载地址](https://github.com/odoo/odoo/tree/10.0)
 
-> nightly的src包和github的目录结构略有不同，比如根目录无odoo-bin等脚本，所有的模块都放到了一起（/odoo/addons）。
+> nightly包和github包的目录结构略有不同，比如根目录无odoo-bin等脚本，还有全部模块都放到了一起。
 适合部署安装用，开发仍然推荐使用git的。
 > 但因为我们使用E版，希望E版模块和C版自带模块区分开，所以我们部署也用github包，这里存有一个疑问
 ：？用阿里云做测试，使用github包里面的setup.py进行安装，在venv环境下，看看安装完后具体位置
@@ -156,6 +161,14 @@ odoo@$ source venv/bin/activate
 ```sh
 (venv) odoo@$ pip install -r requirements.txt -i https://pypi.douban.com/simple
 ```
+中间会安装报错：Failed building wheel for python-ldap，执行下面这个指令安装ldap参考
+[ldap Ubuntu](https://stackoverflow.com/questions/4768446/i-cant-install-python-ldap)
+其实上面已经装过
+
+```sh
+(venv) odoo@$ apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
+```
+
 #### 安装odoo包
 
 > 这里把odoo src包作为python的包安装到venv的lib里去，安装完成后删除整个目录。此时多出一个odoo命令，你可以通过这个命令来启动odoo项目。 
@@ -176,7 +189,7 @@ odoo@$ source venv/bin/activate
 > 也可以在Windows里面下载odoo-10.0.zip，解压缩。然后使用odoo用户名登录WinSCP软件传入所有文件到/home/odoo/odoo10中
 
 其中比较重要的几个文件和目录分别是：
-1.  addons odoo主要业务与功能模块，odoo10中现有260个。
+1.  addons odoo主要业务与功能模块，odoo10中现有263个。
 1.  odoo odoo核心框架代码
 1.  odoo-bin odoo项目启动文件
 1.  requirements.txt python项目依赖说明文件
@@ -188,6 +201,8 @@ odoo@$ source venv/bin/activate
 ```sh
 (venv) odoo@$ pip install -r requirements.txt -i https://pypi.douban.com/simple
 ```
+报错参照上面
+
 #### 安装odoo包
 > 与上面的安装方式不同，？应在不再需要执行Setup步骤，odoo-bin 可以直接启动了
 
