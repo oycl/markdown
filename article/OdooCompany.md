@@ -28,8 +28,10 @@ tar -zcvf addons_c_bruno.tar.gz addons/
    D:\odoo\odoo10\addons\web\static\src\js\abstract_web_client.js    54行
    this.set('title_part', {"zopenerp": "Odoo"});删除odoo 或者改成想要的文字
 6. 加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
+
 ### 2，帮助页面设置
    把view里面点击得到帮助页面的menu指向改到5.55
+   
 ### 3，配置各个工作组，需要详细记录
    工作组及权限对应
 
