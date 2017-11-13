@@ -29,6 +29,7 @@ $ sudo passwd root
 ```sh
 # service ssh restart
 ```
+?putty inactive
 
 ## 四，设置固定IP地址
 ```sh

@@ -176,7 +176,12 @@ server {
 ## 四，配置postgresql
 ### 允许远程连接
 #### 问题一
-如果报错 could not connect to server: Connection refused (0x0000274D/10061) Is the server running on host "120.92.82.112" and accepting TCP/IP connections on port 5432?
+如果报错 
+```sh
+could not connect to server: Connection refused (0x0000274D/10061) Is the server 
+running on host "120.92.82.112" and accepting TCP/IP connections on port 5432?
+```
+编辑配置文件
 ```sh
 vim /etc/postgresql/9.5/main/postgresql.conf
 ```
@@ -196,12 +201,15 @@ systemctl status postgresql.service
 #### 问题二
 PostgreSQ数据库为了安全，它不会监听除本地以外的所有连接请求，
 当用户通过JDBC访问是，会报一些如下的异常：
+```sh
 org.postgresql.util.PSQLException: FATAL: no pg_hba.conf entry for host
-
+```
 pgAdmin登录时也会报错：
-FATAL: no pg_hba.conf entry for host "218.10.12.207", user "postgres", database "testdb", SSL off FATAL: no pg_hba.conf entry for host "218.10.12.207", user "postgres", database "testdb", SSL on
- 
-要解决这个问题，windows下只需要在PostgreSQL数据库的安装目录下找到/data/pg96/pg_hba.conf,
+```sh
+FATAL: no pg_hba.conf entry for host "218.10.12.207", user "postgres", database "testdb", 
+SSL off FATAL: no pg_hba.conf entry for host "218.10.12.207", user "postgres", database "testdb", SSL on
+```
+要解决这个问题，windows下只需要在PostgreSQL数据库的安装目录下找到/data/pg96/pg_hba.conf
 linux下
 ```sh
 vim /etc/postgresql/9.5/main/pg_hba.conf
