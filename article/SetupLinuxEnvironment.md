@@ -25,11 +25,19 @@ $ sudo passwd root
 # vi /etc/ssh/sshd_config
 ```
 找到`PermitRootLogin no`一行，改为`PermitRootLogin yes`
-然后重启 openssh server
+
+3，防止连接中断
+在/etc/ssh/sshd_config最后一行增加`ClientAliveInterval 60`, 
+ClientAliveInterval指定了服务器端向客户端请求消息的时间间隔, 默认是0, 不发送。
+而ClientAliveInterval 60表示每分钟发送一次, 然后客户端响应, 这样就保持长连接了。
+这里比较怪的地方是：不是客户端主动发起保持连接的请求(如FTerm, CTerm等),而是需要服务器先主动。
+另外,至于ClientAliveCountMax(这个值我没有发现), 使用默认值3即可。
+ClientAliveCountMax表示服务器发出请求后客户端没有响应的次数达到一定值, 就自动断开。正常情况下, 客户端不会不响应。
+
+4，然后重启 openssh server
 ```sh
 # service ssh restart
 ```
-?putty inactive
 
 ## 四，设置固定IP地址
 ```sh
@@ -81,6 +89,19 @@ TZ='Asia/Shanghai';export TZ
 ```sh
 # hwclock --systohc
 ```
+### 关于时区的讨论
+1. 导入时间和用户的时区挂钩,会重新计算存储到数据库中
+    1. admin用户选择Hongkong,则数据库导入时间-8做存储，网页显示会+8做调整（这个调整不随用户设置时区改变），然后显示正常
+    1. admin用户选择utc，则数据库导入时间不变，网页显示+8调整看起来就会错误
+以上测试和服务器中数据库的时区设置无关，已经测试。
+
+2. odoo网页显示时间只跟电脑时区挂钩。无论怎么改当前用户的时区，是无效的。
+
+3. 导出时间和存储挂钩,实际字段存储的值就是导出值,这时候又把时区忽略了
+
+我们采用每个用户设置为Asia/Shanghai，页面显示正确，存储差8小时，导出差8小时
+
+
 [关于时区参考](http://os.51cto.com/art/201205/336643.htm)
 
 

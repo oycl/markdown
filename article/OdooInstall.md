@@ -204,7 +204,7 @@ odoo@$ source venv/bin/activate
 报错参照上面
 
 #### 安装odoo包
-> 与上面的安装方式不同，应在不再需要执行Setup步骤，odoo-bin 可以直接启动了
+> 与上面的安装方式不同，不再需要执行Setup步骤，odoo-bin 可以直接启动
 
 
 [back](../)

@@ -18,7 +18,8 @@ tar -zcvf addons_c_bruno.tar.gz addons/
 
 ## 二，部署要点
 ### 1，个性配置
-1. 公司信息：把YTO图标更换，填写网址，地址等等
+1. 去掉登录页面的管理数据库D:\odoo\odoo10\addons\web\views\webclient_templates.xml 注释掉232-237行
+   如果需要访问这个页面，可以访问http://192.168.137.1:8069/web/database/manager
 2. 更换D:\odoo\odoo10\addons\web\static\src\img\logo_inverse_white_206px.png为自己logo
    同时把D:\odoo\custom-addons\web_enterprise\static\src\less\app_switcher.less第130行 中的宽度改为适应logo大小，上面图标用192没问题
 3. 删除无用菜单“Documentation”“Support”“My Odoo.com account”
@@ -27,14 +28,23 @@ tar -zcvf addons_c_bruno.tar.gz addons/
 5. 删除页面 “表名-Odoo”里面的Odoo，仅限Odoo10
    D:\odoo\odoo10\addons\web\static\src\js\abstract_web_client.js    54行
    this.set('title_part', {"zopenerp": "Odoo"});删除odoo 或者改成想要的文字
-6. 加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
+6. 公司信息：把YTO图标更换，填写网址，地址等等。加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
 
 ### 2，帮助页面设置
    把view里面点击得到帮助页面的menu指向改到5.55
    
 ### 3，配置各个工作组，需要详细记录
    工作组及权限对应
-
+   ('001', '研发中心'),
+   ('002', '技术部'),
+   ('003', '采购'),
+   ('004', '生产'),
+   ('005', '库房'),
+   ('006', '质量'),
+   ('007', '销售'),
+   ('008', '数据管理');
+   
+   
 ### 4，建立用户，设置密码
    语言简体中文，时区shanghai
    清单如下

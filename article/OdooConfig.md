@@ -34,7 +34,7 @@ mkdir /home/odoo/odoo10/custom-addons
 ### 在conf文件中输入
 ```sh
 [options]
-db_template = template1
+db_template = template0
 db_host = 127.0.0.1
 db_port = 5432
 db_name = odoo10
@@ -172,6 +172,42 @@ server {
 > 注意如过设置了longpolling单独转发upstream，下文中设置workers不能为0（打印支持必须大于1）
 
 浏览器访问 http://Server_IP
+
+### 使用nginx日志里面会有报错
+2017-11-14 05:54:36,216 877 WARNING admin odoo.http: No CSRF validation token provided for path '/'
+
+Odoo URLs are CSRF-protected by default (when accessed with unsafe
+HTTP methods). See
+https://www.odoo.com/documentation/9.0/reference/http.html#csrf for
+more details.
+
+* if this endpoint is accessed through Odoo via py-QWeb form, embed a CSRF
+  token in the form, Tokens are available via `request.csrf_token()`
+  can be provided through a hidden input and must be POST-ed named
+  `csrf_token` e.g. in your form add:
+
+      <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+* if the form is generated or posted in javascript, the token value is
+  available as `csrf_token` on `web.core` and as the `csrf_token`
+  value in the default js-qweb execution context
+
+* if the form is accessed by an external third party (e.g. REST API
+  endpoint, payment gateway callback) you will need to disable CSRF
+  protection (and implement your own protection if necessary) by
+  passing the `csrf=False` parameter to the `route` decorator.
+
+目前还没有是用nginx很好的解决方法，有时间参考
+[维基百科](https://en.wikipedia.org/wiki/Cross-site_request_forgery)
+
+### 重定向端口
+打开文件
+vim /etc/rc.local
+```sh
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8069
+```
+然后重启，观察效果
+
 
 ## 四，配置postgresql
 ### 允许远程连接
