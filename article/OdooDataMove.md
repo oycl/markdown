@@ -5,7 +5,7 @@
 
 ## 1，手动编辑表格
 
-| 表明                           | 说明              | 
+| 表名                           | 说明              | 
 |:-------------------------------|:------------------|
 | TypeList.csv                   | 类型              | 
 | SheetList.csv                  | 图幅              | 
@@ -29,7 +29,7 @@ S004,A1
 ```
 
 ## 2，使用VIM批量处理的表格
-###  生成 part.csv
+### 1），生成 part.csv
 零件表和组合表的部分列，两个表合成一个表，全部导入到part.csv中。
 目前知道odoo在导入import的时候可以使用name的值，所以用下面这个sql语句
 
@@ -46,40 +46,58 @@ PartList.ImportantNo=ImportantList.ImportantNo AND PartList.OwnerNo=OwnerList.Ow
 
 得到part.csv后使用gvim做一些处理
 1. 替换重要度数据，A，B，C为A级，B级，C级
+```regexp
 %s/,A,/,A级,/
 %s/,B,/,B级,/
 %s/,C,/,C级,/
-1. 每行前加,号
+```
+2. 每行前加,号
+```regexp
 %s/^/,/
-1. 每行前加行号（可能不是必须）
+```
+3. 每行前加行号（可能不是必须）
+```regexp
 %s/^/\=line(".")/
-1. 第一行加标题
+```
+4. 第一行加标题
 这里面由于odoo的外键限制，只能把name当成零件编号字段
+```text
 id,name,part_name,sheet_no,type_no,important_no,designer_no,date_changed,remark
-1. 把从sqlserver导出的带毫秒的数字去掉，模式匹配/.\d\{9},例如.012345678,
+```
+5. 把从sqlserver导出的带毫秒的数字去掉，模式匹配/.\d\{9},例如.012345678,
+```regexp
 %s/.\d\{9},/,/
-处理完后在odoo的part的listview中使用导入import把m.part.csv载入
-Datetime Format填入：YYYY-MM-DD HH:mm:ss
+```
+6. 处理完后在odoo的part的listview中使用导入import把m.part.csv载入
+Datetime Format填入：
+```regexp
+YYYY-MM-DD HH:mm:ss
+```
+7. excel可以很方便的复制第一列,但是要经过反复的ansi和utf8转换,
+如果经过excel处理过,格式可能为
+```regexp
+YYYY/MM/DD HH:mm
+```
+8. 验证一下validate，没有问题，点击import
 
-1. excel可以很方便的复制第一列,但是要经过反复的ansi和utf8转换,
-如果经过excel处理过,可能为YYYY/MM/DD HH:mm
-
-验证一下validate，没有问题，点击import
-
-### 生成assemble.csv
+### 2），生成assemble.csv
 导出装配表的全部
 
 ```sql
 select * from assemble
 ```
 
-1. 每行前加A，形成扩展标识符A000，
+1. 每行前加A，形成扩展标识符A000
+```regexp
 %s/^/A/
-1. 加标题栏
+```
+2. 加标题栏
+```regexp
 id,father_no,child_no,number,group,remark
-准备导入，如果在零件表里面没有这个零件，在装配表里面想要导入的话，
+```
+3. 校验：如果在零件表里面没有这个零件，在装配表里面想要导入的话，
 在validate的时候会产生错误，验证了外键约束建立的正确。
-
+4. 准备导入
 
 
 
