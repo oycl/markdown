@@ -34,27 +34,51 @@ tar -zcvf addons_c_bruno.tar.gz addons/
    把view里面点击得到帮助页面的menu指向改到5.55
    
 ### 3，配置各个工作组，需要详细记录
-   工作组及权限对应
-   ('001', '研发中心'),
-   ('002', '技术部'),
-   ('003', '采购'),
-   ('004', '生产'),
-   ('005', '库房'),
-   ('006', '质量'),
-   ('007', '销售'),
-   ('008', '数据管理');
+   工作组通过res.groups.csv文件导入
+```text
+id,name
+base.group_yanfa,YTO研发中心
+base.group_jishu,YTO技术部
+base.group_caigou,YTO采购
+base.group_shengchan,YTO生产
+base.group_kufang,YTO库房
+base.group_zhiliang,YTO质量
+base.group_xiaoshou,YTO销售
+base.group_shuju,YTO数据
+```
    
    
 ### 4，建立用户，设置密码
-   语言简体中文，时区shanghai
-   清单如下
 
+研发为例res.users.csv，清单如下，语言简体中文，时区shanghai
+
+```text
+id,name,login,lang,tz
+base.user_D001,唐占龙,tangzhanlong,zh_CN,Asia/Shanghai
+base.user_D002,段国臣,duanguochen,zh_CN,Asia/Shanghai
+base.user_D003,石玉峰,shiyufeng,zh_CN,Asia/Shanghai
+base.user_D004,杨波,yangbo,zh_CN,Asia/Shanghai
+base.user_D006,韩守振,hanshouzhen,zh_CN,Asia/Shanghai
+base.user_D007,付东海,fudonghai,zh_CN,Asia/Shanghai
+base.user_D008,袁照华,yuanzhaohua,zh_CN,Asia/Shanghai
+base.user_D009,白荣刚,baironggang,zh_CN,Asia/Shanghai
+base.user_D010,郑强,zhengqiang,zh_CN,Asia/Shanghai
+base.user_D012,葛庆遥,geqingyao,zh_CN,Asia/Shanghai
+base.user_D013,李志,lizhi,zh_CN,Asia/Shanghai
+base.user_D014,王清泉,wangqingquan,zh_CN,Asia/Shanghai
+base.user_D016,王臣,wangchen,zh_CN,Asia/Shanghai
+base.user_D017,宋海东,songhaidong,zh_CN,Asia/Shanghai
+base.user_D018,卢双,lushuang,zh_CN,Asia/Shanghai
+base.user_D019,陈彤,chentong,zh_CN,Asia/Shanghai
+base.user_D020,于广会,yuguanghui,zh_CN,Asia/Shanghai
+```
 ### 5，导入最新原数据库数据
-首次配置需要注意装配时间和零件时间,取上下级零件时间大者为装配时间,不然所有装配时间变成当前时间
-YT01007的名称螺栓后面有个空格
+1. 原数据库改密码封存，开始导入数据
+2. 首次配置需要注意装配时间和零件时间,取上下级零件时间大者为装配时间,不然所有装配时间变成当前时间
+3. YT01007的名称螺栓后面有个空格
 
 
-### 6，配置数据库导入存储过程
+### 6，导入存储过程
 
 
 

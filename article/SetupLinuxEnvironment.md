@@ -10,9 +10,10 @@ $ sudo passwd root
 然后输入密码
 测试`su root`
 
-## 二，安装vim
+## 二，安装vim，unzip
 ```sh
 # apt-get install vim
+# apt-get install unzip
 ```
 
 ## 三，安装openssh server
