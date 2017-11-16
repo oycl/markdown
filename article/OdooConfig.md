@@ -23,7 +23,7 @@
 
 建立模块目录
 ```sh
-mkdir /home/odoo/odoo10/custom-addons
+(venv) odoo@$ mkdir /home/odoo/odoo10/custom-addons
 ```
 
 ### 编写配置文件
@@ -41,7 +41,6 @@ db_name = odoo10
 db_user = odoo
 db_password = odoodb***1
 admin_passwd = odooweb***1
-xmlrpc_interface = 127.0.0.1
 xmlrpc_port = 8069
 data_dir = /home/odoo/odoo10/data
 log_level = warn
@@ -52,6 +51,7 @@ addons_path = /home/odoo/odoo10/custom-addons,/home/odoo/odoo10/addons
 内容详解
 1. admin_passwd 启用web数据库管理密码 admin_passwd（不能设置为admin，无效密码）
 2. xmlrpc_interface 监听IP段改为本地（127.0.0.1）, 可实现禁止外网直接访问odoo（默认0.0.0.0）
+   外网包括局域网，所以只能去掉xmlrpc_interface = 127.0.0.1
 3. xmlrpc_port 监听端口（默认8069）
 4. 注意db_user 和db_password 和之前设置的数据库里的用户名一致
 5. log_level = info

@@ -104,6 +104,9 @@ $ exit
 ```
 ### 验证
 可以在命令行中使用wkhtmltopdf来验证wkhtmltopdf是否正确工作
+```sh
+wkhtmltopdf  www.163.com 163.pdf
+```
 ![](https://devecho.com/media/markdownx/32004dc3-5fa9-4238-a91f-185ca4b2e0a1.jpg)
 如果出现cannot connect to X server错误，可以参考下面链接在linux服务上安装一个X环境
 https://stackoverflow.com/questions/9604625/wkhtmltopdf-cannot-connect-to-x-server

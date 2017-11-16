@@ -1,7 +1,7 @@
 # Odoo数据迁移
 
-> 利用SQLServer的的导入导出向导，把每张表导出为.CSV格式，先从没有外键的表开始，编码为UTF8格式，源为数据库，
-目标为“平面文件”，使用select语句选择一张表中需要的数据，列与列的分隔符为“，”
+> 利用SQLServer的的导入导出向导，把每张表导出为.CSV格式，先从没有外键的表开始，源为数据库，
+目标为“平面文件目标”，代码页为UTF8格式，使用select语句选择一张表中需要的数据，列与列的分隔符为“，”
 
 ## 1，手动编辑表格
 
@@ -55,9 +55,10 @@ PartList.ImportantNo=ImportantList.ImportantNo AND PartList.OwnerNo=OwnerList.Ow
 ```regexp
 %s/^/,/
 ```
-3. 每行前加行号（可能不是必须）
+3. 每行前加行号，加part（可能不是必须）
 ```regexp
 %s/^/\=line(".")/
+%s/^/part/
 ```
 4. 第一行加标题
 这里面由于odoo的外键限制，只能把name当成零件编号字段
@@ -87,9 +88,9 @@ YYYY/MM/DD HH:mm
 select * from assemble
 ```
 
-1. 每行前加A，形成扩展标识符A000
+1. 每行前加assemble，形成扩展标识符assemble000
 ```regexp
-%s/^/A/
+%s/^/assemble/
 ```
 2. 加标题栏
 ```regexp
@@ -100,63 +101,5 @@ id,father_no,child_no,number,group,remark
 4. 准备导入
 
 
-
-
-
-
-
-
-### And an ordered list:
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### Here is an unordered list:
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-> 注释
-> **强调注释**
-
-内容
-
-```sh
-shell get 'var'
-```
-
-```yml
-show_downloads: ["true" or "false" to indicate whether to provide a download URL]
-google_analytics: [Your Google Analytics tracking ID]
-```
-
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
-
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
-
-内嵌代码`su root`
-
-[链接](http://123.com/art/abc.htm)
-
-### Small image
-
-![](https://assets-cdn.github.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![](https://guides.github.com/activities/hello-world/branching.png)
 
 [back](../)

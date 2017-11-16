@@ -30,10 +30,8 @@ tar -zcvf addons_c_bruno.tar.gz addons/
    this.set('title_part', {"zopenerp": "Odoo"});删除odoo 或者改成想要的文字
 6. 公司信息：把YTO图标更换，填写网址，地址等等。加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
 
-### 2，帮助页面设置
-   把view里面点击得到帮助页面的menu指向改到5.55
-   
-### 3，配置各个工作组，需要详细记录
+
+### 2，配置各个工作组，需要详细记录
    工作组通过res.groups.csv文件导入
 ```text
 id,name
@@ -48,7 +46,7 @@ base.group_shuju,YTO数据
 ```
    
    
-### 4，建立用户，设置密码
+### 3，建立用户，设置密码
 
 研发为例res.users.csv，清单如下，语言简体中文，时区shanghai
 
@@ -72,13 +70,13 @@ base.user_D018,卢双,lushuang,zh_CN,Asia/Shanghai
 base.user_D019,陈彤,chentong,zh_CN,Asia/Shanghai
 base.user_D020,于广会,yuguanghui,zh_CN,Asia/Shanghai
 ```
-### 5，导入最新原数据库数据
+### 4，导入最新原数据库数据
 1. 原数据库改密码封存，开始导入数据
 2. 首次配置需要注意装配时间和零件时间,取上下级零件时间大者为装配时间,不然所有装配时间变成当前时间
 3. YT01007的名称螺栓后面有个空格
 
 
-### 6，导入存储过程
+### 5，导入存储过程
 
 
 
