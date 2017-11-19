@@ -28,7 +28,9 @@ tar -zcvf addons_c_bruno.tar.gz addons/
 5. 删除页面 “表名-Odoo”里面的Odoo，仅限Odoo10
    D:\odoo\odoo10\addons\web\static\src\js\abstract_web_client.js    54行
    this.set('title_part', {"zopenerp": "Odoo"});删除odoo 或者改成想要的文字
-6. 公司信息：把YTO图标更换，填写网址，地址等等。加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
+6. 企业版D:\odoo\custom-addons\web_enterprise\static\src\xml\base.xml   
+    第59行改为"欢迎使用查询系统V3.0"
+7. 公司信息：把YTO图标更换，填写网址，地址等等。加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
 
 
 ### 2，配置各个工作组，需要详细记录

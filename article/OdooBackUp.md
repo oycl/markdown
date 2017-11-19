@@ -1,10 +1,8 @@
-# Odoo数据库备份恢复
-
-## 一，表备份和恢复
-
-
+# Odoo数据库备份恢复及计划任务
 
 ## 一，库备份和恢复
+### 备份和恢复命令
+
 备份一下
 pg_dump -Fc -h 120.92.82.112 -p 5432 -U postgres Harvest >back.dump
 
@@ -75,14 +73,17 @@ before this i was trying to restore with out including -c(clean)
 
 even though -c is included in pg_dump it is not used in pg_restore unless we say to use...
 
+### Linux的crontab执行任务
 
 
 
 
 
+## 数据库定时执行计划
+利用pgadmin的pgAgent功能
 
-### 利用脚本定时执行计划
-
+参考文章
+[paAgent](http://blog.csdn.net/sunbocong/article/details/77870205)
 
 
 

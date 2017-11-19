@@ -19,8 +19,11 @@
 [005，Odoo公司定制](/article/OdooCompany.md)
 ------
 
-[006，Odoo数据库备份恢复](/article/OdooBackUp.md)
+[006，Odoo数据库备份恢复及计划任务](/article/OdooBackUp.md)
 ------
 
 [007，Odoo数据迁移](/article/OdooDataMove.md)
+------
+
+[008，Odoo数据迁移](/article/OdooDataMove.md)
 ------
