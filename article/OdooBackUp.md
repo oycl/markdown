@@ -38,9 +38,6 @@ pg_dump -Fc -h 192.168.137.1 -p 5432 -U postgres -c odoo >"D:\odoo\backups\20171
 pg_restore.exe --host localhost --port 5432 --username "postgres" --dbname "postgres" --no-password  --verbose "D:\odoo\backups\zuomian.backup"
 ```
 
-做自动备份时把密码输入环境变量中就不会要密码了
- export PGPASSWORD='odoo'
-
 参考
 i was using the following syntax for pg_dump and restore
 
@@ -75,17 +72,101 @@ even though -c is included in pg_dump it is not used in pg_restore unless we say
 
 ### Linux的crontab执行任务
 
+pgAgent 需要密码
+Linux下
+/var/lib/postgresql/.pgpass
+```sh
+127.0.0.1:5432:*:postgres:pgdbyto1
+```
+将数据库密码写到名为PGPASSWORD的环境变量中，然后使用psql等工具就不会提示输入密码了。
 
+```sh
+ export PGPASSWORD='pgdbyto1'
+```
+windows 环境下
+C:\Users\fudonghai\AppData\Roaming\postgresql\pgpass.conf
+内容
+```text
+localhost:5432:*:postgres:pgdbyto1
+47.94.242.254:5432:*:postgres:pgdbyto1
+192.168.5.55:5432:*:postgres:pgdbyto1
+```
 
 
 
 ## 数据库定时执行计划
-利用pgadmin的pgAgent功能
+安装，并在`postgres数据库`内创建相关表等
+```commandline
+# apt-get install pgagent
+# su postgres
+postgres$ psql
+postgres=# CREATE EXTENSION pgagent;
+```
+
+主机上执行pgagent守护进程
+```commandline
+# pgagent host=127.0.0.1 dbname=postgres user=postgres password=pgdbyto1
+```
+
+pgAdmin 上运行相应任务
+
 
 参考文章
 [paAgent](http://blog.csdn.net/sunbocong/article/details/77870205)
 
+整个数据库备份脚本
+```commandline
+##############################
+## POSTGRESQL BACKUP CONFIG ##
+##############################
+ 
+# Optional system user to run backups as.  If the user the script is running as doesn't match this
+# the script terminates.  Leave blank to skip check.
+BACKUP_USER=
+ 
+# Optional hostname to adhere to pg_hba policies.  Will default to "localhost" if none specified.
+HOSTNAME=
+ 
+# Optional username to connect to database as.  Will default to "postgres" if none specified.
+USERNAME=
+ 
+# This dir will be created if it doesn't exist.  This must be writable by the user the script is
+# running as.
+BACKUP_DIR=/home/backups/database/postgresql/
+ 
+# List of strings to match against in database name, separated by space or comma, for which we only
+# wish to keep a backup of the schema, not the data. Any database names which contain any of these
+# values will be considered candidates. (e.g. "system_log" will match "dev_system_log_2010-01")
+SCHEMA_ONLY_LIST=""
+ 
+# Will produce a custom-format backup if set to "yes"
+ENABLE_CUSTOM_BACKUPS=yes
+ 
+# Will produce a gzipped plain-format backup if set to "yes"
+ENABLE_PLAIN_BACKUPS=yes
+ 
+# Will produce gzipped sql file containing the cluster globals, like users and passwords, if set to "yes"
+ENABLE_GLOBALS_BACKUPS=yes
+ 
+ 
+#### SETTINGS FOR ROTATED BACKUPS ####
+ 
+# Which day to take the weekly backup from (1-7 = Monday-Sunday)
+DAY_OF_WEEK_TO_KEEP=5
+ 
+# Number of days to keep daily backups
+DAYS_TO_KEEP=7
+ 
+# How many weeks to keep weekly backups
+WEEKS_TO_KEEP=5
+ 
+######################################
 
+```
+卸载pgAgent
+```sh
+sudo apt-get remove pgagent
+```
 
 ### And an ordered list:
 1.  Item one
