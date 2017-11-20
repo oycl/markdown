@@ -96,7 +96,7 @@ localhost:5432:*:postgres:pgdbyto1
 
 ## 数据库定时执行计划
 安装，并在`postgres数据库`内创建相关表等
-```commandline
+```sh
 # apt-get install pgagent
 # su postgres
 postgres$ psql
@@ -104,7 +104,7 @@ postgres=# CREATE EXTENSION pgagent;
 ```
 
 主机上执行pgagent守护进程
-```commandline
+```sh
 # pgagent host=127.0.0.1 dbname=postgres user=postgres password=pgdbyto1
 ```
 
