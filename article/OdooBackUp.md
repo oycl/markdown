@@ -70,9 +70,9 @@ before this i was trying to restore with out including -c(clean)
 
 even though -c is included in pg_dump it is not used in pg_restore unless we say to use...
 
-### Linux的crontab执行任务
+### Linux的crontab执行计划任务
 
-pgAgent 需要密码
+psql需要密码时有以下两种解决方法
 Linux下
 /var/lib/postgresql/.pgpass
 ```sh
@@ -95,27 +95,29 @@ localhost:5432:*:postgres:pgdbyto1
 
 
 ## 数据库定时执行计划
-安装，并在`postgres数据库`内创建相关表等
+### 安装，并在`数据库名postgres`内创建相关表等
 ```sh
 # apt-get install pgagent
 # su postgres
 postgres$ psql
 postgres=# CREATE EXTENSION pgagent;
 ```
+> 运行了`CREATE EXTENSION pgagent;`后，pgAdmin里面就会多出一个作业的选项
 
-主机上执行pgagent守护进程
+### 在有数据库的机器上运行pgagent守护进程（windows就是服务）
 ```sh
 # pgagent host=127.0.0.1 dbname=postgres user=postgres password=pgdbyto1
 ```
 
-pgAdmin 上运行相应任务
-
+### pgAdmin 上运行相应任务
 
 参考文章
-[paAgent](http://blog.csdn.net/sunbocong/article/details/77870205)
+[PostgreSQL中定时job执行](http://blog.csdn.net/sunbocong/article/details/77870205)
 
+### 使用pgAgent备份整个数据库
 整个数据库备份脚本
-```commandline
+1. vim pg_backup.config
+```sh
 ##############################
 ## POSTGRESQL BACKUP CONFIG ##
 ##############################
@@ -132,7 +134,7 @@ USERNAME=
  
 # This dir will be created if it doesn't exist.  This must be writable by the user the script is
 # running as.
-BACKUP_DIR=/home/backups/database/postgresql/
+BACKUP_DIR=/var/lib/postgresql/
  
 # List of strings to match against in database name, separated by space or comma, for which we only
 # wish to keep a backup of the schema, not the data. Any database names which contain any of these
@@ -163,10 +165,261 @@ WEEKS_TO_KEEP=5
 ######################################
 
 ```
+2. vim pg_backup.sh
+```sh
+#!/bin/bash
+ 
+###########################
+####### LOAD CONFIG #######
+###########################
+ 
+while [ $# -gt 0 ]; do
+        case $1 in
+                -c)
+                        if [ -r "$2" ]; then
+                                source "$2"
+                                shift 2
+                        else
+                                ${ECHO} "Unreadable config file \"$2\"" 1>&2
+                                exit 1
+                        fi
+                        ;;
+                *)
+                        ${ECHO} "Unknown Option \"$1\"" 1>&2
+                        exit 2
+                        ;;
+        esac
+done
+ 
+if [ $# = 0 ]; then
+        SCRIPTPATH=$(cd ${0%/*} && pwd -P)
+        source $SCRIPTPATH/pg_backup.config
+fi;
+ 
+###########################
+#### PRE-BACKUP CHECKS ####
+###########################
+ 
+# Make sure we're running as the required backup user
+if [ "$BACKUP_USER" != "" -a "$(id -un)" != "$BACKUP_USER" ]; then
+	echo "This script must be run as $BACKUP_USER. Exiting." 1>&2
+	exit 1;
+fi;
+ 
+ 
+###########################
+### INITIALISE DEFAULTS ###
+###########################
+ 
+if [ ! $HOSTNAME ]; then
+	HOSTNAME="localhost"
+fi;
+ 
+if [ ! $USERNAME ]; then
+	USERNAME="postgres"
+fi;
+ 
+ 
+###########################
+#### START THE BACKUPS ####
+###########################
+ 
+ 
+FINAL_BACKUP_DIR=$BACKUP_DIR"`date +\%Y-\%m-\%d`/"
+ 
+echo "Making backup directory in $FINAL_BACKUP_DIR"
+ 
+if ! mkdir -p $FINAL_BACKUP_DIR; then
+	echo "Cannot create backup directory in $FINAL_BACKUP_DIR. Go and fix it!" 1>&2
+	exit 1;
+fi;
+ 
+ 
+#######################
+### GLOBALS BACKUPS ###
+#######################
+ 
+echo -e "\n\nPerforming globals backup"
+echo -e "--------------------------------------------\n"
+ 
+if [ $ENABLE_GLOBALS_BACKUPS = "yes" ]
+then
+        echo "Globals backup"
+ 
+        if ! pg_dumpall -g -h "$HOSTNAME" -U "$USERNAME" | gzip > $FINAL_BACKUP_DIR"globals".sql.gz.in_progress; then
+                echo "[!!ERROR!!] Failed to produce globals backup" 1>&2
+        else
+                mv $FINAL_BACKUP_DIR"globals".sql.gz.in_progress $FINAL_BACKUP_DIR"globals".sql.gz
+        fi
+else
+	echo "None"
+fi
+ 
+ 
+###########################
+### SCHEMA-ONLY BACKUPS ###
+###########################
+ 
+for SCHEMA_ONLY_DB in ${SCHEMA_ONLY_LIST//,/ }
+do
+	SCHEMA_ONLY_CLAUSE="$SCHEMA_ONLY_CLAUSE or datname ~ '$SCHEMA_ONLY_DB'"
+done
+ 
+SCHEMA_ONLY_QUERY="select datname from pg_database where false $SCHEMA_ONLY_CLAUSE order by datname;"
+ 
+echo -e "\n\nPerforming schema-only backups"
+echo -e "--------------------------------------------\n"
+ 
+SCHEMA_ONLY_DB_LIST=`psql -h "$HOSTNAME" -U "$USERNAME" -At -c "$SCHEMA_ONLY_QUERY" postgres`
+ 
+echo -e "The following databases were matched for schema-only backup:\n${SCHEMA_ONLY_DB_LIST}\n"
+ 
+for DATABASE in $SCHEMA_ONLY_DB_LIST
+do
+	echo "Schema-only backup of $DATABASE"
+ 
+	if ! pg_dump -Fp -s -h "$HOSTNAME" -U "$USERNAME" "$DATABASE" | gzip > $FINAL_BACKUP_DIR"$DATABASE"_SCHEMA.sql.gz.in_progress; then
+		echo "[!!ERROR!!] Failed to backup database schema of $DATABASE" 1>&2
+	else
+		mv $FINAL_BACKUP_DIR"$DATABASE"_SCHEMA.sql.gz.in_progress $FINAL_BACKUP_DIR"$DATABASE"_SCHEMA.sql.gz
+	fi
+done
+ 
+ 
+###########################
+###### FULL BACKUPS #######
+###########################
+ 
+for SCHEMA_ONLY_DB in ${SCHEMA_ONLY_LIST//,/ }
+do
+	EXCLUDE_SCHEMA_ONLY_CLAUSE="$EXCLUDE_SCHEMA_ONLY_CLAUSE and datname !~ '$SCHEMA_ONLY_DB'"
+done
+ 
+FULL_BACKUP_QUERY="select datname from pg_database where not datistemplate and datallowconn $EXCLUDE_SCHEMA_ONLY_CLAUSE order by datname;"
+ 
+echo -e "\n\nPerforming full backups"
+echo -e "--------------------------------------------\n"
+ 
+for DATABASE in `psql -h "$HOSTNAME" -U "$USERNAME" -At -c "$FULL_BACKUP_QUERY" postgres`
+do
+	if [ $ENABLE_PLAIN_BACKUPS = "yes" ]
+	then
+		echo "Plain backup of $DATABASE"
+ 
+		if ! pg_dump -Fp -h "$HOSTNAME" -U "$USERNAME" "$DATABASE" | gzip > $FINAL_BACKUP_DIR"$DATABASE".sql.gz.in_progress; then
+			echo "[!!ERROR!!] Failed to produce plain backup database $DATABASE" 1>&2
+		else
+			mv $FINAL_BACKUP_DIR"$DATABASE".sql.gz.in_progress $FINAL_BACKUP_DIR"$DATABASE".sql.gz
+		fi
+	fi
+ 
+	if [ $ENABLE_CUSTOM_BACKUPS = "yes" ]
+	then
+		echo "Custom backup of $DATABASE"
+ 
+		if ! pg_dump -Fc -h "$HOSTNAME" -U "$USERNAME" "$DATABASE" -f $FINAL_BACKUP_DIR"$DATABASE".custom.in_progress; then
+			echo "[!!ERROR!!] Failed to produce custom backup database $DATABASE" 1>&2
+		else
+			mv $FINAL_BACKUP_DIR"$DATABASE".custom.in_progress $FINAL_BACKUP_DIR"$DATABASE".custom
+		fi
+	fi
+ 
+done
+ 
+echo -e "\nAll database backups complete!"
+
+```
+
+3. 赋予执行权限
+```sh
+chmod +x pg_backup.sh
+```
+4. pgAdmin中添加执行，类型是批处理，内容指向脚本
+```sh
+/var/lib/postgresql/pg_backup.sh
+```
+
+###  pgAgent开机自启动
+1. 建立脚本/etc/init.d/pgagent
+内容
+```shell
+#!/bin/bash
+#
+# /etc/init.d/pgagent
+#
+ 
+test -f /lib/lsb/init-functions || exit 1
+. /lib/lsb/init-functions
+ 
+PIDFILE=/var/run/pgagent.pid
+prog=PGAgent
+PGAGENTDIR=/usr/bin
+PGAGENTOPTIONS="hostaddr=127.0.0.1 dbname=postgres user=postgres password=pgdbyto1"
+ 
+start() {
+ log_begin_msg "Starting PGAgent"
+ start-stop-daemon -b --start --quiet --exec "$PGAGENTDIR/pgagent" --name pgagent --startas "$PGAGENTDIR/pgagent" -- $PGAGENTOPTIONS || log_end_msg 1
+ log_end_msg 0
+}
+ 
+stop() {
+ log_begin_msg "Stopping PGAgent"
+ start-stop-daemon --stop --quiet -n pgagent || log_end_msg 1
+ log_end_msg 0
+}
+ 
+#
+# See how we were called.
+#
+case "$1" in
+ start)
+ start
+ ;;
+ stop)
+ stop
+ ;;
+ reload|restart)
+ stop
+ start
+ RETVAL=$?
+ ;;
+ status)
+ status /usr/bin/pgagent
+ RETVAL=$?
+ ;;
+ *)
+ log_success_msg "Usage: $0 {start|stop|restart|reload|status}"
+ exit 1
+esac
+
+```
+
+2. 改变可执行
+```sh
+sudo chmod +x /etc/init.d/pgagent
+```
+3. 添加启动
+```sh
+sudo  update-rc.d pgagent defaults
+```
+
+4. 命令使用
+```sh
+/etc/init.d/pgagent start
+/etc/init.d/pgagent stop
+```
+
+参考文章
+[How to take Automatic SQL Database Backup ](http://technobytz.com/automatic-sql-database-backup-postgres.html)
+
+
+
 卸载pgAgent
 ```sh
 sudo apt-get remove pgagent
 ```
+
+
 
 ### And an ordered list:
 1.  Item one
