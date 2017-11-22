@@ -174,6 +174,8 @@ server {
 浏览器访问 http://Server_IP
 
 ### 使用nginx日志里面会有报错
+后来认为于精简模块无关，内网环境下继续观察这个问题
+
 2017-11-14 05:54:36,216 877 WARNING admin odoo.http: No CSRF validation token provided for path '/'
 
 Odoo URLs are CSRF-protected by default (when accessed with unsafe

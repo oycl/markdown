@@ -61,7 +61,7 @@
 # apt-get install postgresql-9.5 postgresql-server-dev-9.5
 ```
 
-> 安装完postgresql数据库后，数据库会自动创建postgres系统用户，密码为随机，home目录为/var/lib/postgresql
+> 安装完postgresql数据库后，数据库会自动创建postgres系统用户，密码为随机，设为pgyto1，home目录为/var/lib/postgresql
 > 在数据库内也会创建postgres数据库用户，可以更改这个用户的密码，然后创建数据库用户odoo并设置密码
 
 
