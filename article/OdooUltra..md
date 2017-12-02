@@ -93,6 +93,7 @@ part和assemble是一对多的关系
 ```
 在part端我们使用了一个One2many，这个关键字在数据库中没什么作用，但是在一对多的显示中非常有用
 看一下part模型的view，这里面使用了father_no_ids后就可以使用assemble中的字段了
+因为要显示的是装配表，零件表的一个件号去对应装配表的上级，然后将下级的特性显示出来
 
 ```xml
                         <page string="装配表">
@@ -114,7 +115,37 @@ part和assemble是一对多的关系
                         </page>
 ```
 
+### 计算字段的使用
+在上面这个view中，child_no,number,group,date_changed,remark是装配表自己的内容
+part_name,sheer_no,type_no,important_no,designer_no是计算字段
 
+```python
+    part_name = fields.Text(string=u"零件名称", compute='_get_name')
+    sheet_no = fields.Many2one('m.sheet', string=u"图幅", compute='_get_sheet')
+
+
+    # 装配表使用
+    @api.depends('child_no.part_name')
+    def _get_name(self):
+        for record in self:
+            record.part_name = record.child_no.part_name
+
+    @api.depends('child_no.sheet_no')
+    def _get_sheet(self):
+        for record in self:
+            record.sheet_no = record.child_no.sheet_no
+
+```
+这里我们看到,record 代表在这个装配表显示的每一条记录，其名字就是通过记录下级件号得到的名字
+而图幅也是通过记录下级件号得到的图幅
+这里面不用担心如part_name代表一个普通text字段，还是如sheet_no仅代表many2one的一个integer
+显示时统一使用值
+
+
+action 里面，这种组合，只有tree，不能进入form
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+       
 ### And an ordered list:
 1.  Item one
 1.  Item two

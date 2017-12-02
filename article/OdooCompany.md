@@ -72,6 +72,17 @@ base.user_D018,卢双,lushuang,zh_CN,Asia/Shanghai
 base.user_D019,陈彤,chentong,zh_CN,Asia/Shanghai
 base.user_D020,于广会,yuguanghui,zh_CN,Asia/Shanghai
 ```
+D001研发，姓+电话，666
+G001工艺，1111
+X001销售，1111
+Z001质量，zl111
+S001生产，sc111
+K001库房，ku111
+C001采购，cg111
+
+
+
+
 ### 4，导入最新原数据库数据
 1. 原数据库改密码封存，开始导入数据
 2. 首次配置需要注意装配时间和零件时间,取上下级零件时间大者为装配时间,不然所有装配时间变成当前时间
