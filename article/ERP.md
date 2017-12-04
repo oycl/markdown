@@ -7,7 +7,6 @@
 关于BOM
 一定要有两套BOM，设计BOM和工艺BOM，设计BOM给工艺后，工艺要做出调整，制作自己的BOM，ERP拿工艺BOM计划生产
 
-
 PDM专攻文件管理，文件应该是有版本号的，可以保存历史版本。这个文件就是图纸和文档
 
 
@@ -23,6 +22,7 @@ ERP
 实施ERP的难点在于如何改变企业原有的习惯
 无论是设计，工艺，生产，采购，库房
 
+## 三，标题
 
 ### 三，标题
 
@@ -80,3 +80,4 @@ end
 ![](https://guides.github.com/activities/hello-world/branching.png)
 
 [back](../)
+

@@ -1,6 +1,15 @@
-# 题目
+# 读书笔记
 
-## 一，标题
+## Odoo 10 Development Essentials
+## Credits
+## Foreword
+## About the Author
+## About the Reviewer
+## www.PacktPub.com
+### Why subscribe? 
+## Preface
+### What this book covers 
+### What you need for this book 
 ### 三，标题
 
 ### And an ordered list:
