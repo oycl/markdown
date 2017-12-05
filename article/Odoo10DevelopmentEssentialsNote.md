@@ -42,6 +42,13 @@
 
 ### What you need for this book
 
+书中推荐在虚拟机中的Ubuntu系统中安装Odoo，然后使用自有的系统和软件编程
+，具有Python或者XML知识最好，还会使用Linux的命令行
+
+### Who this book is for
+
+目标是拥有商业应用程序开发经验的程序员，最好有MVC设计模式和python语言知识，熟悉HTML，CSS，和JavaScript更有帮助。
+
 ### 三，标题
 
 ### And an ordered list:
