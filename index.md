@@ -21,6 +21,8 @@
 ## 软件开发
 [001，ultraV3.0的实现](/article/OdooUltra.md)
 ------
+[002，Odoo 10 Development Essentials读书笔记](/article/Odoo10DevelopmentEssentialsNote.md)
+------
 
 ## ERP原理
 [001，ERP原理](/article/ERP.md)
