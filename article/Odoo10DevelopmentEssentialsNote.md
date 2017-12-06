@@ -77,7 +77,7 @@ Odoo is built using the Python programming language,and it uses the PostgreSQL d
 
 #### Creating a user account for Odoo
 
-在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装中的##1](OdooInstall.md#3，安装postgresql数据库)
+在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装](OdooInstall.md#test-eng lish)
 
 ### Installing Odoo from the source
 

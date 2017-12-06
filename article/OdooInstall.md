@@ -4,12 +4,16 @@
 
 ## 1，首先创建一个odoo用户，参照之前的分区方案，把odoo放在home中
 ```sh
-# useradd -m -d /home/odoo -U -s /bin/bash odoo 
+# useradd -m -d /home/odoo -U -s /bin/bash odoo
 ```
 > -m option ensures its home directory is created
+>
 > -d参数指定user的home目录
+>
 > -s参数指定使用的shell
-> 没有使用 `-g sudo` adds it to the sudoers list so it can run commands as root
+>
+> `-g sudo` adds it to the sudoers list so it can run commands as root
+>
 > -U,Create a group with the same name as the user, and add the user to this group.
 
 
@@ -60,7 +64,7 @@
 # pip install virtualenv
 ```
 ## 3，安装postgresql数据库
-
+## test-eng lish
 > ubuntu16.04的postgresql是9.5的, 建议开发和部署使用相同版本。
 > 需要安装不同版本的postgresql可以参考https://devecho.com/v/postgresql-basic/
 
