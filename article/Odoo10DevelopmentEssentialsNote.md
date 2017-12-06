@@ -71,16 +71,54 @@
 ## 1,Getting Started with Odoo Development
 Odoo is built using the Python programming language,and it uses the PostgreSQL database for data storage;these are the two main requirements of an Odoo host.
 ### setting up a host for the Odoo server
+
 #### Provision for a Debian host
 
 本书不建议在Windows下搭建环境，但是现实中在pycharm中调试有更高的效率
 
 #### Creating a user account for Odoo
 
-在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装](OdooInstall.md#3安装postgresql数据库)
+在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装](OdooInstall.md#1创建odoo用户)
 
 ### Installing Odoo from the source
 
+首先更新一下系统，详见[Linux系统环境配置](SetupLinuxEnvironment.md#5update)
+安装必要软件包，详见[Linux系统环境配置](SetupLinuxEnvironment.md#2安装vim,unzip,git,npm)
+
+### Initializing a new Odoo database
+
+#### Managing your databases
+
+### A word about Odoo product versions
+
+### More server configuration options
+
+#### Odoo server configuration files
+
+#### Changing the listening port
+
+#### The database filter option
+
+#### Managing server log messages
+
+### Developing from your workstation
+
+#### Using a Linux text editor
+
+#### Installing and configuring Samba
+
+#### Activating the developer tools
+
+
+### Installing third-party modules
+
+#### Finding community modules
+
+#### Configuring the addons path
+
+#### Updating the apps list
+
+### Summary
 
 
 

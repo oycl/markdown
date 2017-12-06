@@ -1,6 +1,6 @@
 # Linux系统环境配置
 
-## 一，开启root用户
+## 1，开启root用户
 有了root用户比较方便，可以少输入好多'sudo'，避免普通用户不在sudor名单的问题。
 但是在做删除的时候头脑一定要清醒
 ```sh
@@ -10,13 +10,18 @@ $ sudo passwd root
 然后输入密码
 测试`su root`
 
-## 二，安装vim，unzip
+## 2，安装vim,unzip,git,npm
+
+> 已经有了就不用安装了
+
 ```sh
 # apt-get install vim
 # apt-get install unzip
+# apt-get install git
+# apt-get install npm
 ```
 
-## 三，安装openssh server
+## 3，安装openssh server
 1，管理服务器需要远程连接，有的服务器已经装好就不需要这一步
 ```sh
 # apt-get install openssh-server
@@ -40,7 +45,7 @@ ClientAliveCountMax表示服务器发出请求后客户端没有响应的次数�
 # service ssh restart
 ```
 
-## 四，设置固定IP地址
+## 4，设置固定IP地址
 ```sh
 # vim /etc/network/interfaces
 ```
@@ -60,7 +65,7 @@ dns-nameservers 202.97.224.69
 ```
 在虚拟机上的结果是原IP和新IP都好使，重启系统后只有新IP生效
 
-## 五，update
+## 5，update
 开始前先update ，是同步 /etc/apt/sources.list 和 /etc/apt/sources.list.d 中列出的源的索引，这样才能获取到最新的软件包
 ```sh
 # apt-get update
@@ -70,7 +75,7 @@ dns-nameservers 202.97.224.69
 # apt-get upgrade 
 ```
 
-## 六，设置时区，时间
+## 6，设置时区，时间
 ```sh
 # vim .profile
 ```

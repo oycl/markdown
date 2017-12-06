@@ -27,6 +27,7 @@
 暂定odoo***1
 
 ## 2，安装python及依赖库
+
 ### python2.7
 ```sh
 # apt-get install python
@@ -102,6 +103,7 @@ $ exit
 ```
 
 ## 5，安装打印程序wkhtmltopdf和中文字体
+
 ### wkhtmltopdf
 
 > ubuntu 14~16 （trusty代表1404的版本号）
