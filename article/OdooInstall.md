@@ -6,6 +6,13 @@
 ```sh
 # useradd -m -d /home/odoo -U -s /bin/bash odoo 
 ```
+> -m option ensures its home directory is created
+> -d参数指定user的home目录
+> -s参数指定使用的shell
+> 没有使用 `-g sudo` adds it to the sudoers list so it can run commands as root
+> -U,Create a group with the same name as the user, and add the user to this group.
+
+
 设置密码
 ```sh
 # passwd odoo

@@ -49,7 +49,40 @@
 
 目标是拥有商业应用程序开发经验的程序员，最好有MVC设计模式和python语言知识，熟悉HTML，CSS，和JavaScript更有帮助。
 
-### 三，标题
+### Conventions
+
+新术语和重要的词加粗，代码作为一个块，Shell命令前有$
+
+### Reader feedback
+
+读者反馈
+
+### Customer support
+
+读者支持
+
+#### Downloading the example code
+#### Downloading the color images of this book
+#### Errata
+#### Piracy
+#### Questions
+
+
+## 1,Getting Started with Odoo Development
+Odoo is built using the Python programming language,and it uses the PostgreSQL database for data storage;these are the two main requirements of an Odoo host.
+### setting up a host for the Odoo server
+#### Provision for a Debian host
+
+本书不建议在Windows下搭建环境，但是现实中在pycharm中调试有更高的效率
+
+#### Creating a user account for Odoo
+
+在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装中的##1](OdooInstall.md#1，首先创建一个odoo用户，参照之前的分区方案，把odoo放在home中)
+
+### Installing Odoo from the source
+
+
+
 
 ### And an ordered list:
 1.  Item one
