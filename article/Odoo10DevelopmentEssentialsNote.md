@@ -67,9 +67,9 @@
 #### Piracy
 #### Questions
 
-
 ## 1,Getting Started with Odoo Development
 	Odoo is built using the Python programming language,and it uses the PostgreSQL database for data storage;these are the two main requirements of an Odoo host.
+
 ### setting up a host for the Odoo server
 
 #### Provision for a Debian host
@@ -120,16 +120,39 @@ them from the command line, so we will learn how to do this. Now press Ctrl + C 
 to stop the Odoo server and get back to the command prompt.
 
 ### Initializing a new Odoo database
-
+```sh
+createdb demo
+~/odoo-dev/odoo/odoo-bin -d demo --db-filter=^demo$
+```
 #### Managing your databases
+```sh
+# sudo createuser --superuser ${whoami}
+# createdb --template=demo demo-test
+# psql -l
+# dropdb demo-test
+```
+> the default administartor account is `admin` with its password `admin`
 
 ### A word about Odoo product versions
+	Odoo10不能使用之前版本软件建立的数据库
+	模块也遵循这个原则，下载模块的时候就要注意版本
+	9.0和10.0版本要保持`API Stable`,这样用户模块就不会因为不兼容的改变而不能运行
+	master分支将会产生下一个版本，但要注意到下一个版本已经不是`API Stable`
 
 ### More server configuration options
+	> ./odoo-bin --help 没有经过安装，应该不能使用
 
 #### Odoo server configuration files
+	Odoo默认使用`.odoorc`文件作为配置文件，位置在home目录。
+	我们使用conf文件，参照[Odoo项目配置](OdooConfig.md)
+	可以使用save命令产生.odoorc文件
+	```sh
+	$ ~/odoo-dev/odoo/odoo-bin --save --stop-after-init #save configuration to file
+	```
+	还可以在启动的时候使用`-c`指定配置文件，我们就是指定`odoo10.conf`作为配置文件
 
 #### Changing the listening port
+	在多实例情况下，可以使用`xmlrpc_port`配置不同的端口提供服务
 
 #### The database filter option
 

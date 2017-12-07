@@ -31,7 +31,7 @@
 (venv) odoo@$ vim /home/odoo/odoo10/odoo10.conf
 ```
 
-### 在conf文件中输入
+### conf文件内容
 ```sh
 [options]
 db_template = template0
@@ -59,7 +59,7 @@ addons_path = /home/odoo/odoo10/custom-addons,/home/odoo/odoo10/addons
 /home/odoo/odoo10/venv/lib/python2.7/site-packages/odoo-10.0.post20170408-py2.7.egg/odoo/addons
 可以不配置addons_path参数
 
-### 手动启动服务器测试
+### 手动启动服务器
 ```sh
 # su odoo
 $ source venv/bin/activate
