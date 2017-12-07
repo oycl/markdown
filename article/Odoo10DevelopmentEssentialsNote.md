@@ -26,40 +26,40 @@
 
 ### What this book covers
 
-1. Chapter 1,Odoo开发环境安装，如何管理Odoo服务器实例
-2. Chapter 2,建立你的第一个Odoo应用
-3. Chapter 3,继承-扩展现有的应用
-4. Chapter 4,模块数据-扩展标识符概念和数据导入导出
-5. Chapter 5,模型-组织应用数据
-6. Chapter 6,视图-设计用户界面
-7. Chapter 7,ORM应用逻辑-支持商业流程
-8. Chapter 8,书写测试和排错代码
-9. Chapter 9,Qweb和Kanban视图
-10. Chapter10,建立QWeb报告
-11. Chapter11,建立Website前端特性
-12. Chapter12,扩展API-和其它系统集成
-13. Chapter13,部署检查清单
+* Chapter 1,Odoo开发环境安装，如何管理Odoo服务器实例
+* Chapter 2,建立你的第一个Odoo应用
+* Chapter 3,继承-扩展现有的应用
+* Chapter 4,模块数据-扩展标识符概念和数据导入导出
+* Chapter 5,模型-组织应用数据
+* Chapter 6,视图-设计用户界面
+* Chapter 7,ORM应用逻辑-支持商业流程
+* Chapter 8,书写测试和排错代码
+* Chapter 9,Qweb和Kanban视图
+* Chapter10,建立QWeb报告
+* Chapter11,建立Website前端特性
+* Chapter12,扩展API-和其它系统集成
+* Chapter13,部署检查清单
 
 ### What you need for this book
 
-书中推荐在虚拟机中的Ubuntu系统中安装Odoo，然后使用自有的系统和软件编程
+	书中推荐在虚拟机中的Ubuntu系统中安装Odoo，然后使用自有的系统和软件编程
 ，具有Python或者XML知识最好，还会使用Linux的命令行
 
 ### Who this book is for
 
-目标是拥有商业应用程序开发经验的程序员，最好有MVC设计模式和python语言知识，熟悉HTML，CSS，和JavaScript更有帮助。
+	目标是拥有商业应用程序开发经验的程序员，最好有MVC设计模式和python语言知识，熟悉HTML，CSS，和JavaScript更有帮助。
 
 ### Conventions
 
-新术语和重要的词加粗，代码作为一个块，Shell命令前有$
+	新术语和重要的词加粗，代码作为一个块，Shell命令前有$
 
 ### Reader feedback
 
-读者反馈
+	读者反馈
 
 ### Customer support
 
-读者支持
+	读者支持
 
 #### Downloading the example code
 #### Downloading the color images of this book
@@ -69,40 +69,35 @@
 
 
 ## 1,Getting Started with Odoo Development
-Odoo is built using the Python programming language,and it uses the PostgreSQL database for data storage;these are the two main requirements of an Odoo host.
+	Odoo is built using the Python programming language,and it uses the PostgreSQL database for data storage;these are the two main requirements of an Odoo host.
 ### setting up a host for the Odoo server
 
 #### Provision for a Debian host
 
-本书不建议在Windows下搭建环境，但是现实中在pycharm中调试有更高的效率
+	本书不建议在Windows下搭建环境，但是现实中在pycharm中调试有更高的效率
 
 #### Creating a user account for Odoo
 
-在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装](OdooInstall.md#1创建odoo用户)
+	在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装](OdooInstall.md#1创建odoo用户)
 
 ### Installing Odoo from the source
 
 1. 更新一下系统
-
 > 详见[Linux系统环境配置](SetupLinuxEnvironment.md#2update)
 
 2. 安装必要软件包
-
-> 详见[Linux系统环境配置](SetupLinuxEnvironment.md#3安装vim,unzip,git,npm,sudo)
+> 详见[Linux系统环境配置](SetupLinuxEnvironment.md#3安装vimunzipgitnpmsudo)
 
 3. 安装nodejs
-
 > 参照[Odoo安装](OdooInstall.md#4安装nodejs)，这里我们使用的指令有所不同
 
-```sh
-sudo ln -s /usr/bin/nodejs /usr/bin/node  # call node runs nodejs
-sudo npm install -g less less-plugin-clean-css  # Install less compiler
-```
-
-> 从9.0版本开始Odoo web client需要less Css 预处理，为了安装这个我们需要Node.js和npm
+	```sh
+	sudo ln -s /usr/bin/nodejs /usr/bin/node  # call node runs nodejs
+	sudo npm install -g less less-plugin-clean-css  # Install less compiler
+	```
+	> 从9.0版本开始Odoo web client需要less Css 预处理，为了安装这个我们需要Node.js和npm
 
 4. 安装odoo
-
 ```sh
 # Install Odoo from source
 mkdir ~/odoo-dev  # Create a directory to work in
@@ -112,12 +107,11 @@ git clone https://github.com/odoo/odoo.git -b 10.0 --depth=1  # Get Odoo source 
 ./odoo/setup/setup_dev.py setup_pg  # Create PostgreSQL superuser for this Unix user
 ```
 
-> 与我们手动的安装方式不同，上面的命令使用了python来运行shell命令
-
-> 这里是我们的手动安装方法：[Odoo安装](OdooInstall.md#6安装odoo)
+	> 与我们手动的安装方式不同，上面的命令使用了python来运行shell命令
+	>
+	> 这里是我们的手动安装方法：[Odoo安装](OdooInstall.md#6安装odoo)
 
 5. 运行
-
 ```sh
 $~/odoo-dev/odoo/odoo-bin
 ```

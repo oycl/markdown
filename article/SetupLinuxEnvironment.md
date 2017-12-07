@@ -56,27 +56,22 @@ npm config set registry=http://registry.npmjs.org
 # apt-get install openssh-server
 ```
 2. 允许root用户登录，可以对 openssh server进行配置
-
 ```sh
 # vi /etc/ssh/sshd_config
 ```
-
 找到`PermitRootLogin no`一行，改为`PermitRootLogin yes`
 
 3. 防止连接中断
-
-在/etc/ssh/sshd_config最后一行增加`ClientAliveInterval 60`, 
+	* 在/etc/ssh/sshd_config最后一行增加`ClientAliveInterval 60`, 
 ClientAliveInterval指定了服务器端向客户端请求消息的时间间隔, 默认是0, 不发送。
 而ClientAliveInterval 60表示每分钟发送一次, 然后客户端响应, 这样就保持长连接了。
-这里比较怪的地方是：不是客户端主动发起保持连接的请求(如FTerm, CTerm等),而是需要服务器先主动。
-另外,至于ClientAliveCountMax(这个值我没有发现), 使用默认值3即可。
-ClientAliveCountMax表示服务器发出请求后客户端没有响应的次数达到一定值, 就自动断开。正常情况下, 客户端不会不响应。
+	* 这里比较怪的地方是：不是客户端主动发起保持连接的请求(如FTerm, CTerm等),而是需要服务器先主动。
+	* 另外,至于ClientAliveCountMax(这个值我没有发现), 使用默认值3即可。ClientAliveCountMax表示服务器发出请求后客户端没有响应的次数达到一定值, 就自动断开。正常情况下, 客户端不会不响应。
 
-4. 然后重启 openssh server
-
+4. 重启 openssh server
 ```sh
 # service ssh restart
-```
+``` 
 
 ## 5，设置固定IP地址
 
