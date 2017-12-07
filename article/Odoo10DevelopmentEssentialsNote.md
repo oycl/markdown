@@ -26,19 +26,19 @@
 
 ### What this book covers
 
-* Chapter 1,Odoo开发环境安装，如何管理Odoo服务器实例
-* Chapter 2,建立你的第一个Odoo应用
-* Chapter 3,继承-扩展现有的应用
-* Chapter 4,模块数据-扩展标识符概念和数据导入导出
-* Chapter 5,模型-组织应用数据
-* Chapter 6,视图-设计用户界面
-* Chapter 7,ORM应用逻辑-支持商业流程
-* Chapter 8,书写测试和排错代码
-* Chapter 9,Qweb和Kanban视图
-* Chapter10,建立QWeb报告
-* Chapter11,建立Website前端特性
-* Chapter12,扩展API-和其它系统集成
-* Chapter13,部署检查清单
+* Chapter 1,[Odoo开发环境安装，如何管理Odoo服务器实例](#1getting-started-with-odoo-development)
+* Chapter 2,[建立你的第一个Odoo应用](#)
+* Chapter 3,[继承-扩展现有的应用](#)
+* Chapter 4,[模块数据-扩展标识符概念和数据导入导出](#)
+* Chapter 5,[模型-组织应用数据](#)
+* Chapter 6,[视图-设计用户界面](#)
+* Chapter 7,[ORM应用逻辑-支持商业流程](#)
+* Chapter 8,[书写测试和排错代码](#)
+* Chapter 9,[Qweb和Kanban视图](#)
+* Chapter10,[建立QWeb报告](#)
+* Chapter11,[建立Website前端特性](#)
+* Chapter12,[扩展API-和其它系统集成](#)
+* Chapter13,[部署检查清单](#)
 
 ### What you need for this book
 
