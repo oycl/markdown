@@ -150,8 +150,6 @@ https://stackoverflow.com/questions/9604625/wkhtmltopdf-cannot-connect-to-x-serv
 > nightly包和github包的目录结构略有不同，比如根目录无odoo-bin等脚本，还有全部模块都放到了一起。
 适合部署安装用，开发仍然推荐使用git的。
 > 但因为我们使用E版，希望E版模块和C版自带模块区分开，所以我们部署也用github包，这里存有一个疑问
-：？用阿里云做测试，使用github包里面的setup.py进行安装，在venv环境下，看看安装完后具体位置
-说白了就是比较nightly包的setup.py和github包的setup.py具体内容
 
 ### 建立安装目录
 ```sh
@@ -211,6 +209,11 @@ odoo@$ source venv/bin/activate
 (venv) odoo@$ git clone https://github.com/odoo/odoo.git --depth 1 --branch 10.0 --single-branch odoo10
 ```
 
+> -branch 10.0:option tells Git to explicitly download the 10.0 branch of Odoo
+>
+> -depth 1:option tells Git to download only the last revision,instead of the full change history,make
+> the download smaller and faster.
+>
 > 也可以在Windows里面下载odoo-10.0.zip，解压缩。然后使用odoo用户名登录WinSCP软件传入所有文件到/home/odoo/odoo10中
 
 其中比较重要的几个文件和目录分别是：

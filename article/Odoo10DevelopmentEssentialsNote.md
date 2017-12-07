@@ -82,8 +82,48 @@ Odoo is built using the Python programming language,and it uses the PostgreSQL d
 
 ### Installing Odoo from the source
 
-首先更新一下系统，详见[Linux系统环境配置](SetupLinuxEnvironment.md#5update)
-安装必要软件包，详见[Linux系统环境配置](SetupLinuxEnvironment.md#2安装vim,unzip,git,npm)
+1. 更新一下系统
+
+> 详见[Linux系统环境配置](SetupLinuxEnvironment.md#2update)
+
+2. 安装必要软件包
+
+> 详见[Linux系统环境配置](SetupLinuxEnvironment.md#3安装vim,unzip,git,npm,sudo)
+
+3. 安装nodejs
+
+> 参照[Odoo安装](OdooInstall.md#4安装nodejs)，这里我们使用的指令有所不同
+
+```sh
+sudo ln -s /usr/bin/nodejs /usr/bin/node  # call node runs nodejs
+sudo npm install -g less less-plugin-clean-css  # Install less compiler
+```
+
+> 从9.0版本开始Odoo web client需要less Css 预处理，为了安装这个我们需要Node.js和npm
+
+4. 安装odoo
+
+```sh
+# Install Odoo from source
+mkdir ~/odoo-dev  # Create a directory to work in
+cd ~/odoo-dev  # Go into our work directory
+git clone https://github.com/odoo/odoo.git -b 10.0 --depth=1  # Get Odoo source code
+./odoo/setup/setup_dev.py setup_deps  # Install Odoo system dependencies
+./odoo/setup/setup_dev.py setup_pg  # Create PostgreSQL superuser for this Unix user
+```
+
+> 与我们手动的安装方式不同，上面的命令使用了python来运行shell命令
+
+> 这里是我们的手动安装方法：[Odoo安装](OdooInstall.md#6安装odoo)
+
+5. 运行
+
+```sh
+$~/odoo-dev/odoo/odoo-bin
+```
+> As a developer, we will need to work with several databases, so it's more convenient to create
+them from the command line, so we will learn how to do this. Now press Ctrl + C in the terminal
+to stop the Odoo server and get back to the command prompt.
 
 ### Initializing a new Odoo database
 
