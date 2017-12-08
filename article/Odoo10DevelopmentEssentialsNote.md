@@ -1,28 +1,29 @@
 # Odoo 10 Development Essentials Notes
 
 ## Odoo 10 Development Essentials
-	权利声明，免责声明，商标说明
+权利声明，免责声明，商标说明
 
 ## Credits
-	职责分工表
+职责分工表
 
 ## Foreword
-	Odoo特性：极简化，模块化，可扩展，可伸缩
-	最新特性：Website特性，和第三方系统的集成机制
+1. Odoo特性：极简化，模块化，可扩展，可伸缩
+
+1. 最新特性：Website特性，和第三方系统的集成机制
 
 ## About the Author
-	作者
+作者
 
 ## About the Reviewer
-	评论者
+评论者
 
 ## www.PacktPub.com
 
 ### Why subscribe?
-	出版网站和订阅优惠
+出版网站和订阅优惠
 
 ## Preface
-	前言，odoo介绍，本书介绍，章节安排
+前言，odoo介绍，本书介绍，章节安排
 
 ### What this book covers
 
@@ -42,24 +43,24 @@
 
 ### What you need for this book
 
-	书中推荐在虚拟机中的Ubuntu系统中安装Odoo，然后使用自有的系统和软件编程
+书中推荐在虚拟机中的Ubuntu系统中安装Odoo，然后使用自有的系统和软件编程
 ，具有Python或者XML知识最好，还会使用Linux的命令行
 
 ### Who this book is for
 
-	目标是拥有商业应用程序开发经验的程序员，最好有MVC设计模式和python语言知识，熟悉HTML，CSS，和JavaScript更有帮助。
+目标是拥有商业应用程序开发经验的程序员，最好有MVC设计模式和python语言知识，熟悉HTML，CSS，和JavaScript更有帮助。
 
 ### Conventions
 
-	新术语和重要的词加粗，代码作为一个块，Shell命令前有$
+新术语和重要的词加粗，代码作为一个块，Shell命令前有$
 
 ### Reader feedback
 
-	读者反馈
+读者反馈
 
 ### Customer support
 
-	读者支持
+读者支持
 
 #### Downloading the example code
 #### Downloading the color images of this book
@@ -68,17 +69,17 @@
 #### Questions
 
 ## 1,Getting Started with Odoo Development
-	Odoo is built using the Python programming language,and it uses the PostgreSQL database for data storage;these are the two main requirements of an Odoo host.
+Odoo is built using the Python programming language,and it uses the PostgreSQL database for data storage;these are the two main requirements of an Odoo host.
 
 ### setting up a host for the Odoo server
 
 #### Provision for a Debian host
 
-	本书不建议在Windows下搭建环境，但是现实中在pycharm中调试有更高的效率
+本书不建议在Windows下搭建环境，但是现实中在pycharm中调试有更高的效率
 
 #### Creating a user account for Odoo
 
-	在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装](OdooInstall.md#1创建odoo用户)
+在root下工作被认为是一个坏习惯。据说，Odoo server 不会被root启动。但是，以我的实际使用效果看，没有root权限会很烦。具体内容详见[Odoo安装](OdooInstall.md#1创建odoo用户)
 
 ### Installing Odoo from the source
 
@@ -134,38 +135,50 @@ createdb demo
 > the default administartor account is `admin` with its password `admin`
 
 ### A word about Odoo product versions
-	Odoo10不能使用之前版本软件建立的数据库
-	模块也遵循这个原则，下载模块的时候就要注意版本
-	9.0和10.0版本要保持`API Stable`,这样用户模块就不会因为不兼容的改变而不能运行
-	master分支将会产生下一个版本，但要注意到下一个版本已经不是`API Stable`
+Odoo10不能使用之前版本软件建立的数据库。模块也遵循这个原则，下载模块的时候就要注意版本
+
+9.0和10.0版本要保持`API Stable`,这样用户模块就不会因为不兼容的改变而不能运行
+
+master分支将会产生下一个版本，但要注意到下一个版本已经不是`API Stable`
 
 ### More server configuration options
-	> ./odoo-bin --help 没有经过安装，应该不能使用
+	$./odoo-bin --help 没有经过安装，应该不能使用
 
 #### Odoo server configuration files
-	Odoo默认使用`.odoorc`文件作为配置文件，位置在home目录。
-	我们使用conf文件，参照[Odoo项目配置](OdooConfig.md)
-	可以使用save命令产生.odoorc文件
+Odoo默认使用`.odoorc`文件作为配置文件，位置在home目录。
+
+我们使用conf文件，参照：[Odoo项目配置](OdooConfig.md)。可以使用save命令产生.odoorc文件
 	```sh
 	$ ~/odoo-dev/odoo/odoo-bin --save --stop-after-init #save configuration to file
 	```
-	还可以在启动的时候使用`-c`指定配置文件，我们就是指定`odoo10.conf`作为配置文件
+还可以在启动的时候使用`-c`指定配置文件，我们就是指定`odoo10.conf`作为配置文件
 
 #### Changing the listening port
 	在多实例情况下，可以使用`xmlrpc_port`配置不同的端口提供服务
 
 #### The database filter option
-
+	For example, to allow only the demo database we would use this command:
+	```sh
+	$ ~/odoo-dev/odoo/odoo-bin --db-filter=^demo$
+	```
+	
 #### Managing server log messages
+参照[Odoo项目配置](OdooConfig.md#conf文件内容)
 
+Finally, the --dev=all option will bring up the Python debugger (pdb ) when an exception is
+raised. It's useful to do a post-mortem analysis of a server error. Note that it doesn't have any effect
+on the logger verbosity. More details on the Python debugger commands can be found at [here.](
+https://docs.python.org/2/library/pdb.html#debugger-commands .)
 ### Developing from your workstation
 
 #### Using a Linux text editor
-
 #### Installing and configuring Samba
+参照[搭建Samba和Ftp文件服务](OdooSambaFtp.md#samba)
 
 #### Activating the developer tools
+The second option, Activate the developer mode (with assets) , also disables the minification of JavaScript and CSS used by the web client, making it easier to debug client-side behavior:
 
+> The Technical menu option allows us to inspect and edit all the Odoo configurations stored in the database, from user interface to security and other system parameters. You will be learning more about many of these throughout the book.
 
 ### Installing third-party modules
 
