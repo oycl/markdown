@@ -115,24 +115,27 @@ git clone https://github.com/odoo/odoo.git -b 10.0 --depth=1  # Get Odoo source 
 5. 运行
 ```sh
 $~/odoo-dev/odoo/odoo-bin
-```
 > As a developer, we will need to work with several databases, so it's more convenient to create
 them from the command line, so we will learn how to do this. Now press Ctrl + C in the terminal
 to stop the Odoo server and get back to the command prompt.
 
 ### Initializing a new Odoo database
 ```sh
+sudo createuser --superuser ${whoami}
 createdb demo
-~/odoo-dev/odoo/odoo-bin -d demo --db-filter=^demo$
+~/odoo-dev/odoo/odoo-bin -d demo
 ```
+> To initialize this database with the Odoo data schema,we should run odoo on the empty database using the `-d` option
+> This will take acouple of mimutes to initialize a demo database, and it will end with an INFO log message,**Moudules loaded**.
+> the default administartor account is `admin` with its password `admin`
+
 #### Managing your databases
 ```sh
-# sudo createuser --superuser ${whoami}
 # createdb --template=demo demo-test
 # psql -l
 # dropdb demo-test
 ```
-> the default administartor account is `admin` with its password `admin`
+> In fact,every time we create a database, a template is used. If none is specified, a predefined one called template1 is used.
 
 ### A word about Odoo product versions
 Odoo10不能使用之前版本软件建立的数据库。模块也遵循这个原则，下载模块的时候就要注意版本
