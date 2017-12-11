@@ -245,7 +245,32 @@ Odoo follows an **MVC-like** architecture, and we will go through the layers dur
 
 #### Modifying and extending modules
 
+As a general rule, it's considered a bad practice to modify existing modules by changing their source code directly.This is especially true for the official modules provided by Odoo.
+
+Instead, we should create the extension modules to be installed next to the modules we want to modify,implementing the changes we need.
+
 #### Creating the module basic skeleton
+
+Odoo includes a scaffold command to automatically create a new module directory, with a basic structure already in place.You can learn more about it with the following command:
+```sh
+$~/odoo-dev/odoo/odoo-bin scaffold --help
+```
+
+* An Odoo addon module is a directory containing a __manifest__.py descriptor file.
+	The content is:
+	```xml
+	{
+		'name':'To-Do Application',
+		'description':'Manage your personal To-Do tasks.',
+		'author':'Daniel Reis',
+		'depends':['base'],
+		'application':True,
+	}
+	```
+	The depends attribute can have a list of other modules that are required. Odoo will have them automatically installed when this module is installed.
+
+* It also needs to be Python importable, so it must also have a __init__py file
+* The module's directory name is its technical name.We will use todo_app for it.The technical name must be a valid Python identifier:it should begin with a letter and can only contain letters, numbers, and the underscore character.
 
 
 #### A word about licenses
