@@ -115,19 +115,27 @@ git clone https://github.com/odoo/odoo.git -b 10.0 --depth=1  # Get Odoo source 
 5. 运行
 ```sh
 $~/odoo-dev/odoo/odoo-bin
-> As a developer, we will need to work with several databases, so it's more convenient to create
+```
+	> As a developer, we will need to work with several databases, so it's more convenient to create
 them from the command line, so we will learn how to do this. Now press Ctrl + C in the terminal
 to stop the Odoo server and get back to the command prompt.
 
 ### Initializing a new Odoo database
-```sh
-sudo createuser --superuser ${whoami}
-createdb demo
-~/odoo-dev/odoo/odoo-bin -d demo
-```
-> To initialize this database with the Odoo data schema,we should run odoo on the empty database using the `-d` option
-> This will take acouple of mimutes to initialize a demo database, and it will end with an INFO log message,**Moudules loaded**.
-> the default administartor account is `admin` with its password `admin`
+
+> To be able to create a new database, your user must be a PostgreSQL superuser. The following command creates a PostgreSQL superuser for the current Unix user:
+
+	sudo createuser --superuser ${whoami}
+
+> To create new database, use `createdb` command. Let's create a `demo` database
+
+	createdb demo
+> To initialize this database with the Odoo data schema,we should run odoo on the empty database using the `-d` option. This will take a couple of minutes to initialize a demo database, and it will end with an INFO log message,**Modules loaded**.
+
+	~/odoo-dev/odoo/odoo-bin -d demo
+
+> By default, this will initialize the database with demonstration data, which is often useful for development databases. To initialize a database without demonstration data, add the --withoutdemo-data=all option to the command.
+>
+> the default administrator account is `admin` with its password `admin`
 
 #### Managing your databases
 ```sh
@@ -135,6 +143,7 @@ createdb demo
 # psql -l
 # dropdb demo-test
 ```
+
 > In fact,every time we create a database, a template is used. If none is specified, a predefined one called template1 is used.
 
 ### A word about Odoo product versions
@@ -145,22 +154,25 @@ Odoo10不能使用之前版本软件建立的数据库。模块也遵循这个�
 master分支将会产生下一个版本，但要注意到下一个版本已经不是`API Stable`
 
 ### More server configuration options
-	$./odoo-bin --help 没有经过安装，应该不能使用
+$./odoo-bin --help 没有经过安装，应该不能使用
 
 #### Odoo server configuration files
 Odoo默认使用`.odoorc`文件作为配置文件，位置在home目录。
 
-我们使用conf文件，参照：[Odoo项目配置](OdooConfig.md)。可以使用save命令产生.odoorc文件
-	```sh
-	$ ~/odoo-dev/odoo/odoo-bin --save --stop-after-init #save configuration to file
-	```
+我们使用conf文件，参照：[Odoo项目配置](OdooConfig.md)。可以使用save命令产生.odoorc文件。
+
+```sh
+$ ~/odoo-dev/odoo/odoo-bin --save --stop-after-init #save configuration to file
+```
+> the --stop-after-init option to stop the server after it finishes its actions.This option is often used when running tests or asking to run a module upgrade to check whether it is installed correctly.
+
 还可以在启动的时候使用`-c`指定配置文件，我们就是指定`odoo10.conf`作为配置文件
 
 #### Changing the listening port
 	在多实例情况下，可以使用`xmlrpc_port`配置不同的端口提供服务
 
 #### The database filter option
-	For example, to allow only the demo database we would use this command:
+For example, to allow only the demo database we would use this command:
 	```sh
 	$ ~/odoo-dev/odoo/odoo-bin --db-filter=^demo$
 	```
@@ -168,10 +180,12 @@ Odoo默认使用`.odoorc`文件作为配置文件，位置在home目录。
 #### Managing server log messages
 参照[Odoo项目配置](OdooConfig.md#conf文件内容)
 
-Finally, the --dev=all option will bring up the Python debugger (pdb ) when an exception is
+Finally, the --dev=all option will bring up the Python debugger (pdb) when an exception is
 raised. It's useful to do a post-mortem analysis of a server error. Note that it doesn't have any effect
 on the logger verbosity. More details on the Python debugger commands can be found at [here.](
 https://docs.python.org/2/library/pdb.html#debugger-commands .)
+
+
 ### Developing from your workstation
 
 #### Using a Linux text editor
@@ -179,6 +193,8 @@ https://docs.python.org/2/library/pdb.html#debugger-commands .)
 参照[搭建Samba和Ftp文件服务](OdooSambaFtp.md#samba)
 
 #### Activating the developer tools
+The developer tools provide advanced server configuration and features. These include a debug menu in the top menu bar along with additional menu options in the Settings menu, in particular the Technical menu.
+
 The second option, Activate the developer mode (with assets) , also disables the minification of JavaScript and CSS used by the web client, making it easier to debug client-side behavior:
 
 > The Technical menu option allows us to inspect and edit all the Odoo configurations stored in the database, from user interface to security and other system parameters. You will be learning more about many of these throughout the book.
@@ -186,66 +202,65 @@ The second option, Activate the developer mode (with assets) , also disables the
 ### Installing third-party modules
 
 #### Finding community modules
+The Odoo apps store at [here](http://apps.odoo.com).Github上有The Odoo Community Association[(OCA)](https://github.com/OCA/)
+
+如果使用git做版本控制，把下载的模块放到源码里面不是很好，因为我们要和服务器保持同步
+
+使用下面命令得到一个todo的app
+```sh
+$ git clone https://github.com/dreispt/todo_app.git -b 10.0
+```
 
 #### Configuring the addons path
+参照[Odoo项目配置](OdooConfig.md#conf文件内容)里面addons_path一项
 
 #### Updating the apps list
+For this, we need developer mode enabled, since it provides the **Update Apps List** menu option. It can be found in the **Apps** top menu.
+
+### Summary
+
+In this chapter, we learned how to set up a Debian system to host Odoo and install it from the GitHub source code. We also learned how to create Odoo databases and run Odoo instances. To allow developers to use their favorite tools in their personal workstation, we explained how to configure file sharing in the Odoo host.
+
+We should now have a functioning Odoo environment to work with and be comfortable with managing databases and instances.
+
+With this in place, we're ready to go straight into action. In the next chapter, we will create our first Odoo module from scratch and understand the main elements it involves.
+
+So let's get started!
+
+
+## 2,Building Your First Odoo Application
+
+Odoo follows an **MVC-like** architecture, and we will go through the layers during our implementation of the To-Do application:
+* The model layer, defining the structure of the app's data
+* The view layer, describing the user interface
+* The controller layer, supporting the business logic of the application
+
+> Note that the concept of the term controller mentioned here is different from the Odoo web development controllers. These are program endpoints that web pages can call to perform actions.
+
+
+### Essential concepts
+#### Understanding applications and modules
+* **Module addons** are the building blocks for Odoo applications. A module can add new features to Odoo, or modify existing ones. It is a directory containing a manifest, or descriptor file, named __manifest__.py , plus the remaining files that implement its features.
+
+### The model layer
+
+
+### The view layer
+
+
+### The business logic layer
+
+
+### Setting up access security
+
+
+### Better describing the module
+
 
 ### Summary
 
 
 
-### And an ordered list:
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
 
-### Here is an unordered list:
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-> 注释
-> **强调注释**
-
-内容
-
-```sh
-shell get 'var'
-```
-
-```yml
-show_downloads: ["true" or "false" to indicate whether to provide a download URL]
-google_analytics: [Your Google Analytics tracking ID]
-```
-
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
-
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
-
-内嵌代码`su root`
-
-[链接](http://123.com/art/abc.htm)
-
-### Small image
-
-![](https://assets-cdn.github.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![](https://guides.github.com/activities/hello-world/branching.png)
 
 [back](../)
