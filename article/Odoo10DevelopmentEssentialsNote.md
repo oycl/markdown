@@ -241,6 +241,25 @@ Odoo follows an **MVC-like** architecture, and we will go through the layers dur
 ### Essential concepts
 #### Understanding applications and modules
 * **Module addons** are the building blocks for Odoo applications. A module can add new features to Odoo, or modify existing ones. It is a directory containing a manifest, or descriptor file, named __manifest__.py , plus the remaining files that implement its features.
+* **Applications** are the way major features are added to Odoo. They provide the core elements for a functional area, such as Accounting or HR, based on which additional addon modules modify or extend features. Because of this, they are highlighted in the Odoo Apps menu.
+
+#### Modifying and extending modules
+
+#### Creating the module basic skeleton
+
+
+#### A word about licenses
+
+
+#### Adding to the addons path
+
+#### Installing the new module
+
+#### Upgrading a module
+
+#### The server development mode
+
+
 
 ### The model layer
 
