@@ -240,7 +240,7 @@ Odoo follows an **MVC-like** architecture, and we will go through the layers dur
 
 ### Essential concepts
 #### Understanding applications and modules
-* **Module addons** are the building blocks for Odoo applications. A module can add new features to Odoo, or modify existing ones. It is a directory containing a manifest, or descriptor file, named __manifest__.py , plus the remaining files that implement its features.
+* **Module addons** are the building blocks for Odoo applications. A module can add new features to Odoo, or modify existing ones. It is a directory containing a manifest, or descriptor file, named \__manifest__.py , plus the remaining files that implement its features.
 * **Applications** are the way major features are added to Odoo. They provide the core elements for a functional area, such as Accounting or HR, based on which additional addon modules modify or extend features. Because of this, they are highlighted in the Odoo Apps menu.
 
 #### Modifying and extending modules
@@ -251,12 +251,12 @@ Instead, we should create the extension modules to be installed next to the modu
 
 #### Creating the module basic skeleton
 
-Odoo includes a scaffold command to automatically create a new module directory, with a basic structure already in place.You can learn more about it with the following command:
+Odoo includes a `scaffold` command to automatically create a new module directory, with a basic structure already in place.You can learn more about it with the following command:
 ```sh
 $~/odoo-dev/odoo/odoo-bin scaffold --help
 ```
 
-* An Odoo addon module is a directory containing a __manifest__.py descriptor file.
+* An Odoo addon module is a directory containing a \__manifest__.py descriptor file.
 	The content is:
 	```xml
 	{
@@ -267,29 +267,174 @@ $~/odoo-dev/odoo/odoo-bin scaffold --help
 		'application':True,
 	}
 	```
-	The depends attribute can have a list of other modules that are required. Odoo will have them automatically installed when this module is installed.
 
-* It also needs to be Python importable, so it must also have a __init__py file
+	`depends`attribute can have a list of other modules that are required. Odoo will have them automatically installed when this module is installed.
+
+	`summary` is displayed as a subtitle for the module.
+
+	`version`, by default, is 1.0. It should follow semantic versioning rules [see](http://semver.org/ for details).
+
+	`license` identifier, by default is LGPL-3.
+
+	`website` is a URL to find more information about the module. This can help people find more documentation or the issue tracker to file bugs and suggestions.
+
+	`category` is the functional category of the module, which defaults to Uncategorized. The list of existing categories can be found in the security groups form ( Settings | User | Groups), in the Application field drop-down list.
+
+	`installable` is by default True but can be set to False to disable a module.
+
+	`auto_install` if set to True , this module will be automatically installed, provided all its dependencies are already installed. It is used for the glue modules.
+
+* It also needs to be Python importable, so it must also have a \__init__py file
 * The module's directory name is its technical name.We will use todo_app for it.The technical name must be a valid Python identifier:it should begin with a letter and can only contain letters, numbers, and the underscore character.
 
 
 #### A word about licenses
-
+LGLP和AGPL的区别
 
 #### Adding to the addons path
 
 #### Installing the new module
+In the **Apps** top menu, select the **Update Apps List** option. This will update the module list, adding any modules that may have been added since the last update to the list. Remember that we need the developer mode enabled for this option to be visible. That is done in the **Settings** dashboard, in the link at the bottom-right, below the Odoo version number information.
+
+The **Apps** option shows us the list of available modules. By default, it shows only the application modules. Since we have created an application module, we don't need to remove that filter to see it. Type todo in the search and you should see our new module, ready to be installed:
+
+Now click on the module's **Install** button and we're ready!
 
 #### Upgrading a module
 
-#### The server development mode
+Developing a module is an iterative process, and you will want changes made on source files to be applied to and made visible in Odoo.
 
+In many cases, this is done by upgrading the module: look up the module in the **Apps** list and once it is already installed, you will have an **Upgrade** button available.
+
+However, when the changes are only in Python code, the upgrade may not have an effect. Instead of a module upgrade, an application server restart is needed. **Since Odoo loads Python code only once, any later changes to code require a server restart to be applied.**
+
+In some cases, if the module changes were in both data files and Python code, **you might need both the operations.** This is a common source of confusion for new Odoo developers.
+
+幸运的是我们可以在终端里使用 **-u** 选项来完成升级模块操作。也就是重启Odoo后，不用再去点击 **升级** 按钮了
+
+```sh
+$ ./odoo-bin -d todo -u todo_app
+```
+但是更新模块清单和卸载模块并没有对应的指令。
+
+
+#### The server development mode
+In Odoo 10 a new option was introduced providing developer-friendly features. To use it start the server instance with the additional option --dev=all.
+
+This enables a few handy features to speed up our development cycle. The most important are:
+* Reload Python code automatically, once a Python file is saved, avoiding a manual server restart
+* Read view definitions directly from the XML files, avoiding manual module upgrades
+
+The --dev option accepts a comma-separated list of options, although the all option will be suitable most of the time. We can also specify the debugger we prefer to use. By default the Python debugger, pdb, is used. Some people might prefer to install and use alternative debuggers. Here also supported are ipdb and pudb.
 
 
 ### The model layer
+Models describe business objects, such as an opportunity, sales order, or partner (customer,supplier, and so on). A model has a list of attributes and can also define its specific business.
+
+Models are implemented using a Python class derived from an Odoo template class. They translate directly to database objects, and Odoo automatically takes care of this when installing or upgrading the module. The mechanism responsible for this is the Object Relational Model (ORM).
+
+Our module will be a very simple application to keep to-do tasks. These tasks will have a single text field for the description and a checkbox to mark them as complete. We should later add a button to clean the to-do list of the old, completed tasks.
+
+#### Creating the data model
+
+Let's create a todo_model.py file in the main directory of the todo_app module.Add the following content to it:
+
+```python
+# -*- coding: utf-8 -*-
+from odoo import models, fields
+class TodoTask(models.Model):
+	_name = 'todo.task'
+	_description = 'To-do Task'
+	name = fields.Char('Description', required=True)
+	is_done = fields.Boolean('Done?')
+	active = fields.Boolean('Active?', default=True)
+
+```
+
+The first line is a special marker telling the Python interpreter that this file has UTF-8 so that it can expect and handle non-ASCII characters. We won't be using any, but it's a good practice to have it anyway.
+
+The second line is a Python code import statement, making available the models and fields objects from the Odoo core.
+
+The third line declares our new model. It's a class derived from models.Model.
+
+The next line sets the \_name attribute defining the identifier that will be used throughout Odoo to refer to this model. Note that the actual Python class name, TodoTask in this case, is meaningless to other Odoo modules. The \_name value is what will be used as an identifier.
+Notice that this and the following lines are **indented** . If you're not familiar with Python, you should know that this is important: indentation defines a nested code block, so these four lines should all be equally indented.
+
+Then we have the \_description model attribute. It is not mandatory, but it provides a user friendly name for the model records, that can be used for better user messages.
+
+The last three lines define the model's fields. It's worth noting that **name and active are special field names**.
+* By default, Odoo will use the name field as the record's title when referencing it from other models.
+* The active field is used to inactivate records, and by default, only active records will be shown. We will use it to clear away completed tasks without actually deleting them from the database.
+
+
+Right now, this file is not yet used by the module. We must tell Python to load it with the module in the \__init__.py file. Let's edit it to add the following line:
+```python
+from . import todo_model
+```
+
+If everything goes right, it is confirmed that the model and fields were created. If you can't see them here, try a server restart with a module upgrade, as described before.
+
+We can also see some additional fields we didn't declare. These are reserved fields Odoo automatically adds to every new model. They are as follows:
+* id is a unique numeric identifier for each record in the model.
+* create_date and create_uid specify when the record was created and who created it respectively.
+* write_date and write_uid confirm when the record was last modified and who modified it respectively.
+* \__last_update is a helper that is not actually stored in the database. It is used for concurrency checks.
+
+
+#### Adding automated tests
+The test code files should have a name starting with test_ and should be imported from tests/__init__.py . But the tests directory (or Python submodule) should not be imported from the module's top __init__.py , since it will be automatically discovered and loaded only when tests are executed.
+
+
+Now add the actual test code, available in the tests/test_todo.py file:
+```python
+# -*- coding: utf-8 -*-
+from odoo.tests.common import TransactionCase
+class TestTodo(TransactionCase):
+	def test_create(self):
+		"Create a simple Todo"
+		Todo = self.env['todo.task']
+		task = Todo.create({'name': 'Test Task'})
+		self.assertEqual(task.is_done, False)
+```
+
+This adds a simple test case to create a new to-do task and verifies that the Is Done? field has the correct default value.
+
+Now we want to run our tests. This is done by adding the `--test-enable` option while installing the module:
+```sh
+$ ./odoo-bin -d todo -i todo_app --test-enable
+```
+
+The Odoo server will look for a tests/ subdirectory in the upgraded modules and will run them. If any of the tests fail, the server log will show that.如果运行成功，log会输出
+```sh
+INFO odoo10 odoo.addons.todo_app.tests.test_todo: OK
+```
+但是在数据库中并没有发现一条记录，也只是测试
 
 
 ### The view layer
+The view layer describes the user interface. Views are defined using XML, which is used by the web client framework to generate data-aware HTML views.
+
+The Odoo development guidelines states that the XML files defining the user interface should be placed inside a views/ subdirectory.
+
+#### Adding menu items
+
+
+#### Creating the form view
+
+
+#### Business document form view
+
+#### Adding action buttons
+
+
+#### Using groups to organize forms
+
+
+#### The complete form view
+
+
+#### Adding list and search views
+
 
 
 ### The business logic layer
