@@ -278,7 +278,7 @@ $~/odoo-dev/odoo/odoo-bin scaffold --help
 
 	`website` is a URL to find more information about the module. This can help people find more documentation or the issue tracker to file bugs and suggestions.
 
-	`category` is the functional category of the module, which defaults to Uncategorized. The list of existing categories can be found in the security groups form ( Settings | User | Groups), in the Application field drop-down list.
+	`category` is the functional category of the module, which defaults to Uncategorized. The list of existing categories can be found in the security groups form ( Settings \| User \| Groups), in the Application field drop-down list.
 
 	`installable` is by default True but can be set to False to disable a module.
 
@@ -417,7 +417,7 @@ The view layer describes the user interface. Views are defined using XML, which 
 The Odoo development guidelines states that the XML files defining the user interface should be placed inside a views/ subdirectory.
 
 #### Adding menu items
-
+test
 
 #### Creating the form view
 
