@@ -417,24 +417,159 @@ The view layer describes the user interface. Views are defined using XML, which 
 The Odoo development guidelines states that the XML files defining the user interface should be placed inside a views/ subdirectory.
 
 #### Adding menu items
-test
+Create the views/todo_menu.xml file to define a menu item and the action performed by it:
+```xml
+<?xml version="1.0"?>
+<odoo>
+<!-- Action to open To-do Task list -->
+<act_window id="action_todo_task"
+	name="To-do Task"
+	res_model="todo.task"
+	view_mode="tree,form" />
+
+<!-- Menu item to open To-do Task list -->
+<menuitem id="menu_todo_task"
+	name="Todos"
+	action="action_todo_task" />
+</odoo>
+```
+The user interface, including menu options and actions, is stored in database tables.
+* The &lt;act_window&gt; element defines a client-side window action that will open the todo.task model with the tree and form views enabled, in that order.在 **数据库表ir_act_window**里面会生成一条记录，记录视图模式tree,form等，参考模型res_model等等
+* The &lt;menuitem&gt; defines a top menu item calling the `action_todo_task` action, which was defined before.在 **数据库表ir_ui_menu**里面会生成一条记录,记录上级菜单，菜单图标等等
+
+	* IR=Information Repository 信息资源库
+	* RES=Resource 资源库
+
+> 在Odoo中有两种类型的数据，IR用来代表odoo用来工作的一些参数，比如menus,windows,views,wizards,database tables等等。
+> 而RES代表某种存储在odoo中的真实世界对象，比如partner,products,或者账户交易记录等
+
+**The XML file is a data file used to load those definitions into the database when the module is installed or upgraded.**
+
+Both elements include an id attribute. **This id attribute also called an XML ID, is very important:it is used to uniquely identify each data element inside the module, and can be used by other elements to reference it.**
+In this case, the &lt;menuitem&gt; element needs to reference the action to process, and needs to make use of the &lt;act_window&gt; ID for that. XML IDs are discussed in greater detail in Chapter 4, Module Data .
+
+Add this attribute to the manifest's dictionary:
+```xml
+'data': ['views/todo_menu.xml'],
+```
+
+Now we need to upgrade the module again for these changes to take effect.
+
+> If an upgrade fails because of an XML error, don't panic! Comment out the last edited XML portions or remove the XML file from \__manifest__.py and repeat the upgrade. The server should start correctly. Now read the error message in the server log carefully: it should point you to where the problem is.
+
+Odoo supports several types of views, but the three most important ones are: **tree (usually called list views), form , and search views**. We'll add an example of each to our module.
+
 
 #### Creating the form view
 
+Add this new views/todo_view.xml file to define our form view:
+```xml
+<?xml version="1.0"?>
+<odoo>
+<record id="view_form_todo_task" model="ir.ui.view">
+	<field name="name">To-do Task Form</field>
+	<field name="model">todo.task</field>
+	<field name="arch" type="xml">
+	<form string="To-do Task">
+		<group>
+			<field name="name"/>
+			<field name="is_done"/>
+			<field name="active" readonly="1"/>
+		</group>
+	</form>
+	</field>
+</record>
+</odoo>
+
+	```
+
+**在数据库表ir.ui.view**里面会生成记录.记录的 identifier 是 `view_form_todo_task`. The view is for the `todo.task` model and is named `To-do Task Form`. The name is just for information; it does not have to be unique, but it should allow one to easily identify which record it refers to.
+
+The most important attribute is arch, and it contains the view definition, highlighted in the XML code above. The &lt;form&gt; tag defines the view type, and in this case, contains three fields. We also added an attribute to the `active` field to make it read only.
 
 #### Business document form view
 
-#### Adding action buttons
+Odoo has a presentation style that mimics a paper page. This form contains two elements: 
+&lt;header&gt; to contain action buttons
+&lt;sheet&gt; to contain the data fields.
 
+We can now replace the basic &lt;form&gt; defined in the previous section with this one:
+```xml
+	<form string="To-do Task">
+        <header>
+		<!-- Buttons go here-->
+		</header>
+		<sheet>
+            <group>
+                <field name="name"/>
+                <field name="is_done"/>
+                <field name="active" readonly="1"/>
+            </group>
+		</sheet>
+	</form>
+
+```
+
+#### Adding action buttons
+Forms can have buttons to perform actions. These buttons are able to run window actions such as opening another form or run Python functions defined in the model.
+They can be placed anywhere inside a form, but for document-style forms, the recommended place for them is the &lt;header&gt; section.
+
+```xml
+<header>
+	<button name="do_toggle_done" type="object"
+	string="Toggle Done" class="oe_highlight" />
+	<button name="do_clear_done" type="object"
+	string="Clear All Done" />
+</header>
+```
+The basic attributes of a button comprise the following:
+* string with the text to display on the button
+* type of action it performs
+* name is the identifier for that action
+* class is an optional attribute to apply CSS styles, like in regular HTML
 
 #### Using groups to organize forms
+The &lt;group&gt; tag allows you to organize the form content. Placing &lt;group&gt; elements inside a &lt;group&gt; element creates a two column layout inside the outer group. 
+Group elements are advised to have a name attribute so that its easier for other modules to extend them.
 
+We will use this to better organize our content. Let's change the &lt;sheet&gt; content of our form to match this:
+```xml
+<sheet>
+<group name="group_top">
+	<group name="group_left">
+		<field name="name"/>
+	</group>
+	<group name="group_right">
+		<field name="is_done"/>
+		<field name="active" readonly="1"/>
+	</group>
+</group>
+</sheet>
+```
 
 #### The complete form view
+> Remember that, for the changes to be loaded to our Odoo database, **a module upgrade is needed**.To see the changes in the web client, the form needs to be **reloaded**: either click again on the menu option that opens it or reload the browser page (F5 in most browsers).
+
+> The action buttons won't work yet since we still need to add their business logic.
 
 
 #### Adding list and search views
+When viewing a model in list mode, a &lt;tree&gt; view is used. Tree views are capable of displaying lines organized in **hierarchies**, but most of the time, they are used to display plain lists.
 
+We can add the following tree view definition to todo_view.xml:
+```xml
+<record id="view_tree_todo_task" model="ir.ui.view">
+	<field name="name">To-do Task Tree</field>
+	<field name="model">todo.task</field>
+	<field name="arch" type="xml">
+		<tree colors="decoration-muted:is_done==True">
+			<field name="name"/>
+			<field name="is_done"/>
+		</tree>
+	</field>
+</record>
+
+```
 
 
 ### The business logic layer
