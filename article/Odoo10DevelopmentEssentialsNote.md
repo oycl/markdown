@@ -463,6 +463,7 @@ Odoo supports several types of views, but the three most important ones are: **t
 #### Creating the form view
 
 Add this new views/todo_view.xml file to define our form view:
+
 ```xml
 <?xml version="1.0"?>
 <odoo>
@@ -480,10 +481,9 @@ Add this new views/todo_view.xml file to define our form view:
 	</field>
 </record>
 </odoo>
+```
 
-	```
-
-**在数据库表ir.ui.view**里面会生成记录.记录的 identifier 是 `view_form_todo_task`. The view is for the `todo.task` model and is named `To-do Task Form`. The name is just for information; it does not have to be unique, but it should allow one to easily identify which record it refers to.
+ **在数据库表ir.ui.view**里面会生成记录.记录的 identifier 是 `view_form_todo_task`. The view is for the `todo.task` model and is named `To-do Task Form`. The name is just for information; it does not have to be unique, but it should allow one to easily identify which record it refers to.
 
 The most important attribute is arch, and it contains the view definition, highlighted in the XML code above. The &lt;form&gt; tag defines the view type, and in this case, contains three fields. We also added an attribute to the `active` field to make it read only.
 
