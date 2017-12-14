@@ -483,7 +483,7 @@ Add this new views/todo_view.xml file to define our form view:
 </odoo>
 ```
 
- **在数据库表ir.ui.view**里面会生成记录.记录的 identifier 是 `view_form_todo_task`. The view is for the `todo.task` model and is named `To-do Task Form`. The name is just for information; it does not have to be unique, but it should allow one to easily identify which record it refers to.
+**在数据库表ir.ui.view**里面会生成记录。记录的 identifier 是 `view_form_todo_task`. The view is for the `todo.task` model and is named `To-do Task Form`. The name is just for information; it does not have to be unique, but it should allow one to easily identify which record it refers to.
 
 The most important attribute is arch, and it contains the view definition, highlighted in the XML code above. The &lt;form&gt; tag defines the view type, and in this case, contains three fields. We also added an attribute to the `active` field to make it read only.
 
@@ -525,8 +525,8 @@ They can be placed anywhere inside a form, but for document-style forms, the rec
 The basic attributes of a button comprise the following:
 * string with the text to display on the button
 * type of action it performs
-* name is the identifier for that action
-* class is an optional attribute to apply CSS styles, like in regular HTML
+* name is the identifier for that action.对应python文件中的函数名
+* class is an optional attribute to apply CSS styles, like in regular HTML.这里在第一个按钮里使用了class,观察实际效果为反色高亮
 
 #### Using groups to organize forms
 The &lt;group&gt; tag allows you to organize the form content. Placing &lt;group&gt; elements inside a &lt;group&gt; element creates a two column layout inside the outer group. 
@@ -568,11 +568,108 @@ We can add the following tree view definition to todo_view.xml:
 		</tree>
 	</field>
 </record>
+```
+这段代码同样会在ir.ui.view中添加一条XML ID为`view_tree_todo_task`的记录。
+
+This defines a list with only two columns: name and is_done. We also added a nice touch: the lines for done tasks (is_done==True ) are shown grayed out. This is done applying the Bootstrap class muted . [Check](http://getbootstrap.com/css/#helper-classes-colors) for more information on Bootstrap and its contextual colors.但是在企业版里面尝试改几个颜色也没有效果，也许是颜色的关键词用的不对，或者企业版不支持。
+
+继续往todo_view.xml里面添加search view
+```xml
+    <!-- To-Do Task Search view -->
+    <record id="view_filter_todo_task" model="ir.ui.view">
+      <field name="name">To-do Task Filter</field>
+      <field name="model">todo.task</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <filter string="Not Done" domain="[('is_done','=',False)]"/>
+          <filter string="Done" domain="[('is_done','!=',False)]"/>
+        </search>
+      </field>
+    </record>
 
 ```
 
+The &lt;field&gt; elements define fields that are also searched when typing in the search box.如果放置两列，在搜索的时候就会出现两列供选择使用哪一列。
+
+输入一次同时搜索两列，使用下面代码
+```xml
+<field name="name" string="件号或者名称"
+ filter_domain="['|', ('name', 'ilike', self), ('part_name', 'ilike', self)]"/>
+```
+
+The &lt;filter&gt; elements add predefined filter conditions, that can be toggled with a user click, defined
+using a specific syntax.预置在筛选下面，供直接使用
 
 ### The business logic layer
+Now we will add some logic to our buttons. This is done with Python code, using the methods in the model's Python class.
+#### Adding business logic
+First, we need to import the new API, so add it to the import statement at the top of the Python file:
+```python
+from odoo import models, fields, api
+```
+The action of the **Toggle Done** button will be very simple: just toggle the **Is Done?** flag. For logic on records, use the @api.multi decorator. Here, **self** will represent a recordset, and we should then loop through each record.
+
+Inside the TodoTask class, add this:
+```python
+@api.multi
+def do_toggle_done(self):
+	for task in self:
+		task.is_done = not task.is_done
+	return True
+```
+
+The code loops through all the to-do task records and, for each one, modifies the is_done field,inverting its value. 事实是在Form视图内，只对本条记录起作用，并不会影响其它记录。而这个按钮也不会出现在list视图里面。
+
+The method does not need to return anything, but we should have it to at least return a True value. The reason is that clients can use XML-RPC to call these methods, and this protocol does not support server functions returning just a None value.
+
+For the **Clear All Done** button, we want to go a little further. It should look for all active records that are done, and make them inactive.
+
+Usually form buttons are expected to act only on the selected record, but in this case, we will want it also act on records other than the current one.这一次确实影响了所有记录的状态。
+```python
+@api.model
+def do_clear_done(self):
+	dones = self.search([('is_done', '=', True)])
+	dones.write({'active': False})
+	return True
+```
+这里面使用@api.model会出现错误，google的答案是新版本要使用@api.multi
+
+~~On methods decorated with @api.model~~, the self variable represents the model with no record in particular. We will build a dones recordset containing all the tasks that are marked as done.Then, we set the active flag to False on them.
+
+The `search` method is an API method that returns the records that meet some conditions. These conditions are written in a domain, which is a list of triplets. We'll explore domains in more detail in Chapter 6 , Views - Designing the User Interface .
+
+The `write` method sets the values at once on all the elements of the recordset. The values to write are described using a dictionary. **Using `write` here is more efficient than iterating through the recordset to assign the value to each of them one by one.**
+
+
+#### Adding tests
+Now we should add tests for the business logic. Ideally, we want every line of code to be covered by at least one test case. In tests/test_todo.py, add a few more lines of code to the test_create() method:
+添加完以后test就变成这样
+```python
+    def test_create(self):
+        "Create a simple Todo"
+        Todo = self.env['todo.task']
+        task = Todo.create({'name': 'Test Task'})
+        self.assertEqual(task.is_done, False)
+
+        "Test Toggle Done"
+        task.do_toggle_done()
+        self.assertTrue(task.is_done)
+        "Test Clear Done"
+        Todo.do_clear_done()
+        self.assertFalse(task.active)
+```
+试着理解一下，Todo把指针指向todo.task这个model，Todo有create方法，建立了一条记录task
+the self variable represents the model with no record in particular.self测试task这一条记录的is_done是True还是False因为默认建立一条记录的is_done是False的，所以应该通过。我们试着修改False为True，则log返回
+```sh
+.todo_app.tests.test_todo: `     self.assertEqual(task.is_done, True)
+.todo_app.tests.test_todo: ` AssertionError: False != True
+.todo_app.tests.test_todo: Ran 1 test in 0.020s
+.todo_app.tests.test_todo: FAILED
+```
+
+
+
 
 
 ### Setting up access security
