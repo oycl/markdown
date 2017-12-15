@@ -357,8 +357,9 @@ The second line is a Python code import statement, making available the models a
 
 The third line declares our new model. It's a class derived from models.Model.
 
-The next line sets the \_name attribute defining the identifier that will be used throughout Odoo to refer to this model. Note that the actual Python class name, TodoTask in this case, is meaningless to other Odoo modules. The \_name value is what will be used as an identifier.
-Notice that this and the following lines are **indented** . If you're not familiar with Python, you should know that this is important: indentation defines a nested code block, so these four lines should all be equally indented.
+The next line sets the \_name attribute defining the identifier that will be used throughout Odoo to refer to this model. Note that the actual Python class name, TodoTask in this case, is meaningless to other Odoo modules. The \_name value is what will be used as an identifier.Python类名没什么实际意义，但是_name属性用作标识符，在view里面直接使用todo.task；在数据库里把.转换成下划线_变成数据库表名：todo.task就会变成表todo_task。
+
+> Notice that this and the following lines are **indented** . If you're not familiar with Python, you should know that this is important: indentation defines a nested code block, so these four lines should all be equally indented.
 
 Then we have the \_description model attribute. It is not mandatory, but it provides a user friendly name for the model records, that can be used for better user messages.
 
@@ -435,12 +436,13 @@ Create the views/todo_menu.xml file to define a menu item and the action perform
 ```
 The user interface, including menu options and actions, is stored in database tables.
 * The &lt;act_window&gt; element defines a client-side window action that will open the todo.task model with the tree and form views enabled, in that order.在 **数据库表ir_act_window**里面会生成一条记录，记录视图模式tree,form等，参考模型res_model等等
-* The &lt;menuitem&gt; defines a top menu item calling the `action_todo_task` action, which was defined before.在 **数据库表ir_ui_menu**里面会生成一条记录,记录上级菜单，菜单图标等等
+* The &lt;menuitem&gt; defines a top menu item calling the `action_todo_task` action, which was defined before.在 **数据库表ir_ui_menu**里面会生成一条记录,记录上级菜单，菜单图标等等。其中的action字段存储了指向ir_act_window表里面主键id的值，也就是点击这个菜单调用哪个ir_act_windows
 
 	* IR=Information Repository 信息资源库
 	* RES=Resource 资源库
 
 > 在Odoo中有两种类型的数据，IR用来代表odoo用来工作的一些参数，比如menus,windows,views,wizards,database tables等等。
+>
 > 而RES代表某种存储在odoo中的真实世界对象，比如partner,products,或者账户交易记录等
 
 **The XML file is a data file used to load those definitions into the database when the module is installed or upgraded.**
@@ -495,19 +497,18 @@ Odoo has a presentation style that mimics a paper page. This form contains two e
 
 We can now replace the basic &lt;form&gt; defined in the previous section with this one:
 ```xml
-	<form string="To-do Task">
-        <header>
-		<!-- Buttons go here-->
-		</header>
-		<sheet>
-            <group>
-                <field name="name"/>
-                <field name="is_done"/>
-                <field name="active" readonly="1"/>
-            </group>
-		</sheet>
-	</form>
-
+<form string="To-do Task">
+	<header>
+	<!-- Buttons go here-->
+	</header>
+	<sheet>
+		<group>
+			<field name="name"/>
+			<field name="is_done"/>
+			<field name="active" readonly="1"/>
+		</group>
+	</sheet>
+</form>
 ```
 
 #### Adding action buttons
@@ -529,7 +530,7 @@ The basic attributes of a button comprise the following:
 * class is an optional attribute to apply CSS styles, like in regular HTML.这里在第一个按钮里使用了class,观察实际效果为反色高亮
 
 #### Using groups to organize forms
-The &lt;group&gt; tag allows you to organize the form content. Placing &lt;group&gt; elements inside a &lt;group&gt; element creates a two column layout inside the outer group. 
+The &lt;group&gt; tag allows you to organize the form content. Placing &lt;group&gt; elements inside a &lt;group&gt; element creates a two column layout inside the outer group.
 Group elements are advised to have a name attribute so that its easier for other modules to extend them.
 
 We will use this to better organize our content. Let's change the &lt;sheet&gt; content of our form to match this:
@@ -569,25 +570,24 @@ We can add the following tree view definition to todo_view.xml:
 	</field>
 </record>
 ```
-这段代码同样会在ir.ui.view中添加一条XML ID为`view_tree_todo_task`的记录。
+这段代码同样会在数据库表ir.ui.view中添加一条XML ID为`view_tree_todo_task`的记录。
 
 This defines a list with only two columns: name and is_done. We also added a nice touch: the lines for done tasks (is_done==True ) are shown grayed out. This is done applying the Bootstrap class muted . [Check](http://getbootstrap.com/css/#helper-classes-colors) for more information on Bootstrap and its contextual colors.但是在企业版里面尝试改几个颜色也没有效果，也许是颜色的关键词用的不对，或者企业版不支持。
 
-继续往todo_view.xml里面添加search view
+继续往todo_view.xml里面添加search view。在数据库表ir.ui.view中添加一条XML ID为`view_filter_todo_task`的记录。
 ```xml
-    <!-- To-Do Task Search view -->
-    <record id="view_filter_todo_task" model="ir.ui.view">
-      <field name="name">To-do Task Filter</field>
-      <field name="model">todo.task</field>
-      <field name="arch" type="xml">
-        <search>
-          <field name="name"/>
-          <filter string="Not Done" domain="[('is_done','=',False)]"/>
-          <filter string="Done" domain="[('is_done','!=',False)]"/>
-        </search>
-      </field>
-    </record>
-
+<!-- To-Do Task Search view -->
+<record id="view_filter_todo_task" model="ir.ui.view">
+	<field name="name">To-do Task Filter</field>
+	<field name="model">todo.task</field>
+	<field name="arch" type="xml">
+		<search>
+		<field name="name"/>
+		<filter string="Not Done" domain="[('is_done','=',False)]"/>
+		<filter string="Done" domain="[('is_done','!=',False)]"/>
+		</search>
+	</field>
+</record>
 ```
 
 The &lt;field&gt; elements define fields that are also searched when typing in the search box.如果放置两列，在搜索的时候就会出现两列供选择使用哪一列。
@@ -608,7 +608,7 @@ First, we need to import the new API, so add it to the import statement at the t
 ```python
 from odoo import models, fields, api
 ```
-The action of the **Toggle Done** button will be very simple: just toggle the **Is Done?** flag. For logic on records, use the @api.multi decorator. Here, **self** will represent a recordset, and we should then loop through each record.
+The action of the **Toggle Done** button will be very simple: just toggle the **Is Done?** flag. For logic on records, use the @api.multi decorator. Here, **self** will represent a recordset, and we should then loop through each record. **self表示一个记录集**
 
 Inside the TodoTask class, add this:
 ```python
@@ -669,11 +669,110 @@ the self variable represents the model with no record in particular.self测试ta
 ```
 
 
-
-
-
 ### Setting up access security
+You might have noticed that, upon loading, our module is getting a warning message in the server log:
+```sh
+The model todo.task has no access rules, consider adding one.
+```
+As a superuser, the `admin` ignores data access rules, and that's why we were able to use the form without errors. But we must fix this before other users can use our model.
 
+Another issue we have yet to address is that we want the to-do tasks to be private to each user.Odoo supports **row-level access rules**, which we will use to implement that.
+
+#### Testing access security
+we should change them so that they use the Demo user instead.For this, we should edit the tests/test_todo.py file to add a setUp method:
+```python
+class TestTodo(TransactionCase):
+
+	def setUp(self, *args, **kwargs):
+		result = super(TestTodo, self).setUp(*args, **kwargs)
+		user_demo = self.env.ref('base.user_demo')
+		self.env= self.env(user=user_demo)
+		return result
+```
+This first instruction calls the setUp code of the parent class. 调父类，不太懂
+The next ones change the environment used to run the tests, `self.env` , to a new one using the Demo user. No further changes are needed to the tests we already wrote.
+
+We should also add a test case to make sure that users can see only their own tasks. For this, first, add an additional import at the top:
+```python
+from odoo.exceptions import AccessError
+```
+Next, add an additional method to the test class:
+```python
+def test_record_rule(self):
+	"Test per user record rules"
+	Todo = self.env['todo.task']
+	task = Todo.sudo().create({'name':'Admin Task'})
+	with self.assertRaises(AccessError):
+		Todo.browse([task.id]).name
+```
+Since our `env` method is now using the Demo user, we used the `sudo()` method to change the context to the admin user. We then use it to create a task that should not be accessible to the Demo user.
+
+When trying to access this task data, we expect an AccessError exception to be raised. If we run the tests now, they should fail, so let's take care of that.
+
+#### Adding access control security
+use the web client and go to **Settings \| Technical \| Security \| Access Controls List** :
+里面显示了对每个模型的访问控制列表，具体到每一个群组对记录允许的行为。这些信息存储在数据库表ir.model.access里面。
+
+We will add full access to the employee group on the model. Employee is the basic access group nearly everyone belongs to.使用一个CSV文件来做这件事:security/ir.model.access.csv
+```csv
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+acess_todo_task_group_user,todo.task.user,model_todo_task,base.group_user,1,1,1,1
+```
+文件名对应数据库表，第一行是列名，解释如下：
+
+* `id` is the record external identifier (also known as XML ID). It should be unique in our module.
+* `name` is a description title. It is only informative and it's best if it's kept unique. Official modules usually use a dot-separated string with the model name and the group. Following this convention, we used todo.task.user.
+* `model_id` is the external identifier for the model we are giving access to. Models have XML IDs automatically generated by the ORM: for todo.task , the identifier is **model_todo_task**.注意这一条命名原则
+* `group_id` identifies the security group to give permissions to. The most important ones are provided by the base module. The Employee group is such a case and has the identifier `base.group_user`.这是组的扩展标识符，在对公司进行分组的时候，要把这个标识符起好，以便后续使用。
+* `perm` fields flag the access to grant read , write , create , or unlink (delete) access.
+
+最后还要在 \__manifest__.py 里面加入这一条，看起来是这样的
+```xml
+'data': [
+	'security/ir.model.access.csv',
+	'views/todo_view.xml',
+	'views/todo_menu.xml',
+],
+```
+If we run our tests now they should only fail the `test_record_rule` test case.
+
+#### Row-level access rules
+在 **访问控制列表** 菜单旁边是 **记录列表** 菜单。记录列表是定义在 **数据库表ir_rule** 里面的。
+
+As usual, we need to provide a distinctive name.We also need the model they operate on and the domain filter to use for the access restriction. The domain filter uses the usual list of tuples syntax used across Odoo.
+
+Usually, rules apply to some particular security groups. In our case, we will make it apply to the Employees group. If it applies to no security group, in particular, it is considered global (the global field is automatically set to True ). Global rules are different because they impose restrictions that non-global rules can't override.
+
+To add the record rule, we should create a `security/todo_access_rules.xml` file with the following content:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data noupdate="1">
+    <record id="todo_task_user_rule" model="ir.rule">
+      <field name="name">ToDo Tasks only for owner</field>
+      <field name="model_id" ref="model_todo_task"/>
+      <field name="domain_force">[('create_uid','=',user.id)]
+      </field>
+      <field name="groups" eval="[(4,ref('base.group_user'))]"/>
+    </record>
+  </data>
+</odoo>
+
+```
+> Notice the noupdate="1" attribute. It means this data will not be updated in module upgrades. This will allow it to be customized later since module upgrades won't destroy user-made changes. But be aware that this will also be the case while developing, so you might want to set noupdate="0" during development until you're happy with the data file.
+
+> In the groups field, you will also find a special expression. It's a one-to-many relational field, and they have a special syntax to operate with. In this case, the (4, x) tuple indicates to append x to the records, and here x is a reference to the Employees group, identified by base.group_user. This one-to-many writing special syntax is discussed in more detail in Chapter 4 , Module Data.
+
+把`security/todo_access_rules.xml`添加到\__manifest__.py里面
+```xml
+'data': [
+	'security/ir.model.access.csv',
+	'security/todo_access_rules.xml',
+	'views/todo_view.xml',
+	'views/todo_menu.xml',
+],
+```
+如果一切顺利，我们添加的测试就可以通过了。
 
 ### Better describing the module
 
