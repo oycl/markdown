@@ -708,7 +708,6 @@ def test_record_rule(self):
 Since our `env` method is now using the Demo user, we used the `sudo()` method to change the context to the admin user. We then use it to create a task that should not be accessible to the Demo user.
 
 When trying to access this task data, we expect an AccessError exception to be raised. If we run the tests now, they should fail, so let's take care of that.
-整个测试语句是先把用户切换到demo用户，然后用admin用户建立一个记录，最后用demo用户访问admin用户的记录，然后会引发错误
 
 #### Adding access control security
 use the web client and go to **Settings \| Technical \| Security \| Access Controls List** :
@@ -740,7 +739,7 @@ If we run our tests now they should only fail the `test_record_rule` test case.
 #### Row-level access rules
 在 **访问控制列表** 菜单旁边是 **记录列表** 菜单。记录列表是定义在 **数据库表ir_rule** 里面的。
 
-As usual, we need to provide a distinctive name.We also need the model they operate on and the domain filter to use for the access restriction. The domain filter uses the usual list of tuples syntax used across Odoo.也就是说`domain_force`可以过滤出自己创建的记录。
+As usual, we need to provide a distinctive name.We also need the model they operate on and the domain filter to use for the access restriction. The domain filter uses the usual list of tuples syntax used across Odoo.
 
 Usually, rules apply to some particular security groups. In our case, we will make it apply to the Employees group. If it applies to no security group, in particular, it is considered global (the global field is automatically set to True ). Global rules are different because they impose restrictions that non-global rules can't override.
 
@@ -774,69 +773,12 @@ To add the record rule, we should create a `security/todo_access_rules.xml` file
 ],
 ```
 如果一切顺利，我们添加的测试就可以通过了。
-填写一些自己的测试，当这一条规则添加到数据库表ir_rule后，把todo_access_rules.xml从\__manifest__.py里面注释掉，重启服务，则数据库表里面记录会删除，这说明在data里面的文件每次启动都会使用。然后我们用上面提到的`noupdate`来进行控制。
-实际上我们只看到了`domain_force`在ir_rule里面有存储，而`group`字段还有待研究，到第四章我们会回来再看一下。
-
 
 ### Better describing the module
-图标文件在todo_app/static/description/icon.png里面，注意这个图标是应用的图标不是菜单的图标
+test
 
 ### Summary
-We created a new module from the start, covering the most frequently used elements in a module:models, the three basic types of views(form, list, and search), business logic in model methods, and access security. In the process, we got familiar with the module development process, which involves module upgrades and application server restarts to make the gradual changes effective in Odoo.
-Always remember, when adding model fields, an upgrade is needed. When changing Python code, including the manifest file, a restart is needed. When changing XML or CSV files, an upgrade is needed; also, when in doubt, do both: restart the server and upgrade the modules.
-In the next chapter, you will learn how to build modules that will stack on existing ones in order to add features.
 
-## 3,Inheritance - Extending Existing Applications
-One of Odoo's most powerful feature is the ability to add features without directly modifying the underlying objects.This is achieved through inheritance mechanisms.
-
-### Adding sharing capabilities to the To-Do app
-We will do this with a new module to extend the previously created To-Do app and add these new features using the inheritance mechanisms.
-
-我们将做如下改进
-* 扩展task模型，例如哪位用户会对一个任务做出响应
-* 改变事物逻辑来操作当前用户的任务，而不是所有能看到的任务
-* 扩展views来添加需要的字段
-* 添加社交属性：一个信息墙和跟随者
-
-首先建立todo_user/__manifest__.py文件，依赖是todo_app，就是上一章我们建立的app。当依赖todo_app更新时，todo_user也跟着更新，这对于继承机制能否工作来说是必要和重要的
-
-### Extending models
-**_inherit**关键字继承了父模型的所有特性，我们只需要声明我们引入的更改
-事实上，odoo的model使用了一种集中注册机制。在这种机制中，我们使用self.env[<model name>]来访问。当修改一个model时，我们得到其注册类的引用，然后修改它。这意味着在所有使用这个新model的地方修改都是生效的。
-
-当odoo server启动时，module读取的顺序是有讲究的，这也就是使用依赖的目的。
-
-
-#### Adding fields to a model
-我们会在todo.task模型上添加user responsible和deadline date两个字段
-
-
-
-
-
-#### Modifying existing fields
-
-#### Modifying model methods
-
-### Extending views
-
-#### Extending the form view
-
-#### Extending the tree and search views
-
-#### Copying features with prototype inheritance
-
-#### Embedding models using delegation inheritance
-
-#### Adding the social network features
-
-### Modifying data
-
-#### Modifying menu and action records
-
-#### Modifying security record rules
-
-### Summary
 
 
 
