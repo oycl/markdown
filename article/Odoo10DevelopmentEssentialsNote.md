@@ -810,9 +810,20 @@ We will do this with a new module to extend the previously created To-Do app and
 #### Adding fields to a model
 我们会在todo.task模型上添加user responsible和deadline date两个字段
 
+分别在顶层目录和models目录里添加\__init.py__文件，顶层目录的导入models目录名。models目录里面的导入里面的py文件名，如果有很多文件就都写在这里，每行一个。
 
+然后建立todo_task.py文件
+```python
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api
+class TodoTask(models.Model):
+	_inherit = 'todo.task'
+	user_id = fields.Many2one('res.users','Responsible')
+	date_deadline = fields.Date('Deadline')
+```
+> 注意_name名字并没有出现，因为已经从父模型中继承了
 
-
+**_inherit** 这种继承并没有多建立数据库表，只是在原表上扩充了两个字段，原来数据库的内容依然会保留
 
 #### Modifying existing fields
 
