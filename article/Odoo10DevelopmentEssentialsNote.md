@@ -823,11 +823,54 @@ class TodoTask(models.Model):
 ```
 > 注意_name名字并没有出现，因为已经从父模型中继承了
 
-**_inherit** 这种继承并没有多建立数据库表，只是在原表上扩充了两个字段，原来数据库的内容依然会保留
+**_inherit** 这种继承并没有多建立数据库表，只是在原表上扩充了两个字段，原来数据库的内容依然会保留。
+通过这种继承方式，我们可以
+* add fields to a model,
+* override the definition of fields on a model,
+* add constraints to a model,
+* add methods to a model,
+* override existing methods on a model.
+我们继续做一个卸载的测试，我把刚刚扩展的两个字段填上了数据，然后卸载模块，则这两个字段也从数据库表里面消失了。
+
 
 #### Modifying existing fields
+使用和父类里面同名的字段，然后把修改写进去。我们给name字段添加一条提示
+```python
+name = fields.Char(help="what needs to be done?")
+```
+这种方式，只修改需要的属性，略过其它没有必要的属性。
 
 #### Modifying model methods
+在事物逻辑层面同样有继承机制：添加新类就是在继承类里面声明函数。而扩展或者改变现有逻辑，就是声明相同名字的函数。新的函数将会取代旧的函数，同时也会扩展被继承类的code，使用Python's `super()`方法调用父方法。它可以在`super()`方法前或者后面对原有的逻辑添加新逻辑。
+
+修改函数参数要确保原有的调用能工作正常，事实上，我们需要添加附加参数，使用它们的可选关键字参数（带一个默认值）
+
+原函数Clear All Done因为会清除所有人的task，我们这次修改只清除当前用户的task
+
+```python
+    @api.multi
+    def do_clear_done(self):
+        domain = [('is_done','=',True),'|',('user_id','=',self.env.uid),('user_id','=',False)]
+        done_recs = self.search(domain)
+        done_recs.write({'active':False})
+        return True
+```
+
+首先我们设置了过滤条件，这种表达式遵从Odoo-specific语法。这些条件默认使用“与”连接，对于“或”逻辑，使用“|”来连接其后的两个条件。然后使用`search`方法得到记录集来进行操作。
+
+接下来我们重写方法来保留已有的逻辑，我们使用Python`super()`方法来调用父类的方法。使用do_toggle_done()方法为例。
+```python
+    @api.multi
+    def do_toggle_done(self):
+        for task in self:
+            if task.user_id != self.env.user:
+                raise  ValidationError('Only the responsible can do this!')
+        return super(TodoTask, self).do_toggle_done()
+```
+这里我们实际上是给原do_toggle_done()函数套了一层马甲，加了一层判断条件来看是否调用原do_toggle_done()函数。
+
+这里和上一章发现的问题一样，即使使用了multi，函数也不会去搜索整个数据表的记录，只会操作当前form的一条记录。
+
 
 ### Extending views
 
