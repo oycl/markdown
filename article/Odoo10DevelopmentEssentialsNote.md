@@ -873,10 +873,87 @@ name = fields.Char(help="what needs to be done?")
 
 
 ### Extending views
+The `inherit_id` field identifies the view to be extended by referring to its external identifier using the special ref attribute. External identifiers will be discussed in more detail in Chapter 4 ,Module Data.
+odoo有一种简洁的写法，可以避免使用XPath语法。但是如果定位使用的字段出现了多次，还是要使用XPath语法。
+还有&lt;sheet&gt;,&lt;group&gt;,&lt;div&gt;这些标志也可以被使用，使用它们的name属性来定位。还有CSS的class元素
+
+
+The position attribute used with the locator element is optional and can have the following values:
+* `after` adds the content to the parent element, after the matched node.
+* `before` adds the content, before the matched node.
+* `inside` (default value) appended the content inside matched node.
+* `replace` replaces the matched node. If used with empty content, it deletes an element. Since Odoo 10 it also allows to wrap an element with other markup, by using $0 in the content to represent the element being replaced.
+* `attributes` modifies the XML attributes of the matched element. This is done using in the element content <attribute name="attr-name"> elements with the new attribute values to set.
+
+For Example, in the Task form, we have the active field, but having it visible is not that useful.We could hide it from the user. This can be done by setting its invisible attribute:
+```xml
+<field name="active" position="attributes">
+	<attribute name="invisible">1</attribute>
+</field>
+```
+使用隐藏是一个好的习惯，避免因为删除导致其它以来模块出问题。
 
 #### Extending the form view
+```xml
+<record id="view_form_todo_task_inherited" model="ir.ui.view">
+	<field name="name">Todo Task form -User extension</field>
+	<field name="model">todo.task</field>
+	<field name="inherit_id" ref="todo_app.view_form_todo_task"/>
+	<field name="arch" type="xml">
+		<field name="name" position="after">
+			<field name="user_id"/>
+		</field>
+		<field name="is_done" position="before">
+			<field name="date_deadline"/>
+		</field>
+		<field name="active" position="attributes">
+			<attribute name="invisible">1</attribute>
+		</field>
+	</field>
+</record>
+```
+> 在数据库表ir.ui.view里面也会产生一条记录，并且inherit_id字段等于被继承视图的id
+
+> 继承视图依然可以被继承，但是会非常复杂，尽量避免。
 
 #### Extending the tree and search views
+For the list view, we want to add the `user` field to it:
+```xml
+<record id="view_tree_todo_task_inherited" model="ir.ui.view">
+	<field name="name">Todo Task tree - User extension</field>
+	<field name="model">todo.task</field>
+	<field name="inherit_id" ref="todo_app.view_tree_todo_task"/>
+	<field name="arch" type="xml">
+		<field name="name" position="after">
+			<field name="user_id"/>
+		</field>
+	</field>
+</record>
+```
+For the search view, we will add the search by the user and predefined filters for the user's own tasks and the tasks not assigned to anyone:
+```xml
+<record id="view_filter_todo_task_inherited" model="ir.ui.view">
+	<field name="name">Todo Task tree - User extension</field>
+	<field name="model">todo.task</field>
+	<field name="inherit_id" ref="todo_app.view_filter_todo_task"/>
+	<field name="arch" type="xml">
+		<field name="name" position="after">
+			<field name="user_id"/>
+			<filter name="filter_my_tasks" string="My Tasks"
+				domain="[('user_id','in',[uid,False])]"/>
+			<filter name="filter_not_assigned" string="Not Assigned"
+				domain="[('user_id','=',False)]"/>
+		</field>
+	</field>
+</record>
+
+```
+### More model inheritance mechanisms
+**_inheritance** 可以继承很多父模型，在_inheritance后面加入一个列表。对于这种情况，我们可以使用混合类，混合类是实现了通用特征的模型，以便我们可以其它模型。混合类不希望被直接使用，像一个特性的容器等待被添加到其它模型。
+
+如果我们使用_name属性，起一个不同的名字，我们就可以得到一个新模型，重用了原模型的特性，而不是用数据库表和特性。官方文档管这叫 **prototype inheritance**。可以在这种继承上添加新特性，原模型将不会改变。
+
+还有一种继承叫 **delegation inheritance**,使用`_inherits`属性。允许一个模型包含其它模型使用对观察者来说透明的方法，而在这种情况下每个模型有自己的数据。你扩展一个模型，当你添加新特性时，他们添加到新的模型，原模型不变。在新模型的记录有一个link到原模型，原模型的字段可以直接在新模型使用。
 
 #### Copying features with prototype inheritance
 
