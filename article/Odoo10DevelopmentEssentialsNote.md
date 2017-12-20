@@ -956,10 +956,27 @@ For the search view, we will add the search by the user and predefined filters f
 还有一种继承叫 **delegation inheritance**,使用`_inherits`属性。允许一个模型包含其它模型使用对观察者来说透明的方法，而在这种情况下每个模型有自己的数据。你扩展一个模型，当你添加新特性时，他们添加到新的模型，原模型不变。在新模型的记录有一个link到原模型，原模型的字段可以直接在新模型使用。
 
 #### Copying features with prototype inheritance
-
+如果使用_name属性指定新名字则新模型会拷贝原模型的特性。拷贝意味着继承到的方法和字段在新模型上是有效的。对字段来说，意味着会被建立和存储在新模型的数据库表上，新模型和原模型的数据再没有关联，只有定义是共享的。
+接下来，我们会继承mail.thread的属性到我们的模型。实际中，当我们用到混合时，我们很少从正常的模型继承，因为这会引起数据结构的重复。
+Odoo还提供了 **委托继承** 机制来避免数据结构的复制，所以在一般情况下，这种继承使用的更多一些。
 #### Embedding models using delegation inheritance
+委托继承并不常用，但是它提供了非常便利的解决方案。关键字是 **_inherits** 一个非常好的例子就是odoo的用户模型：res.users，它继承了res.partner模型
+```python
+class User(models.Model)
+	_name = 'res.users'
+	_inherits = {'res.partner':'partner_id'}
+	partner_id = fields.Many2one('res.partner')
+```
+使用委托继承，当一个新的用户被创建时，一个partner同样被创建，这个链接保存在用户模型的partner_id里面。这与OO编程中的多态概念类似。
+通过委托继承partner模型里的名字和地址可以直接被res.users模型使用，但是数据还是存储在partner模型里面
+
+这种继承的好处是，比较prototype继承，不需要重复的数据结构，例如地址，占用好几个数据表。任何新模型想使用地址信息可以继承partner模型，如果在partner模型里面修改了地址信息，那么其它所有嵌入这个partner模型的地方也会立即生效。
+
+>  注意委托继承只能继承字段，不能继承方法。
 
 #### Adding the social network features
+
+
 
 ### Modifying data
 
