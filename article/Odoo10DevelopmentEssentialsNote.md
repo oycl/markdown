@@ -1013,12 +1013,43 @@ The next chapters will each focus on a specific area of Odoo development, most o
 ## 4,Module Data
 XML和CSV文件在odoo的运行时是不会使用的，只是把它们读入到数据库里面。
 ### Understanding external identifiers
-
+扩展标识符的概念非常重要，一个原因是更新一个模块，需要检测已经存在的记录，来决定是更新它们还是新建记录;另一个原因是支持内连数据：数据之间的依赖关系。在模块安装的时候，实际数据ID只是一个自增序数。而扩展标识符提供了一种手段来参考相关的记录，不用知道数据库指定的这个ID。Odoo管理从扩展标识符到实际ID的转换。这个机制其实很简单，就在数据库表 **ir.model.data**里面。
+在找扩展标识符的时候我们可以按照模块或者模型来寻找
+#### Finding external identifiers
+一种是使用扩展标识符菜单，另一种是使用查看元数据方法
 ### Exporting and importing data
+
+#### Exporting data
+
+#### Importing data
+
+#### Related records in CSV data files
 
 ### Module data
 
+#### Demonstration data
+
+
 ### XML data files
+
+#### The data noupdate attribute
+
+#### Defining records in XML
+
+##### Setting field values
+
+##### Setting values using expressions
+
+##### Setting values for relation fields
+
+#### Shortcuts for frequently used models
+
+#### Other actions in XML data files
+
+##### Deleting records
+
+##### Triggering functions and workflows
+
 
 ### Summmary
 
