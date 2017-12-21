@@ -975,18 +975,53 @@ class User(models.Model)
 >  注意委托继承只能继承字段，不能继承方法。
 
 #### Adding the social network features
+The social network messaging features are provided by the `mail.thread` model of the `mail` module. To add it to a custom model, we need to do the following:
+* Have the module depend on `mail`
+* Have the class inherit from `mail.thread`
+* Have the followers and thread widgets added to the form view
+* Optionally, we need to set up record rules for followers.
 
+按照这个清单，通过书，一步一步加进去就行。
+
+`mail.thread`是一个抽象模型。 **抽象模型** 跟普通模型差不多，只是没有数据库里面的表。抽象模型不是被直接使用的，而是希望被用作混合类。我们可以把其当作一个具有特征的模板。为了建立一个抽象类，我们只需要在建立类的时候继承`models.AbstractModel`而不是像普通模型一样继承`models.Model`
 
 
 ### Modifying data
+The &lt;record id="x" model="y"&gt; data loading elements actually perform an insert or update operation on the model y : if model x does not exist, it is created; otherwise, it is updated/written over.
+
+Since records in other modules can be accessed using a &lt;model&gt;.&lt;identifier&gt; global identifier, it's possible for our module to overwrite something that was written before by another module.
+
+> Note that since the dot is reserved to separate the module name from the object identifier, it can't be used in identifier names. Instead, use the underscore option.注意，点用来分隔模块名和标识符，就不能用来在标识符内使用，可以用下划线来代替。
+
+
 
 #### Modifying menu and action records
 
 #### Modifying security record rules
 
 ### Summary
+You should now be able to create your own modules by extending the existing ones.
 
+To demonstrate how to do this, we extended the To-Do module we created in the previous chapter, adding new features to the several layers that make up an application.
 
+We extended an Odoo model to add new fields and extended its business logic methods. Next, we modified the views to make the new fields available to them. Finally, we learned how to inherit features from other models and use them to add the social network features to the To-Do app.
+
+The first three chapters gave us an overview of the common activities involved in Odoo development, from Odoo installation and setup to module creation and extension.
+
+The next chapters will each focus on a specific area of Odoo development, most of which we briefly visited in these first chapters. In the following chapter, we will address data serialization and the usage of XML and CSV data files in more detail.
+
+## 4,Module Data
+XML和CSV文件在odoo的运行时是不会使用的，只是把它们读入到数据库里面。
+### Understanding external identifiers
+
+### Exporting and importing data
+
+### Module data
+
+### XML data files
+
+### Summmary
 
 
 [back](../)
+
