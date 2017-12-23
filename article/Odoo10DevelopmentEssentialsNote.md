@@ -1020,27 +1020,99 @@ XML和CSV文件在odoo的运行时是不会使用的，只是把它们读入到�
 ### Exporting and importing data
 
 #### Exporting data
+在listview里面，导出数据是一个标准特性。
+> 在Odoo9以后，点击标题会选择全部记录，这对数据记录非常大的情况是非常有用的。
+> Odpp会自动导出一个附加 `id` 列，这一列是扩展标识符。如果记录没有指定扩展标识符，一个带有__export__字符取代实际模块名称的标识符会自动产生。
+> 在实际使用中，初始迁移的数据每一条记录都指定了扩展标识符，而后来手动输入的记录开始以为不会有标识符，按照书中所说确实在ir.model.data里面搜索到模块module名称为__export__的标识符。而由数据库产生的记录也同样有这种标识符(m.bom)。看来想通过减少ir.model.data记录数量来优化odoo是不可能了。
 
 #### Importing data
-
+就像之前提到的那样，id列提供了唯一标识符。这样就允许已经存在的记录是被更新而不是新建。对于新的记录，我们可以提供一个扩展标识符，或者不填（自动生成）
 #### Related records in CSV data files
+前面的例子里，user_id是一个`多对一`的关系，列名是user_id/id，值是相关记录的扩展标识符，例如使用`base.user_root`来代表administrator用户
+
+> 使用真实的数据库ID只适用于你在同一个数据库上进行导入导出。通常你会更喜欢使用扩展标识符。
+> 如果使用扩展标识符，关联列有/id添加到列名里；如果使用数据库ID，有/.id添加到列名里。而冒号:可以代替斜杠/起到同样效果
+
+实际导出时选择“导入兼容”会比“导出全部数据”少一些列，这些列应该就是关联列。
+
+* 导入兼容:依照form视图的组织形式，只把原始列导出
+* 导出全部数据:把关联表的其它字段也加入进来
+
+数据如下
+```text
+重要度/ID","重要度/重要度名称","重要度"
+"1","A级","ultra.I001"
+```
+
+同样，多对多的关系一样被支持。一个多对多的典型例子是用户和群组。列名会被添加/id,列值接受被双引号包围的列表，里面是使用逗号分隔的扩展标识符。
+```text
+"id","name","groups_id/id"
+"base.user_demo","Demo User","base.group_no_one,base.group_partner_manager,base.group_user"
+"base.user_D009","白荣刚","base.group_yanfa,base.group_no_one,base.group_partner_manager,base.group_user"
+```
+
+最后，一对多的关系一样可以通过CSV文件导入。典型例子是一个文档标题有很多行。注意一对多的关系总是多对一关系的反转。还有就是一个公司会有多个银行账户，在下面的例子中我们导入三个银行账户。
+```xml
+id,name,bank_ids/id,bank_ids/acc_number,bank_ids/state
+base.main_company,YourCompany,__export__.res_partner_bank_4,123456789,bank
+,,__export__.res_partner_bank_5,135792468,bank
+,,__export__.res_partner_bank_6,1122334455,bank
+```
+实际使用时，需要在银行账户中先建立起银行信息。这种“多”一定是规范的信息，注意使用这种一对多的导入本身不能建立“多”的信息，只能是关联已有“多”的id，再把银行帐号等其它信息填入进去。
+
 
 ### Module data
+CSV文件导入的限制是文件名必须匹配模型名，例如使用ir.model.access.csv文件载入ir.model.access模型。
 
 #### Demonstration data
-
+演示数据的意义在于，可以示范模块的使用，还可以建立测试用的数据集。
+可以在\__manifest__.py里面使用 `demo`指定一串文件。
+每次模块升级，demo文件内容也重新载入
 
 ### XML data files
+CSV格式提供了一种简单和紧凑格式表示数据，XML文件则提供了对读取过程更强大和更多的控制。文件名也不必匹配模型的名称。这是因为XML格式通过XML元素提供了信息。
+之前的章节我们用过XML文件，用户界面组件：视图和菜单，是存储在系统模型里的。在模型中的XML文件就是用来读取记录到服务器的。我们以`data/todo_data.xml`为例演示XML文件的使用。
+
+元素&lt;element&gt;拥有两个强制属性，model和id（就是扩展标识符），然后使用&lt;field&gt; 标志对每个字段进行写。
+
+> 注意的是，斜杠/在XML文件中不能使用，取而代之的是`ref`来引用扩展标识符。我们将会讨论一对多的字段值该如何填写。
 
 #### The data noupdate attribute
+当数据重复读取，之前的记录就会被重写。记住：升级模块将来会重写任何手动的更改。尤其是用户在web上修改的视图，如果模型升级将会丢失。正确的过程是对于改变建立继承视图，就像第三章讨论的那样。
+
+这种重复导入的行为是默认的，但是可以被改变，所以当一个模块升级，一些data文件是不被读取的。这就用到了`noupdat="1"`属性来指定。当模块安装的时候执行一次，后面升级就会忽略。
+
+这种特性让我们的手动修改，在模块升级的时候是安全的。 **经常被用到的地方是ACL访问控制列表，因为在系统运行后，难免会添加一些用户和组，然后去修改规则。**
+
+我们还可以使用多个 &lt;data&gt;数据段，有的可以更新，有的不能更新。
+
+在扩展标识符菜单里可以指定是否能够更新。
+
+> noupdate 在开发的时候也很烦人，因为里面的更改不能被体现出来。一个解决方法是使用重新安装指令-i，来代替升级指令-u
+。这样重新安装就会体现noupdate里面的更改。
 
 #### Defining records in XML
+每个&lt;record&gt;元素有两个基本属性`id`和`model`，然后用&lt;field&gt;指定字段的值。
+* id对应扩展标识符
+* model对应记录被存入的目标模型
+
+&lt;field&gt;指定值的方式有一点不同，让我们看下面：
 
 ##### Setting field values
+在&lt;field&gt;中&lt;name&gt;定义了字段，被写入值的内容在&gt;和&lt;/之间。对于时间和日期来说，字符"YYYY-mm-dd" and "YYYY-mm-dd HH:MM:SS"会被妥善处理。但是布尔类型字段任何非空值将被转换为True，"0"和"False"将会被转换为“False”
+
+> 在odoo10上对布尔类型做了改进。因为以前的版本任何非空值包括"0"和"False"都会被转换为真
 
 ##### Setting values using expressions
+最详细的定义一个值是使用`eval`属性。它会计算一个python表达式，然后指定结果给字段赋值。
+表达式除了有Python内建，还有一些附加的标识符可以使用，接下来我们看一看。
+
+
 
 ##### Setting values for relation fields
+
+
+
 
 #### Shortcuts for frequently used models
 
