@@ -1107,24 +1107,177 @@ CSV格式提供了一种简单和紧凑格式表示数据，XML文件则提供�
 最详细的定义一个值是使用`eval`属性。它会计算一个python表达式，然后指定结果给字段赋值。
 表达式除了有Python内建，还有一些附加的标识符可以使用，接下来我们看一看。
 
+如果想处理日期，接下来的模块必须有效：time,datetime,timedelta还有relativedelta。他们允许你计算日期值，在演示和测试数据时经常使用，所以日期的使用非常接近模块的安装日期。例如，设置一个昨天的时间，我们这样使用：
+```xml
+<field name="date_deadline" eval="(datetime.now() + timedelta(-1)).strftime('%Y-%m-%d')" />
+```
+在赋值内容中可以使用ref()函数，用来做扩展标识符和数据库ID的转换。这也可以用来设置相关联的字段
+```xml
+<field name="user_id" eval="ref('base.group_user')" />
+```
 
 
 ##### Setting values for relation fields
+我们来看看怎样设置一个多对一的关系字段，例如user_id，使用eval属性和ref()函数，但是还有一种更简单的方法。
+```xml
+<field name="user_id" ref="base.user_demo" />
+```
 
+对于一对多和多对多字段，一个关联IDs的列表可以使用，所以需要一个不同的语法。Odoo提供了一种特殊的语法来写这种类型的字段。
+下面这个例子来自官方的车辆管理APP，代替了tag_ids相关的记录。
 
-
+```xml
+<field name="tag_ids"
+eval="[(6,0,
+	[ref('vehicle_tag_leasing'),
+	ref('fleet.vehicle_tag_compact'),
+	ref('fleet.vehicle_tag_senior')]
+)]" />
+```
+为了写一个对多的字段，我们使用了一个三元列表。每一元是一个写命令，依据code做了不同的事情
+```xml
+	(0,_ ,{'field': value}) creates a new record and links it to this one
+	(1,id,{'field': value}) updates the values on an already linked record
+	(2,id,_)                unlinks and deletes a related record
+	(3,id,_)                unlinks but does not delete a related record
+	(4,id,_)                links an already existing record
+	(5,_,_)                 unlinks but does not delete all the linked records
+	(6,_,[ids])             replaces the list of linked records with the provided list
+```
+The underscore symbol used in the preceding list represents irrelevant values, usually filled with 0 or False.
 
 #### Shortcuts for frequently used models
+在前面第二章中，我们会还用了&lt;act_window&gt;和&lt;menuitem&gt;。这只是&lt;record&gt;的一种简写方式，也可以使用&lt;record&gt;来写。
+下面是一些简写对应的模型
+```xml
+<act_window> is the window action model, ir.actions.act_window, 实际是ir_act_window
+<menuitem> is the menu items model, ir.ui.menu
+<report> is the report action model, ir.actions.report.xml, 实际是ir_act_report_xml
+<template> is for QWeb templates stored in the model ir.ui.view
+<url> is the URL action model, ir.actions.act_url, 实际是ir_act_url
+```
 
 #### Other actions in XML data files
-
+到目前为止，我们只看到了使用XML文件添加和更新数据。特别地，也可以删除数据，执行任意的模型方法，触发工作流事件。
 ##### Deleting records
+&lt;delete&gt;可以删除记录，可以通过ID或者一个search domain来定位记录。
+```xml
+使用ID
+<delete model="ir.rule" id="todo_app.todo_task_user_rule" />
+使用 search domain
+<delete model="ir.rule" search=" [('id','=',ref('todo_app.todo_task_user_rule'))]" />
+```
+经过实际测试，可以这样使用
+```xml
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="0">
+        <delete model="todo.task" id="todo_user.todo_task_f" />
+    </data>
+</odoo>
+```
 
 ##### Triggering functions and workflows
+&lt;function&gt;可以执行方法，例如
+```xml
+<function
+	model="crm.lead"
+	name="action_set_lost"
+	eval="[ref('crm_case_7'), ref('crm_case_9')
+			, ref('crm_case_11'), ref('crm_case_12')]
+			, {'install_mode': True}" 
+/>
+```
+这段代码执行`crm.lead`模型里的`action_set_lost`方法，使用eval属性传递两个参数。第一个是作用的ID，下一个是所用的内容。
+另一个作用是触发工作流，属性是&lt;workflows&gt;。举个例子，工作流可以触发销售单的状态或者转化成一个发票。`sale`app不再使用工作流，但是这个例子在演示数据中仍然可以被发现：
+```xml
+<workflow model="sale.order"
+	ref="sale_order_4"
+	action="order_confirm" />
+```
+The `model` attribute is self-explanatory by now, and `ref` identifies the workflow instance we are acting upon. The `action` is the workflow signal sent to this workflow instance.
+
+### Summary
+You have learned all the essentials about data serialization and gained a better understanding of the XML aspects we saw in the previous chapters. We also spent some time understanding external identifiers, a central concept of data handling in general and module configurations in particular.
+XML data files were explained in detail. You learned about the several options available to set values on fields and also to perform actions, such as deleting records and calling model methods.
+CSV files and the data import/export features were also explained. These are valuable tools for Odoo's initial setup or for mass editing of data.
+
+In the next chapter, we will explore how to build Odoo models in detail and learn more about building their user interfaces.
+
+## 5,Models – Structuring the Application Data
+接下来的章节中，将详细讨论这些层次：模型，视图和事物逻辑。在这一章里，学习怎样设计数据结构来支撑一个应用，还有怎样表示结构之间的关系。
+
+### Organizing application features into modules
+Odoo的继承机制提供一种有效的扩展机制。允许你扩展第三方应用而不用直接更改他们。这种可组合性也形成了以模块为导向开发模式，这样大的app可以被分成小的特性，足够表示他们自己。
+
+这同时在技术层面和用户经验层面有助于限制复杂性。从技术角度看，分割一个大的问题到小的部分使问题更容易解决，对于增加的特性的开发也更友好。从用户经验角度看，我们可以选择激活用户真正需要的特性，使用尽量简单的用户界面。所以我们将会改进我们的To-Do 应用通过附加模块，最后形成一个具有全部特性的应用。
 
 
-### Summmary
+#### Introducing the todo_ui module
+接下来，我们将会改进用户界面，包括一个kanban视图。kanban视图是一个简单的以列组织条目的工作流，这些条目从左向右流动，直到完成。我们会组织我们的任务进入对应的列，依据不同的阶段：等待，准备，开始和完成。
+我们开始添加数据结构以完成上面的任务。我们需要添加stages，最好可以支持tags，允许任务通过主题分类。在这一章，我们会聚焦于数据模型。用户界面在下一章和第九章讨论。
+
+第一件事是我们的数据怎样组织好以便我们可以设计支持模型。我们已经有了整个条目：To-do Task。每个task在一个时间将会处于一个阶段，tasks会有一个或者多个tags。我们将会添加两个附加模型，还有相应的关系：
+	每个task有一个stage，很多tasks会处以同意stage
+	每个task有多个tags，每个tags有多个tasks
+这意味着tasks和stages有多对一的关系，和tags有多对多的关系。反过来说：stages和tasks有一对多的关系，tags和tasks有多对多的关系。
+
+### Creating models
+
+
+#### Model attributes
+
+#### Models and Python classes
+
+#### Transient and Abstract models
+
+#### Inspecting existing models
+
+### Creating fields
+
+#### Basic field types
+
+#### Common field attributes
+
+#### Special field names
+
+
+### Relationships between models
+
+#### Many-to-one relationships
+
+#### Many-to-many relationships
+
+#### One-to-many inverse relationships
+
+#### Hierarchic relationships
+
+#### Reference fields using dynamic relationships
+
+
+### Computed fields
+
+#### Searching and writing on computed fields
+
+#### Storing computed fields
+
+#### Related fields
+
+### Model Constraints
+
+### Summary
+
+We went through a detailed explanation of models and fields, using them to extend the To-Do app with Tags and Stages on tasks. You learned how to define relationships between models, including hierarchical parent/child relationships. Finally, we saw simple examples of computed fields and constraints using Python code.
+
+In the next chapter, we will work on the user interface for these backend model features, making them available in the views used to interact with the application.
+
+
+## 6,Views - Designing the User Interface
+
+## 7,ORM Application Logic – Supporting Business Processes
 
 
 [back](../)
+
+
 
