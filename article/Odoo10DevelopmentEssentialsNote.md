@@ -1218,11 +1218,30 @@ Odoo的继承机制提供一种有效的扩展机制。允许你扩展第三方�
 我们开始添加数据结构以完成上面的任务。我们需要添加stages，最好可以支持tags，允许任务通过主题分类。在这一章，我们会聚焦于数据模型。用户界面在下一章和第九章讨论。
 
 第一件事是我们的数据怎样组织好以便我们可以设计支持模型。我们已经有了整个条目：To-do Task。每个task在一个时间将会处于一个阶段，tasks会有一个或者多个tags。我们将会添加两个附加模型，还有相应的关系：
-	每个task有一个stage，很多tasks会处以同意stage
+	每个task有一个stage，很多tasks会处于同一个stage
 	每个task有多个tags，每个tags有多个tasks
 这意味着tasks和stages有多对一的关系，和tags有多对多的关系。反过来说：stages和tasks有一对多的关系，tags和tasks有多对多的关系。
 
 ### Creating models
+todo_ui/models/todo_model.py内容为
+```python
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api
+
+class Tag(models.Model):
+    _name = 'todo.task.tag'
+    _description = 'To-do Tag'
+    name = fields.Char('Name', size=40, translate=True)
+
+class Stage(models.Model):
+    _name = 'todo.task.stage'
+    _description = 'To-do Stage'
+    _order = 'sequence,name'
+    name = fields.Char('Name', 40, translate=True)
+    sequence = fields.Integer('Sequence')
+```
+注意倒数第二行的40会引起编译错误，改成size=40，错误消失
+
 
 
 #### Model attributes
