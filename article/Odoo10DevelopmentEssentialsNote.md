@@ -1245,18 +1245,116 @@ class Stage(models.Model):
 
 
 #### Model attributes
+一些模型属性
+* `_name` is the internal identifier for the Odoo model we are creating. Mandatory when creating a new model.
+* `_description` is a user friendly title for the model's records, shown when the model is viewed in the user interface. Optional but recommended.
+* `_order` sets the default order to use when the model's records are browsed, or shown in a list view. It is a text string to be used as the SQL `order by` clause, so it can be anything you could use there, although it has a smart behavior and supports translatable and many-to-one field names.
+注意在view视图里面，也有一个排序的属性
+```xml
+<tree default_order="calc desc,name">
+```
+还有一些属性被用在高级一点的情况。
+* `_rec_name` indicates the field to use as the record description when referenced from related fields, such as a many-to-one relationship. By default, it uses the name field, which is a commonly found field in models. But this attribute allows us to use any other field for that purpose.
+* `_table` is the name of the database table supporting the model. Usually, it is left to be calculated automatically, and is the model name with the dots replaced by underscores. But it's possible to set to indicate a specific table name.
+
+We can also have the \_inherit and \_inherits attributes, as explained in Chapter 3, Inheritance - Extending Existing Applications.
 
 #### Models and Python classes
+Odoo模型使用了一个中央注册机制，在旧的odoo版本中可以参考`pool`。这是一个在实例中保存到所有模型类引用的字典，也可以被模型名称引用。特别地，在一个模型的方法中可以使用`self.env['x']`来得到一个类的引用表示模型x。
+这样你就了解了模型名称在通过注册机制访问时的重要性。通常对模型名称来说使用小写字母并通过点连接，例如todo.task.stage。通常我们应该使用单数形式todo.task来代替todo.tasks，只有一些例外是历史原因造成的，如res.users。
+模型名称必须是全局唯一。因为这个，第一个单词应该能表现模块的主要功能。在我们的例子中是todo。其它例子是核心模块project,crm,sale
+python类名位于python文件中声明的地方。类名只在文件中标识代码，正因为如此，类名也不用加上主应用的前缀，我们使用stage类名来实现todo.task.stage模型完全没有问题。在其它模块中使用相同的类名也不会产生冲突的风险。
+
+对于类定义来说，两种不同的常规命名法可以被使用：`snake_case`和`CamelCase`。python标准是使用后一种。
+
+说来说去，模型的名称要唯一，因为最后映射到数据库表上面。类名随意，不起什么作用。
 
 #### Transient and Abstract models
+在之前的模型里，类继承自`models.Model`。这种类型的模型会被数据库留存：建立数据表并存储记录直到明确地删除它们。
+但是odoo还提供了两种模型：Transient和Abstract
+* Transient models are based on the `models.TransientModel` class and are used for wizardstyle user interaction. Their data is still stored in the database, but it is expected to be temporary. A vacuum job periodically clears old data from these tables. For example, the Load a Language dialog window, found in the Settings | Translations menu, uses a Transient model to store user selections and implement wizard logic.
+* Abstract models are based on the `models.AbstractModel` class and have no data storage attached to them. They act as reusable feature sets to be mixed in with other models, using the Odoo inheritance capabilities. For example, mail.thread is an Abstract model, provided by the Discuss addon, used to add message and follower features to other models.
+
 
 #### Inspecting existing models
+在**Setting**菜单 **Technical|Database Structure|Models**菜单里面，可以查看模型列表。
+这是一个很好的检查模型结构的工具，你可以看到从不同模块改变的结果。在这种情况下，你可以看到`In Apps`字段，这个模型todo.task的定义，来自于todo_app和todo_user模块
+接下来我们可以看到：字段，访问权，和这个模型关联的视图的page
+
+我们可以找到模型的扩展标识符，使用查看元数据菜单就能看到。扩展标识符是由ORM自动产生的，比如todo.task模型的扩展标识符就是model_todo_task.
+
+> 上面模型的视图是可以编辑的，可以从这里修改模型，字段，视图。在固化到模块之前可以先在这里建一个原型。
 
 ### Creating fields
+Odoo支持text strings,integers,floating point numbers,Booleans,dates,datetimes and image/binary data.
+一些字段名是特别的，因为他们被ORM保留做特殊的用途，或者由于一些内建的特性使用了一些默认的字段名。
 
 #### Basic field types
+在 Stage类上添加字段
+```python
+class Stage(models.Model):
+    _name = 'todo.task.stage'
+    _description = 'To-do Stage'
+    _order = 'sequence,name'
+    #string fields:
+    name = fields.Char('Name', size=40, translate=True)
+    desc = fields.Text('Description')
+    state = fields.Selection(
+        [('draft','New'),('open','Started'),('done','Closed')],
+        'State',
+        # selection_add= When extending a Model, adds items to selection list
+    )
+    docs = fields.Html('Documentation')
+
+    #Numeric fields:
+    sequence = fields.Integer('Sequence')
+    perc_complete = fields.Float('% Complete', digits=(3,2))
+
+    #Date fields
+    date_effective = fields.Date('Effective Date')
+    date_changed = fields.Datetime('Last Changed')
+
+    #Other fields:
+    fold =  fields.Boolean('Folded?')
+    image = fields.Binary('Image')
+
+```
+很多情况下，第一个参数是field title,对应于string字段参数，这个参数就是用户界面的列名称。这个字段是可选的，如果没有使用，默认会由name字段产生。
+
+对于date 字段来说，有一个通用的规则是使用date作为前缀。例如，date_effectiv。相同的规则也使用于其它字段：amount_,price_,或者qty_
+
+还有一些标准的位置参数适用于各种字段类型
+* Char expects a second, optional, argument size, for the maximum text size. It's recommended to not use it unless there is business requirement that requires it, such as a social security number with a fixed length.
+* Text differs from Char , in that, it can hold multiline text content, but expects the same arguments.
+* Selection is a drop-down selection list. The first argument is the list of selectable options and the second is the string title. The selection item is a list of ('value', 'Title') tuples, for the value stored in the database and the corresponding user interface description. When extending through inheritance, the **selection_add** argument is available to append new items to an existing selection list.
+* Html is stored as a text field, but has specific handling on the user interface, for HTML content presentation. For security reasons, they are sanitized by default, but this behavior can be overridden.
+* Integer just expects a string argument for the field title. 
+* Float has a second optional argument, an (x,y) tuple with the field's precision: x is the total number of digits; of those, y are decimal digits.
+* Date and Datetime fields expect only the string text as a positional argument. For historical reasons, the ORM handles their values in a string format. Helper functions should be used to convert them to actual date objects. Also the datetime values are stored in the database in UTC time but presented in local time, using the user's time zone preferences. This is discussed in more detail in Chapter 6 , Views - Designing the User Interface .注意使用UTC存储，而在界面中按实际时间显示。参照[Linux系统环境配置](SetupLinuxEnvironment.md#关于时区的讨论)
+* Boolean holds True or False values, as you might expect, and only have one positional argument for the string text.
+* Binary stores file-like binary data, and also expects only the string argument. They can be handled by Python code using base64 encoded strings.
+
 
 #### Common field attributes
+当字段定义的时候，可以设置字段属性。像前面一节那样，依赖字段类型，一些属性可以不使用关键字而通过位置传递。更多的关键字参数可以参照[Python官方文档](https://docs.python.org/2/tutorial/controlflow.html#keyword-arguments)
+所有属性都可以使用关键字参数，下面是一些通常使用的属性和相应的关键字：
+
+* string is the field default label, to be used in the user interface. Except for selection and relational fields, it is the first positional argument, so most of the time it is not used as a keyword argument.除selection和relational字段，string是第一个位置参数。
+* default sets a default value for the field. It can be a static value, such as a string, or a callable reference, either a named function or an anonymous function (a lambda expression).
+* size applies only to Char fields, and can set a maximum size allowed. Current best practice is to not use it unless it's really needed.
+* translate applies only to Char , Text , and Html fields, and makes the field contents translatable, holding different values for different languages.
+* help provides the text for tooltips displayed to the users.
+* readonly=True makes the field by default not editable on the user interface. This is not enforced at the API level; it is only a user interface setting.
+* required=True makes the field by default mandatory in the user interface. This is enforced at the database level by adding a NOT NULL constraint on the column.
+* index=True will create a database index on the field.
+* copy=False has the field ignored when using the duplicate record feature, copy() ORM method. The non-relational fields are copyable by default.
+* groups allows limiting the field's access and visibility to only some groups. It expects a comma separated list of XML IDs for security groups, such as
+```xml
+groups='base.group_user,base.group_system' .
+```
+**这一条非常重要，现在开始试验**
+
+
 
 #### Special field names
 

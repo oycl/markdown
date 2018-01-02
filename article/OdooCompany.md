@@ -45,6 +45,7 @@ base.group_kufang,YTO库房
 base.group_zhiliang,YTO质量
 base.group_xiaoshou,YTO销售
 base.group_shuju,YTO数据
+base.group_caiwu,YTO财务
 ```
    
    
