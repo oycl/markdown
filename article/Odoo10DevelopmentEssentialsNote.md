@@ -1339,31 +1339,123 @@ class Stage(models.Model):
 当字段定义的时候，可以设置字段属性。像前面一节那样，依赖字段类型，一些属性可以不使用关键字而通过位置传递。更多的关键字参数可以参照[Python官方文档](https://docs.python.org/2/tutorial/controlflow.html#keyword-arguments)
 所有属性都可以使用关键字参数，下面是一些通常使用的属性和相应的关键字：
 
-* string is the field default label, to be used in the user interface. Except for selection and relational fields, it is the first positional argument, so most of the time it is not used as a keyword argument.除selection和relational字段，string是第一个位置参数。
-* default sets a default value for the field. It can be a static value, such as a string, or a callable reference, either a named function or an anonymous function (a lambda expression).
-* size applies only to Char fields, and can set a maximum size allowed. Current best practice is to not use it unless it's really needed.
-* translate applies only to Char , Text , and Html fields, and makes the field contents translatable, holding different values for different languages.
-* help provides the text for tooltips displayed to the users.
-* readonly=True makes the field by default not editable on the user interface. This is not enforced at the API level; it is only a user interface setting.
-* required=True makes the field by default mandatory in the user interface. This is enforced at the database level by adding a NOT NULL constraint on the column.
-* index=True will create a database index on the field.
-* copy=False has the field ignored when using the duplicate record feature, copy() ORM method. The non-relational fields are copyable by default.
-* groups allows limiting the field's access and visibility to only some groups. It expects a comma separated list of XML IDs for security groups, such as
+* `string` is the field default label, to be used in the user interface. Except for selection and relational fields, it is the first positional argument, so most of the time it is not used as a keyword argument.除selection和relational字段，string是第一个位置参数。
+* `default` sets a default value for the field. It can be a static value, such as a string, or a callable reference, either a named function or an anonymous function (a lambda expression).
+* `size` applies only to Char fields, and can set a maximum size allowed. Current best practice is to not use it unless it's really needed.
+* `translate` applies only to Char , Text , and Html fields, and makes the field contents translatable, holding different values for different languages.
+* `help` provides the text for tooltips displayed to the users.
+* `readonly=True` makes the field by default not editable on the user interface. This is not enforced at the API level; it is only a user interface setting.
+* `required=True` makes the field by default mandatory in the user interface. This is enforced at the database level by adding a NOT NULL constraint on the column.
+* `index=True` will create a database index on the field.
+* `copy=False` has the field ignored when using the duplicate record feature, copy() ORM method. The non-relational fields are copyable by default.
+* `groups` allows limiting the field's access and visibility to only some groups. It expects a comma separated list of XML IDs for security groups, such as
 ```xml
-groups='base.group_user,base.group_system' .
+groups='base.group_user,base.group_system'
 ```
 **这一条非常重要，现在开始试验**
+经过实际测试，在model中的某字段做出groups的限制后，form和tree视图统一添加该字段做显示。实际结果是只有groups里面的组可以在两个视图中看到这个字段，其它组既看不到也不能导出数据，即使是administrator也看不到，符合要求！！
+* `states` expects a dictionary mapping values for UI attributes depending on values of the state field. For example: states={'done':[('readonly',True)]} . Attributes that can be used are readonly, required , and invisible.
 
+> 注意states字段属性相当于视图的attrs属性。在视图属性中也支持一个states属性，但是是不同的用法：接受一个逗号分隔符的状态列表来控制元素何时被显示。
 
+* `deprecated=True` logs a warning whenever the field is being used.
+* `oldname='field'` is used when a field is renamed in a newer version, enabling the data in the old field to be automatically copied into the new field.
 
 #### Special field names
+很少的字段名被用于ORM
+* `id`是一个自增的序列，使用的是数据库的主键，会自动添加到每一个模型
 
+下面字段也会在新模型中自动建立，除非`_log_access=False`模型属性被设置
+* `create_uid` is for the user that created the record
+* `create_date` is for the date and time when the record is created
+* `write_uid` is for the last user to modify the record
+* `write_date` is for the last date and time when the record was modified
+
+上面这些信息也可以通过激活开发者模式在 **View Metadata** 菜单看到.
+
+一些API的内建特性需要通过默认的字段名实现，我们要避免使用这些字段名，其中的一些甚至完全不能被其它目的使用。
+
+* `name` is used by default as the display name for the record. Usually it is a Char, but can also be a Text or a Many2one field type. We can still set another field to be used for display name, using the \_rec_name model attribute.
+
+* `Active` of type Boolean, allows inactivating records. Records with active==False will automatically be excluded from queries. To access them an ('active','=',False) condition must be added to the search domain, or 'active_test': False should be added to the current context.
+这个特性应该也会用到，非激活状态的数据不能被直接看到，但是可以设置过滤条件找到并导出，虽然不能用来保密，但是对于历史记录可以起到隐藏显示的作用。当流程走到最后一步，点击完成按钮就可以把Active设置成False。比如生产计划，正在进行的生产计划会显示，完成的会隐藏，但是想查看的时候也能查看。在界面上组合readonly="1"，即使有编辑权限的人也不能直接编辑，必须流程走到最后点击完成，实现隐藏。
+
+* `Sequence` of type Integer , if present in a list view, allows to manually define the order of the records. To work properly you should not forget to use it with the model's \_order attribute.在数据库记录层面来调整显示顺序，需要配合\_order属性使用,指定数字123，就会按数字顺序显示记录。在view层面可以使用&lt;tree default_order="calc desc,name"&gt;
+
+* `State` of type Selection , represents basic states of the record's life cycle, and can be used by the state's field attribute to dynamically modify the view: some form fields can be made readonly, required, or invisible in specific record states.
+用来表示记录生命循环的基本状态，可以被state字段属性修改视图：一些form视图字段可以被设置只读，必填或者不可见。
+没怎么用过，需要仔细看看，也许会有新发现。
+
+* `parent_id , parent_left , and parent_right` of type Integer , have special meaning for parent/child hierarchical relations. We will discuss them in detail in the next section.这个可能在BOM中用到。
+
+到目前为止，我们就讨论了非联系字段。但是一个应用最好的部分是描述实体之间关系的部分。我们继续看一看。
 
 ### Relationships between models
+继续分析这个应用：
+	每个task有一个stage，这是一个`多对一`的关系，也就是外键。反过来说就是`一对多`的关系，意味着处于一个stage会有很多task
+	每个task有多个Tags，这是一个`多对多`的关系。反过来说也是`多对多`的关系，因为每个Tag有多个task
+在模型文件中加入这一段，运行后查看数据库表会多一个stage_id列。还会多一个todo_task_todo_task_tag_rel表。
+```python
+class TodoTask(models.Model):
+    _inherit = 'todo.task'
+    stage_id = fields.Many2one('todo.task.stage', 'Stage')
+    tag_ids = fields.Many2many('todo.task.tag', string='Tags')
+```
+对于关联字段的命名规则是添加\_id和\_ids，分别对应`对一`和`对多`关系
 
 #### Many-to-one relationships
+The `Many2one` relationship 接受两个位置参数：关联模型（使用comodel关键字）和列名（string关键字），它建立了一个对关联表的外键。
+下面是一些附加的命名参数
+
+* `ondelete` defines what happens when the related record is deleted. Its default is `set null`, meaning that an empty value is set when the related record is deleted. Other possible values are `restrict`, raising an error preventing the deletion, and `cascade` also deleting this record.
+* `context` is a dictionary of data, meaningful for the web client views, to carry information when navigating through the relationship. For example, to set default vales. It will be better explained in the Chapter 6 , Views - Designing the User Interface.数据字典，对视图有意义，设置默认值，在第六章解释。
+* `domain` is a domain expression, a list of tuples, used filter the records available for the relation field.对相关字段进行过滤
+* `auto_join=True` allows the ORM to use SQL joins when doing searches using this relationship. If used, the access security rules will be bypassed, and the user could have access to related records the security rules wouldn't allow, but the SQL queries will be more efficient and run faster.当使用这个关联做查找时，允许ORM使用SQL的joins。如果使用这个关键字，则访问安全规则将会被忽略。用户将会访问之前规则不允许访问的关联记录，但是SQL的查询将会执行的更快。
 
 #### Many-to-many relationships
+
+The `Many2many` minimal signature accepts one argument for the related model, and it is recommended to also provide the string argument with the field title.
+
+在数据库层面，并不添加任何列到已经存在的表，而是生成一个只有两个ID列的表，使用外键分别关联到原表上。新表名和列名自动产生，新表名是两个表连接到一起再加一个_rel属性。
+
+在一些情况下，我们可能重写这些自动产生的名字：
+* 一种情况是关联模型有一个长名字，导致新表名过长，超过了PostgreSQL63个字符的限制。在这种情况下我们需要手动指定新表名来适应数据库的长度限制。
+* 另一种情况是在相同的模型中，需要第二个多对多关系。在这种情况下我们需要手动提供一个关联表名。所以不能和之前已经存在的第一个关系使用的表名产生冲突。
+
+两种方法手动指定：位置参数或者关键字参数
+
+位置参数
+```python
+tag_ids = fields.Many2many(
+	'todo.task.tag',      # related= (model name)
+	'todo_task_tag_rel',  # relation= (table name)
+	'task_id',               # column1= ("this" field)
+	'tag_id',                # column2= ("other" field)
+	string='Tags')
+```
+> 我们也可以只设置表名，让字段名自动产生。
+
+关键字参数
+```python
+# Task <-> Tag relation (keyword args):
+tag_ids = fields.Many2many(
+	comodel_name='todo.task.tag', # related model
+	relation='todo_task_tag_rel',# relation table name
+	column1='task_id', # field for "this" record
+	column2='tag_id', # field for "other" record
+	string='Tags')
+```
+就像多对一字段，多对多字段也支持domain和context属性
+
+> 在ORM的设计中，有一个限制：关于抽象类，当你生成了关联表的名字和列名，他们不能被干净地继承。所以在抽象模型中不能使用这种关联。？？
+
+多对多关系的反转也是多对多关系，如果我们在Tags模型中添加多对多关系，则Odoo也会推断是Task模型关系的反转。我们可以这样实现。
+```python
+# Many2many inverse relationship
+task_ids = fields.Many2many(
+	'todo.task',  #related model
+	string='Tasks')
+```
 
 #### One-to-many inverse relationships
 
@@ -1390,6 +1482,8 @@ In the next chapter, we will work on the user interface for these backend model 
 
 
 ## 6,Views - Designing the User Interface
+可以指定数据在界面层能否被编辑，这个应该也很有用
+<field name="active" readonly="1"/>
 
 ## 7,ORM Application Logic – Supporting Business Processes
 
