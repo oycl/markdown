@@ -1429,8 +1429,8 @@ The `Many2many` minimal signature accepts one argument for the related model, an
 tag_ids = fields.Many2many(
 	'todo.task.tag',      # related= (model name)
 	'todo_task_tag_rel',  # relation= (table name)
-	'task_id',               # column1= ("this" field)
-	'tag_id',                # column2= ("other" field)
+	'task_id',            # column1= ("this" field)
+	'tag_id',             # column2= ("other" field)
 	string='Tags')
 ```
 > 我们也可以只设置表名，让字段名自动产生。
@@ -1458,13 +1458,84 @@ task_ids = fields.Many2many(
 ```
 
 #### One-to-many inverse relationships
+`一对多`这种关系虽然不在数据库中产生任何改变，但是可以让我们很容易的从`一`端查看对应的`多`条记录。一个典型的应用是一个文档标题对应多行文字。
+
+在我们的例子里，是一个Stage会有多个Task，添加如下代码
+```python
+task_ids = fields.One2many(
+	'todo.task', # related model, keyword arguments:comodel_name=
+	'stage_id',  # field for "this" on related model,keyword arguments:inverse_name=
+	'Tasks in this stage' #title string
+	)
+```
 
 #### Hierarchic relationships
+父子树的关系可以对同一个模型使用一个`多对一`关系，所以每个记录可以参照它的父亲。反过来，One2many可以让父亲很容易追踪到儿子。
+
+Odoo改进了对这种分层数据结构的支持。通过树的兄弟进行更快的浏览，在domain表达式里面通过使用`child_of`操作符可以更容易的找到。
+
+为了使用这个特性，我们需要设置`_parent_store`标志属性，添加模型帮助字段`parent_left 和 parent_right`。注意这个附加的操作在存储和执行上都有时间花费，所以适用于那些读多于写的情况，例如一个分类树。
+
+在python文件添加如下代码
+```python
+    # Hierarchic relationships:
+    _parent_store = True
+    _parent_name = 'parent_id'  # the default
+    parent_id = fields.Many2one(
+        'todo.task.tag',
+        'Parent Tag',
+        ondelete='restrict')
+    parent_left = fields.Integer('Parent Left', index=True)
+    parent_right = fields.Integer('Parent Right', index=True)
+```
+执行后数据表会多出三列:parent_id,parent_left,parent_right。parent_id字段参照父记录，\_parent_store 属性添加了分层搜索支持。parent_left,parent_right也要一并增加
+parent_id字段参照到父记录，我们也可以用\_parent_name属性指定
+
+同样，在记录的直接孩子中可以非常方便的添加一个字段child_ids
+```python
+child_ids = fields.One2many(
+        'todo.task.tag',
+        'parent_id',
+        'Child Tags')
+```
+我的理解是模型中的每条记录即是父又是子，这种父子关系是固定的，就像图书分类，每一类固定父类和子类，不会出现一个孩子既属于这个父类，又属于那个父类。但是在BOM中一个零件会出现在各个分支中。
+
 
 #### Reference fields using dynamic relationships
+通常的关联字段都是固定关联某个模型，参照字段类型没有这个限制并支持动态关系，所以同一个字段可以参照多个模型。例如我们可以使用一个refer_to字段既关联User又关联Partner:
+```python
+class TodoTask(models.Model):
+	refers_to = fields.Reference(
+	[('res.users', 'User'), ('res.partner', 'Partner')],
+	'Refers to')
+```
+经过实际测试，在数据库的模型'todo.task'只多了一个字段，res.users和res.partner不知道存储在何处了
+
+在视图面，会出现两个选择栏，先选择是res.users，还是res.partner,然后根据选择调出第二个选择栏。就像行政区划分，选择了省出现市，选择市出现县。
+
+这个字段的意义可以这样利用，如果使用零件库和原料库，则可以同时关联这两个这两个仓库，然后就可以把零件和原料放在不同的模型中。兼容目前程序，避免混乱。
+
+还可以有另外一种实现方式：在数据库结构菜单里面有“可参照模型”菜单，可以配置参照字段使用的模型。当建立一个这样的字段，我们就可以使用这里的任何模型了。我们是通过odoo.addons.res.res_request模块（实际是数据库表res_request_link）里的referenceable_models()函数。
+
+像下面这样，使用参照模型菜单配置一个改进版本的`Refers to`字段
+```python
+from odoo.addons.base.res.res_request import referenceable_models
+# class TodoTask(models.Model):
+	refers_to = fields.Reference(
+	referenceable_models,
+	'Refers to')
+```
+这里的灵活性在于，我们在“可参照模型”菜单中设置好需要参照的模型，然后这里使用referenceable_models，不必把所有列表写死，以后还可以继续添加。
+
+> 注意odoo9使用的api有些不同
 
 
 ### Computed fields
+字段值可以通过函数计算出来，而不是简单的读取数据库的存储值。计算字段的声明和普通字段是一样的，但是附加了`compute`参数，来定义用于计算的函数。
+在大多数情况下，计算字段用来写一些事物逻辑，所以我们将在Chapter 7, ORM Application Logic - Supporting Business Processes.里做更详细的讨论。我们在这里的讨论将保持事物逻辑的简单化。
+
+我们以Stages模型里的fold字段为例演示。
+
 
 #### Searching and writing on computed fields
 
