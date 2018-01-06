@@ -1535,15 +1535,102 @@ from odoo.addons.base.res.res_request import referenceable_models
 在大多数情况下，计算字段用来写一些事物逻辑，所以我们将在Chapter 7, ORM Application Logic - Supporting Business Processes.里做更详细的讨论。我们在这里的讨论将保持事物逻辑的简单化。
 
 我们以Stages模型里的fold字段为例演示。
+```python
+    stage_id = fields.Many2one(comodel='todo.task.stage', string='Stage1')
 
+    # Calculated fields:
+    stage_fold = fields.Boolean(
+        string='Stage Folded?',
+        compute='_compute_stage_fold',
+        search='_search_stage_fold',
+        inverse='_write_stage_fold',
+        #store=False,  # the default
+    )
+
+    @api.depends('stage_id.fold')
+    def _compute_stage_fold(self):
+        for record in self:
+            record.stage_fold = record.stage_id.fold
+```
+这个例子取`多对一`中`一`中一条记录的一个属性，给`多`中一个字段赋值。与我们使用assemble中取part的属性一样。
+
+\_compute_stage_fold 函数名作为字符串传递，但也允许作为可以调用的引用传递（函数定义符没有引号）。在这种情况下我们
+确保函数定义在该文件中使用的字段之前。
+
+当计算依赖其他字段时，`@api.depends` 装饰符就是必要的了。装饰器让服务器知道何时重新计算存储或者缓存数据。一个或者更多字段名称被作为参数接收，而点表达式被用来分割接下来的字段关系。
+
+计算函数期待指定一个值给字段或者字段用来计算。如果不是这样，将会错误。因为`self`是一个记录对象，我们这里的计算只是使用stage_id.fold简单的得到 **Folded?**字段的值。结果是取出指定值，写入计算字段：stage_fold。
+
+对这个模块我们的视图还不能工作，但是你可以马上在task的form上做一个编辑以确认计算字段是否工作正常：使用开发者模式里的编辑视图选项，直接在XML form里面添加字段。不用担心：这个改变在下一次升级的时候将会被清除。
+经过测试这确实是一个临时的方法，因为表示视图的XML文件没有被修改，所以下一次升级还会以XML文件为准。
+
+在这个计算字段的测试中，升级模块时，pycharm会出现报错KeyError: 'compute_fold'，然后继续运行。也没找到更好的解决方法，也许重启电脑会有效果。
 
 #### Searching and writing on computed fields
+计算字段只能被读取，不能被搜索和写入，为了打开这个特性，我们需要实现特殊的函数。我们使用`search`和`inverse`函数实现搜索和写入逻辑。
+```python
+    def _search_stage_fold(self, operator, value):
+        return [('stage_id.fold', operator, value)]
+
+    def _write_stage_fold(self):
+        self.stage_id.fold = self.stage_fold
+```
+当一个关于这个字段的(field, operator, value)条件在一个搜索domain表达式中被建立，`search`函数被调用。它接受`operateor`和`value`参数，翻译原始的搜索元素到一个替代的domain搜索表达式。
+
+`inverse`函数执行运算逻辑的反向动作，发现数值并写入原始字段，如stage_id.fold
+
 
 #### Storing computed fields
+使用`store = True`计算字段的值也可以被存储在数据库，当依赖改变是，字段将会被重新计算。由于值被存储了，就可以像普通字段一样搜索，不用再写函数。
 
 #### Related fields
+使用关联字段可以和上面的计算字段赋值起到同样的效果。关联字段直接在一个模型上，字段属于一个相关的模型，访问使用一个点表达式链。这使得点表达式不能使用的情况下非常有用，比如UI form视图。
+
+To-do Tasks被可改变Stages组织。我们将会使State值直接在Task模型上，所以在下一章将会使用一些客户端逻辑
+
+我们在task模型上添加stage_state字段，并使用related属性。
+
+这次我们
+```python
+  # Related fields:
+    state = fields.Selection(
+        related='stage_id.state',
+        string='Stage State',
+        store=True,  # optional
+    )
+```
+在这种情况下，关联字段只是非常方便的实现了search和inverse的计算字段。就是不用像计算字段那样写函数了。
 
 ### Model Constraints
+为了保证数据的完整性，模型支持两种类型的约束：SQL和Python
+
+SQL约束直接添加到数据库表里面，由PostgreSQL保证，使用`_sql_constraints`属性，接着一个列表：约束名；约束SQL；错误提示
+
+通常是添加唯一性约束给模型，假设我们不想两个激活的task的有相同的名称
+```python
+# class TodoTask(models.Model):
+_sql_constraints = [
+    ('todo_task_name_uniq',
+    'UNIQUE (name, active)',
+    'Task title must be unique!')]
+
+```
+
+Python约束可以使用任意的代码来检查条件。检查函数使用装饰器`@api.constraints`，后面接需要被检查的字段列表。当其中的任何字段改变时会触发正确性检查，如果条件为假则会引发异常。
+
+例如检查字符名需要至少五个字符长度
+```python
+from odoo.exceptions import ValidationError
+
+    @api.constrains('name')
+    def _check_name_size(self):
+        for todo in self:
+            if len(todo.name) < 5:
+                raise ValidationError('Title must have 5 chars!')
+
+```
+试了一下，不知道为什么不好使
+
 
 ### Summary
 
@@ -1553,6 +1640,108 @@ In the next chapter, we will work on the user interface for these backend model 
 
 
 ## 6,Views - Designing the User Interface
+使用上一章的模型层，这一章建立视图层
+
+### Defining the user interface with XML files
+不要忘了在\__manifest__.py里声明XML文件
+
+> 注意data文件的读取顺序，因为当前文件只能引用已经存在的XML ID
+
+我们还要建立 views/todo_view.xml 和 views/todo_menu.xml
+
+我们将在第三章的基础上继续添加menu和相应的windows actions
+
+#### Menu items
+菜单存储在ir.ui.menu里面，也可以在技术界面查看
+
+todo_app建立了顶级菜单来打开task，现在我们修改到二级菜单，让其它菜单挨着它
+我们将会添加一个新的顶级菜单，修改已经存在的菜单，views/todo_menu.xml添加如下代码
+```xml
+<!-- Menu items -->
+<!-- Modify top menu item -->
+<menuitem id="todo_app.menu_todo_task" name="To-Do" />
+
+<!-- App menu items -->
+<menuitem id="menu_todo_task_view"
+  name="Tasks"
+  parent="todo_app.menu_todo_task"
+  sequence="10"
+  action="todo_app.action_todo_task" />
+
+<menuitem id="menu_todo_config"
+  name="Configuration"
+  parent="todo_app.menu_todo_task"
+  sequence="100"
+  groups="base.group_system" />
+
+<menuitem id="menu_todo_task_stage"
+  name="Stages"
+  parent="menu_todo_config"
+  sequence="10"
+  action="action_todo_stage" />
+
+```
+
+#### Window actions
+
+### Context and domain
+
+#### Context data
+
+#### Domain expressions
+
+### The form views
+
+#### Dealing with several views of the same type
+
+#### Business document views
+
+##### The header
+
+##### The sheet
+
+##### Title and subtitle
+
+##### Smart buttons area
+
+##### Grouping content in a form
+
+##### Tabbed notebooks
+
+### View semantic components
+
+#### Fields
+
+##### Labels for fields
+
+##### Relational fields
+
+##### Field widgets
+
+#### Buttons
+
+#### Smart buttons
+
+### Dynamic views
+
+#### On change events
+
+#### Dynamic attributes
+
+
+### List views
+
+### Search views
+
+### Calendar views
+
+### Graph and pivot views
+
+### Other view types
+
+### Summary
+
+
 可以指定数据在界面层能否被编辑，这个应该也很有用
 <field name="active" readonly="1"/>
 
