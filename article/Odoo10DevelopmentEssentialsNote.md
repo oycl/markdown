@@ -1654,8 +1654,16 @@ In the next chapter, we will work on the user interface for these backend model 
 #### Menu items
 菜单存储在ir.ui.menu里面，也可以在技术界面查看
 
-todo_app建立了顶级菜单来打开task，现在我们修改到二级菜单，让其它菜单挨着它
-我们将会添加一个新的顶级菜单，修改已经存在的菜单，views/todo_menu.xml添加如下代码
+todo_app建立了顶级菜单来打开task，现在我们让其仍然打开Task，建立二级菜单Tasks和Configuration，将其parent属性指向顶级菜单。
+
+二级菜单Tasks还是打开todo_app建立的action：todo_app.action_todo_task
+二级菜单Configuration使用了`groups`属性，只给admin用户使用，其它用户登录看不到
+
+二级菜单Configuration添加三级菜单Stages，打开stages
+
+注意，这些菜单的Action还没有定义，还不能运行升级选项，在下一节添加Action
+
+`views/todo_menu.xml`添加如下代码
 ```xml
 <!-- Menu items -->
 <!-- Modify top menu item -->
@@ -1681,6 +1689,10 @@ todo_app建立了顶级菜单来打开task，现在我们修改到二级菜单�
   action="action_todo_stage" />
 
 ```
+这里我们直接使用了&lt;menuitem&gt;，代替&lt;record model="ir.ui.menu"&gt;
+
+
+
 
 #### Window actions
 
