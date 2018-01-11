@@ -1695,10 +1695,74 @@ todo_app建立了顶级菜单来打开task，现在我们让其仍然打开Task�
 
 
 #### Window actions
+一般使用菜单或者按钮调用window action来给GUI客户端传递指令。它来告诉GUI使用什么模型和视图。这些action可以使用domain关键字来只显示记录集的子集，也可以使用context属性来设置默认值和filter
+
+将下面的action添加到`views/todo_menu.xml`,注意要在刚才添加菜单的前面
+
+```xml
+<!-- Actions for the menu items -->
+<act_window id="action_todo_stage"
+name="To-Do Task Stages"
+res_model="todo.task.stage"
+view_mode="tree,form"
+target="current"
+context="{'default_state': 'open'}"
+domain="[]"
+limit="80"
+/>
+<act_window id="todo_app.action_todo_task"
+name="To-Do Tasks"
+res_model="todo.task"
+view_mode="tree,form,calendar,graph,pivot"
+target="current"
+context="{'search_default_filter_my_tasks': True}"
+/>
+<!-- Add option to the "More" button -->
+<act_window id="action_todo_task_stage"
+name="To-Do Task Stages"
+res_model="todo.task.stage"
+src_model="todo.task"
+multi="False"
+/>
+
+```
+action存储在ir_act_window数据库表里，可以使用简写&lt;act_window&gt;定义。
+
+上面代码中的第一个action打开Task Stages，包括了window actions的大多数相关的属性
+
+* `name` is the title that will be displayed on the views opened through this action.
+* `res_model` is the identifier of the target model.
+* `view_mode` is the view type available and their order. The first is the one opened by default.
+* `target`, if set to `new`, will open the view in a pop-up dialog window. By default it is`current`, opening the view inline, in the main content area.
+* `context` sets context information on the target views, which can set default values or activate filters, among other things. We will see it in more details in a moment.
+* `domain` is a domain expression forcing a filter for the records that will be browseable in the opened views.
+* `limit` is the number of records for each page, in the list view.
+
+第二个action替换了原始的todo_app中的action，添加了马上要讲解的calendar和graph视图。当更新完毕，在右上角将会看到新的按钮，但是在添加代码之前还不能工作。
+
+第三个action,还没有使用。它向我们显示了怎样向More菜单添加选项，在list和form视图的右上部分生效，为了做到这样的效果，我们使用两个特别的属性
+
+* `src_model` indicates on what model this action should be made available.
+* `multi`, when set to True , makes it available in the list view so that it can applied to a multiple selection of records. The default value is False , as in our example, it will make the option available only in the form view, and so can only be applied to one record at a time.
+
+没有调用出来
 
 ### Context and domain
+我们已经使用context和domain好几次了，而且模型中的关联字段也用它们作为属性。
 
 #### Context data
+**context**是一个字典承载session data，这种数据可以用在客户端的用户界面和服务器端的ORM和事物逻辑
+
+客户端：从一个视图传递信息到另一个视图，比如在点击一个link或者按钮后在前面视图激活的记录ID，或者在接下来的视图中提供一个默认的值
+
+服务器端：一些记录集的字段值依赖context提供的本地设定。特别是`lang`key影响翻译字段的值。Context也能给服务器端代码提供信号。例如，`active_test`key当设定到False时改变ORM的search()方法，以使它不能过滤出非激活字段
+
+一个从web client而来的初始的context看起来是这样：
+{'lang': 'en_US', 'tz': 'Europe/Brussels', 'uid': 1}
+你可以看到语言，市区和当前用户
+
+当从前一个视图的link或者button打开一个form视图，一个active_id就添加到context中，
+
 
 #### Domain expressions
 
