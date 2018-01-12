@@ -1759,16 +1759,74 @@ action存储在ir_act_window数据库表里，可以使用简写&lt;act_window&g
 
 一个从web client而来的初始的context看起来是这样：
 {'lang': 'en_US', 'tz': 'Europe/Brussels', 'uid': 1}
-你可以看到语言，市区和当前用户
+你可以看到语言，时区和当前用户
 
-当从前一个视图的link或者button打开一个form视图，一个active_id就添加到context中，
+当从前一个视图的link或者button打开一个form视图，一个active_id就添加到context中，在原来的视图中这个ID是我们正在看的记录。在一种list视图特别的情况下，我们有`active_ids`context key 包含一个在之前视图选择的很多ID的列表。
 
+在客户端，context可以被用于设置默认值，或者激活filter，这两种情况使用关键字`default_`或者`default_search_`。例如：
+把当前的user作为user_id字段的默认值，我们会使用
+```xml
+{'default_user_id': uid}
+```
+在采购录入收货单时，采购者直接用这个default_user_id指定，然后readonly=1
+
+想默认使用`filter_my_tasks`我们使用
+```xml
+{'default_search_filter_my_tasks': 1}
+```
 
 #### Domain expressions
+域用来过滤数据记录，使用特别的Odoo ORM能解析的语法，解析后能产生SQL WHERE语句，然后查询数据库
+
+格式是这样的('field_name', 'operator',value)，例如：[('is_done','=',False)]
+在act_window里面使用domain后，会直接从数据库拿到符合条件的数据，不符合条件的数据不会被显示和导出。
+
+下面解释一下表达式的元素
+* `field name` is the field being filtered, and can use dot-notation for fields in related models
+   domain="[('stage_id.state','=','done')]"
+   
+* `value` 被当作一个python表达式计算，可以是字面值：数字，布尔，字符串，列表，也可以使用evaluation context里的字段和标识符。下面是实际使用的两种evaluation contexts for domains
+	用在客户端，例如windes actons或者field属性，raw field values用来呈现有效的当前视图，但是不能使用dot-notation
+	用在服务器端，例如security record rules和server python code,dot-notation 可以在字段中被使用，因为当前record is a object
+
+* `operator`
+	The usual comparison operators are < , > , <= , >= , = , !=.
+
+	'=like' matches against a pattern, where the underscore symbol, _ , matches any single character, and the percentage symbol, % , matches any sequence of characters.
+
+	'like' matches against a '%value%' pattern. The 'ilike' is similar but case insensitive.
+
+	The 'not like' and 'not ilike' operators are also available.
+
+	'child of' finds the children values in a hierarchical relation, for the models configured to support them.
+
+	'in' and 'not in' are used to check for inclusion in a given list, so the value should be a list of values. When used on a "to-many" relation field the in operator behaves like a contains operator.
+
+当domain expression 是一个列表时，包含几个条件时，默认使用AND连接。如果显式的使用连接符，&表示AND，\|表示OR，连接符会作用在接下来的两个表达式。！表示NOT，会作用在接下来的一个操作符。所以应该这样使用['!',('is_done','=',True)]
+
+next item 也可以是一个像上面的三元表达式，完成条件嵌套
+
+在服务器端记录规则里面，我们可以发现像这样的domain expressions
+```xml
+['|', ('message_follower_ids', 'in',
+[user.partner_id.id]),
+'|', ('user_id', '=', user.id),
+('user_id', '=', False)
+]
+```
+This domain filters all the records where the current user is in the follower list, is the responsible user, or does not have a responsible user set.
+
+
 
 ### The form views
+我们接下来会设计business document views和怎样使用elements，widgets。继续以继承和扩展todo_app视图为例。但是为了清楚起见，我们会建立一个完全的新视图替代原始视图。
+
 
 #### Dealing with several views of the same type
+一个模型可以有同一类型的多个视图。通过XML ID，Window action可以指定使用哪个视图。所以我们可以有两个不同的menu打开同一个模型的不同视图。通过添加一个`view_id`属性到window action，指定要使用视图的XML ID。例如，我们继续在`todo_app.action_todo_task`里面添加`view_id="view_form_todo_task_ui`。我们在todo_app里面修改后并没有看到效果，可能是todo_ui后加载覆盖了前面的修改。后来在todo_ui的action里加入view_id="todo_app.view_form_todo_task_second"修改成功
+
+如果不指定视图ID，则会使用较低priority的视图。priority的默认值是16，新视图设置为15就会起作用。
+
 
 #### Business document views
 
