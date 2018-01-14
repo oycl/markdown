@@ -1250,6 +1250,7 @@ class Stage(models.Model):
 * `_description` is a user friendly title for the model's records, shown when the model is viewed in the user interface. Optional but recommended.
 * `_order` sets the default order to use when the model's records are browsed, or shown in a list view. It is a text string to be used as the SQL `order by` clause, so it can be anything you could use there, although it has a smart behavior and supports translatable and many-to-one field names.
 注意在view视图里面，也有一个排序的属性
+
 ```xml
 <tree default_order="calc desc,name">
 ```
@@ -1790,9 +1791,9 @@ action存储在ir_act_window数据库表里，可以使用简写&lt;act_window&g
 	用在服务器端，例如security record rules和server python code,dot-notation 可以在字段中被使用，因为当前record is a object
 
 * `operator`
-	The usual comparison operators are < , > , <= , >= , = , !=.
+	The usual comparison operators are < , > , <= , >=, =, !=
 
-	'=like' matches against a pattern, where the underscore symbol, _ , matches any single character, and the percentage symbol, % , matches any sequence of characters.
+	`=like` matches against a pattern, where the underscore symbol, _ , matches any single character, and the percentage symbol, %, matches any sequence of characters.
 
 	'like' matches against a '%value%' pattern. The 'ilike' is similar but case insensitive.
 
