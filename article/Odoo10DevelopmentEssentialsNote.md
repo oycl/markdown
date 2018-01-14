@@ -1273,7 +1273,7 @@ python类名位于python文件中声明的地方。类名只在文件中标识�
 #### Transient and Abstract models
 在之前的模型里，类继承自`models.Model`。这种类型的模型会被数据库留存：建立数据表并存储记录直到明确地删除它们。
 但是odoo还提供了两种模型：Transient和Abstract
-* Transient models are based on the `models.TransientModel` class and are used for wizardstyle user interaction. Their data is still stored in the database, but it is expected to be temporary. A vacuum job periodically clears old data from these tables. For example, the Load a Language dialog window, found in the Settings | Translations menu, uses a Transient model to store user selections and implement wizard logic.
+* Transient models are based on the `models.TransientModel` class and are used for wizardstyle user interaction. Their data is still stored in the database, but it is expected to be temporary. A vacuum job periodically clears old data from these tables. For example, the Load a Language dialog window, found in the Settings \| Translations menu, uses a Transient model to store user selections and implement wizard logic.
 * Abstract models are based on the `models.AbstractModel` class and have no data storage attached to them. They act as reusable feature sets to be mixed in with other models, using the Odoo inheritance capabilities. For example, mail.thread is an Abstract model, provided by the Discuss addon, used to add message and follower features to other models.
 
 
@@ -1565,7 +1565,7 @@ from odoo.addons.base.res.res_request import referenceable_models
 对这个模块我们的视图还不能工作，但是你可以马上在task的form上做一个编辑以确认计算字段是否工作正常：使用开发者模式里的编辑视图选项，直接在XML form里面添加字段。不用担心：这个改变在下一次升级的时候将会被清除。
 经过测试这确实是一个临时的方法，因为表示视图的XML文件没有被修改，所以下一次升级还会以XML文件为准。
 
-在这个计算字段的测试中，升级模块时，pycharm会出现报错KeyError: 'compute_fold'，然后继续运行。也没找到更好的解决方法，也许重启电脑会有效果。
+在这个计算字段的测试中，升级模块时，pycharm会出现报错KeyError: 'compute_fold'，然后继续运行。也没找到更好的解决方法，重启电脑也没有解决。怀疑：数据库在不停的升级过程中弄坏了，换了一个全新的数据库就没有问题。
 
 #### Searching and writing on computed fields
 计算字段只能被读取，不能被搜索和写入，为了打开这个特性，我们需要实现特殊的函数。我们使用`search`和`inverse`函数实现搜索和写入逻辑。
@@ -1630,7 +1630,7 @@ from odoo.exceptions import ValidationError
                 raise ValidationError('Title must have 5 chars!')
 
 ```
-试了一下，不知道为什么不好使
+开始不好使，换了一个新数据库就好使了。
 
 
 ### Summary
@@ -1665,6 +1665,7 @@ todo_app建立了顶级菜单来打开task，现在我们让其仍然打开Task�
 注意，这些菜单的Action还没有定义，还不能运行升级选项，在下一节添加Action
 
 `views/todo_menu.xml`添加如下代码
+
 ```xml
 <!-- Menu items -->
 <!-- Modify top menu item -->
@@ -1703,27 +1704,27 @@ todo_app建立了顶级菜单来打开task，现在我们让其仍然打开Task�
 ```xml
 <!-- Actions for the menu items -->
 <act_window id="action_todo_stage"
-name="To-Do Task Stages"
-res_model="todo.task.stage"
-view_mode="tree,form"
-target="current"
-context="{'default_state': 'open'}"
-domain="[]"
-limit="80"
+	name="To-Do Task Stages"
+	res_model="todo.task.stage"
+	view_mode="tree,form"
+	target="current"
+	context="{'default_state': 'open'}"
+	domain="[]"
+	limit="80"
 />
 <act_window id="todo_app.action_todo_task"
-name="To-Do Tasks"
-res_model="todo.task"
-view_mode="tree,form,calendar,graph,pivot"
-target="current"
-context="{'search_default_filter_my_tasks': True}"
+	name="To-Do Tasks"
+	res_model="todo.task"
+	view_mode="tree,form,calendar,graph,pivot"
+	target="current"
+	context="{'search_default_filter_my_tasks': True}"
 />
 <!-- Add option to the "More" button -->
 <act_window id="action_todo_task_stage"
-name="To-Do Task Stages"
-res_model="todo.task.stage"
-src_model="todo.task"
-multi="False"
+	name="To-Do Task Stages"
+	res_model="todo.task.stage"
+	src_model="todo.task"
+	multi="False"
 />
 
 ```
@@ -1766,12 +1767,14 @@ action存储在ir_act_window数据库表里，可以使用简写&lt;act_window&g
 
 在客户端，context可以被用于设置默认值，或者激活filter，这两种情况使用关键字`default_`或者`default_search_`。例如：
 把当前的user作为user_id字段的默认值，我们会使用
+
 ```xml
 {'default_user_id': uid}
 ```
 在采购录入收货单时，采购者直接用这个default_user_id指定，然后readonly=1
 
 想默认使用`filter_my_tasks`我们使用
+
 ```xml
 {'default_search_filter_my_tasks': 1}
 ```
@@ -1791,23 +1794,24 @@ action存储在ir_act_window数据库表里，可以使用简写&lt;act_window&g
 	用在服务器端，例如security record rules和server python code,dot-notation 可以在字段中被使用，因为当前record is a object
 
 * `operator`
-	The usual comparison operators are < , > , <= , >=, =, !=
+The usual comparison operators are < , > , <= , >=, =, !=
 
-	`=like` matches against a pattern, where the underscore symbol, _ , matches any single character, and the percentage symbol, %, matches any sequence of characters.
+ * `=like` matches against a pattern, where the underscore symbol, _ , matches any single character, and the percentage symbol, %, matches any sequence of characters.
 
-	'like' matches against a '%value%' pattern. The 'ilike' is similar but case insensitive.
+ * `like` matches against a '%value%' pattern. The 'ilike' is similar but case insensitive.
 
-	The 'not like' and 'not ilike' operators are also available.
+ * The `not like` and `not ilike` operators are also available.
 
-	'child of' finds the children values in a hierarchical relation, for the models configured to support them.
+ * `child of` finds the children values in a hierarchical relation, for the models configured to support them.
 
-	'in' and 'not in' are used to check for inclusion in a given list, so the value should be a list of values. When used on a "to-many" relation field the in operator behaves like a contains operator.
+ * `in` and `not in` are used to check for inclusion in a given list, so the value should be a list of values. When used on a "to-many" relation field the in operator behaves like a contains operator.
 
 当domain expression 是一个列表时，包含几个条件时，默认使用AND连接。如果显式的使用连接符，&表示AND，\|表示OR，连接符会作用在接下来的两个表达式。！表示NOT，会作用在接下来的一个操作符。所以应该这样使用['!',('is_done','=',True)]
 
 next item 也可以是一个像上面的三元表达式，完成条件嵌套
 
 在服务器端记录规则里面，我们可以发现像这样的domain expressions
+
 ```xml
 ['|', ('message_follower_ids', 'in',
 [user.partner_id.id]),
@@ -1830,13 +1834,111 @@ This domain filters all the records where the current user is in the follower li
 
 
 #### Business document views
+商业应用通常是一些记录的系统：库房里么产品，财务部的单据等等。很多记录数据可以用一张纸质文档表示。为了达到更好的用户体验，form视图要模仿这些文档。例如，在我们的app中，我们可以认为To-Do Task就是一张用来填写的简单的纸质文件。下面提供一个form view的骨架
+
+```xml
+   <record id="view_form_todo_task_ui" model="ir.ui.view">
+      <field name="model">todo.task</field>
+      <field name="priority">15</field>
+      <field name="arch" type="xml">
+
+        <form>
+          <header>
+          </header>
+
+          <sheet>
+            <!-- Title -->
+
+            <!-- Smart buttons -->
+
+            <!-- Details -->
+          </sheet>
+        </form>
+      </field>
+    </record>
+```
+如果不指定view的name，就自动产生。为了简单起见，我们使用省略的name
+
+我们看到business document views使用了单个主要区域：header status bar,sheet for main content,history and communication(chatter)
+
+history 和 communication section,使用了social network widgets(由mail addon module提供支撑)。为了使用这个功能，我们的模型应该继承mail.thread的多重继承模型，可以参照Chapter 3 , Inheritance - Extending Existing Applications
+
 
 ##### The header
+顶部的header通常标识生命周期或者步骤，步骤的执行是通过action buttons来实现的。这些action buttons是普通的form buttons.重要的next steps可以被高亮，使用class="oe_highlight"
+
+文档的生命周期使用`statusbar`widget,具体是通过一个表示当前文档正处于的生命周期的字段表示。通常是一个State selection字段或者Stage many-to-one字段。在几个Odoo 核心模块中都能发现这两个字段。
+
+Stage字段是一个多对一的字段，使用一个支持的模型来设置流程的步骤。因为这样用户可以动态配置来满足特定的商业流程，并且特别地支持kanban视图。
+
+state是一个选择列表，表示一个少量，稳定，流程的步骤，例如：New，In Progress和Done。由于它是静态的所以不能被用户配置，但非常容易被用户使用。The view 字段甚至有一个特别的支持：依赖于文档的状态，state 属性允许一个字段对用户是否有效
+
+从时间上看，stages引入的比states晚。两者同时共存，但是Odoo核心有使用stages代替states的趋势。但是参照之前的说明，states仍然提供了一些stages没有的特性。
+
+仍然可以结合二者的优点，mapping stages into states。这就是我们在之前的章节所作的。在Stages模型里添加一个state字段，然后在To-do task文档中通过一个计算字段使其生效，使用state字段的属性。
+
+接下来我们继续扩展views/todo_view.xml文件中的header，添加一个 status bar
+
+```xml
+          <header>
+              <field name="state" invisible="True"/>
+              <button name="do_toggle_done" type="object"
+                      attrs="{'invisible':[('state','in',['draft'])]}"
+                      string="Toggle Done"
+                      class="oe_highlight"/>
+              <field name="stage_id"
+                     widget="statusbar"
+                     clickable="True"
+                     options="{'fold_field': 'fold'}"/>
+          </header>
+```
+这里我们使用了state字段作为hidden字段。我们需要强制客户端包括这个字段从server取得数据。否则就不能用于表达式里面。
+> 这里有一个非常重要的原则：任何想要使用的字段，在domain或者attrs表达式中，必须被读入到view中，所以在你需要的时候让字段隐藏，用户就看不见了。
+
+下一行，一个button添加到status bar，让用户开关 task Done flag。在状态栏显示的button应该改变，基于当前文档所处的生命周期
+
+当文档处于draft状态时，我们使用`attrs`属性隐藏按钮。这个条件判断使用了state字段，前面添加的隐藏字段。
+
+如果我们有一个state选择字段，我们可以不使用states属性。在这种情况下，相同的实现可以通过使用states="open,done"。它更加简洁，但是没有attrs属性灵活。
+
+`clickable`属性允许用户通过点击状态栏来改变文档的stage。我们通常打开这个功能，但是有些时候需要关闭，比如当我们要给workflow更多的控制的时候，我们需要用户仅通过有效的button来处理stages，这样在stages期间移动的时候可以执行验证。
+
+当使用status bar widget处理stages，我们很少使用stages隐藏在一个更多的stage组中。对于这一点，stages模型必须有一个flag来配置隐藏项，通常命名为fold。status bar widget应该使用一个option属性，就像前面代码显示的那样，提供字段名给fold_field选项。
+
+当使用一个state字段来使用status bar widget，使用statusbar_visible属性也可以实现一个相似的效果。这个属性用于列出应该看见的状态，极少的情况下隐藏例外的状态。这样使用
+```xml
+<field name="stage_id" widget="statusbar"
+clickable="True"
+statusbar_visible="draft,open" />
+```
+
+在这一节我们完成了header设计，button可以根据文档状态（stage）显示与否，使用这种特性我们可以灵活的实现控制
 
 ##### The sheet
+sheet画布是form的主要区域，展示实际的数据元素。设计成纸质文档样子，通常可以看到在Odoo里记录是作为文档提供的。
+通常，一个文档结构包括这些区域：
+* A document title and subtitle at the top.
+* A button box at the top-right corner.
+* Other document header fields.
+* A notebook for additional fields organized in tabs or pages. Document lines would also go
+here, usually in the first notebook page.
 
+让我们来看一看
 ##### Title and subtitle
+在&lt;group&gt;外面的元素是无法自动拥有label显示。&lt;label for"..."/&gt;元素用来表示title，通过一些额外的工作，给label显示更多的控制
+```xml
+           <div class="oe_title">
+              <label for="name" class="oe_edit_only"/>
+                <h1><field name="name"/></h1>
 
+                <h3>
+                  <span class="oe_read_only"> By</span>
+
+                  <label for=" user_id" class="oe_edit_only"/>
+                      <field name="user_id" class="oe_inline" />
+                </h3>
+           </div>
+```
 ##### Smart buttons area
 
 ##### Grouping content in a form
