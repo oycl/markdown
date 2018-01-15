@@ -24,14 +24,14 @@ tar -zcvf addons_c_bruno.tar.gz addons/
    同时把D:\odoo\custom-addons\web_enterprise\static\src\less\app_switcher.less第130行 中的宽度改为适应logo大小，上面图标用192没问题
 3. 删除无用菜单“Documentation”“Support”“My Odoo.com account”
    D:\odoo\odoo10\addons\web\static\src\xml\base.xml  第1270行，注释掉前面三个菜单
-4. 如果是社区版 把主题的apps替换掉。方法： D:\odoo\custom-addons\web_responsive\views\web.xml 查找apps。企业版不需要
+4. 如果是社区版 把主题的apps替换掉。方法： D:\odoo\custom-addons\web_responsive\views\web.xml 查找apps注释掉，位置在221行。企业版不需要。
 5. 删除页面 “表名-Odoo”里面的Odoo，仅限Odoo10
    D:\odoo\odoo10\addons\web\static\src\js\abstract_web_client.js    54行
    this.set('title_part', {"zopenerp": "Odoo"});删除odoo 或者改成想要的文字
 6. 企业版D:\odoo\custom-addons\web_enterprise\static\src\xml\base.xml   
     第59行改为"欢迎使用查询系统V3.0"
 7. 公司信息：把YTO图标更换，填写网址，地址等等。加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
-
+8. 使用企业版，有时候安装讨论模块会使数据库到期。就想恢复到社区版，但是社区版的backend主题能调出搜索框看到很多不该看到的内容，目前修改还很费事（后来发现web_responsive-10.0.1.1.0这个版本好用，升级web_responsive-10.0.1.2.2后反倒有问题）。实际上在目前情况下只安装了企业版的web_enterprise，web_gantt，web_mobile，grid，依次卸载后三个，保留quality，web_enterprise模块，把企业版其他模块挪出。这里面我们使用了企业版的质检模块。目前还没发现数据库过期情况，等放假前最后一天测试。
 
 ### 2，配置各个工作组，需要详细记录
    工作组通过res.groups.csv文件导入
