@@ -1834,7 +1834,7 @@ This domain filters all the records where the current user is in the follower li
 
 
 #### Business document views
-商业应用通常是一些记录的系统：库房里么产品，财务部的单据等等。很多记录数据可以用一张纸质文档表示。为了达到更好的用户体验，form视图要模仿这些文档。例如，在我们的app中，我们可以认为To-Do Task就是一张用来填写的简单的纸质文件。下面提供一个form view的骨架
+商业应用通常是一些记录的系统：库房里的产品，财务部的单据等等。很多记录数据可以用一张纸质文档表示。为了达到更好的用户体验，form视图要模仿这些文档。例如，在我们的app中，我们可以认为To-Do Task就是一张用来填写的简单的纸质文件。下面提供一个form view的骨架
 
 ```xml
    <record id="view_form_todo_task_ui" model="ir.ui.view">
@@ -1926,7 +1926,7 @@ here, usually in the first notebook page.
 让我们来看一看
 ##### Title and subtitle
 在&lt;group&gt;外面的元素是无法自动拥有label来显示它们。&lt;label for"..."/&gt;元素用来表示title，通过一些额外的工作，给label显示更多的控制。
-HTML和CSS元素可以是title更好看。一般来说title应该在&lt;div&gt;里使用oe_title类。
+HTML和CSS元素可以使title更好看。一般来说title应该在&lt;div&gt;里使用oe_title类。
 ```xml
   <div class="oe_title">
        <label for="name" class="oe_edit_only"/>
@@ -1940,7 +1940,7 @@ HTML和CSS元素可以是title更好看。一般来说title应该在&lt;div&gt;�
        </h3>
   </div>
 ```
-这里我们看到我们使用了HTML元素，div, span, h1, and h3，&lt;label&gt;元素允许我们控制。for属性指定字段ID。另一个使用属性是string，给label提供一个特定的text。我们还使用了class="oe_edit_only"属性，以便于在编辑模式下是可见的。
+这里我们使用了HTML元素，div, span, h1, and h3，&lt;label&gt;元素允许我们控制。for属性指定字段ID。另一个使用属性是string，给label提供一个特定的text。我们还使用了class="oe_edit_only"属性，以便于在编辑模式下是可见的。
 
 在一些情况下，比如partner和product，在左上角落里有一个展示的图片。假设我们有一个my_image binary字段我们可以在div class="oe_title"前面使用
 &lt;field name="my_image" widget="image" class="oe_avatar"/&gt;
