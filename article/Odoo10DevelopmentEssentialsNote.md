@@ -1925,21 +1925,47 @@ here, usually in the first notebook page.
 
 让我们来看一看
 ##### Title and subtitle
-在&lt;group&gt;外面的元素是无法自动拥有label显示。&lt;label for"..."/&gt;元素用来表示title，通过一些额外的工作，给label显示更多的控制
+在&lt;group&gt;外面的元素是无法自动拥有label来显示它们。&lt;label for"..."/&gt;元素用来表示title，通过一些额外的工作，给label显示更多的控制。
+HTML和CSS元素可以是title更好看。一般来说title应该在&lt;div&gt;里使用oe_title类。
 ```xml
-           <div class="oe_title">
-              <label for="name" class="oe_edit_only"/>
-                <h1><field name="name"/></h1>
+  <div class="oe_title">
+       <label for="name" class="oe_edit_only"/>
+       <h1><field name="name"/></h1>
 
-                <h3>
-                  <span class="oe_read_only"> By</span>
+       <h3>
+         <span class="oe_read_only"> By</span>
 
-                  <label for=" user_id" class="oe_edit_only"/>
-                      <field name="user_id" class="oe_inline" />
-                </h3>
-           </div>
+         <label for="user_id" class="oe_edit_only"/>
+         <field name="user_id" class="oe_inline" />
+       </h3>
+  </div>
 ```
+这里我们看到我们使用了HTML元素，div, span, h1, and h3，&lt;label&gt;元素允许我们控制。for属性指定字段ID。另一个使用属性是string，给label提供一个特定的text。我们还使用了class="oe_edit_only"属性，以便于在编辑模式下是可见的。
+
+在一些情况下，比如partner和product，在左上角落里有一个展示的图片。假设我们有一个my_image binary字段我们可以在div class="oe_title"前面使用
+&lt;field name="my_image" widget="image" class="oe_avatar"/&gt;
+
+
 ##### Smart buttons area
+右上的区域可以有一个不可见的box用来放置buttons。从8.0开始引入smart buttons,
+带着一个静态指示器形状为正方形，可以通过点击被follow
+
+在oe_title后面的DIV，我们添加
+```xml
+           <div name="buttons" class="oe_right oe_button_box">
+                <button class="oe_stat_button"
+                        type="action" icon="fa-tasks"
+                        name="%(action_todo_task_button)d"
+                        context="{'default_user_id': user_id}"
+                        string=""
+                        help="Other to-dos for this user" >
+                    <field string="User To-dos" name="user_todo_count"
+                           widget="statinfo"/>
+                </button>
+            </div>
+```
+
+装buttons的容器是div，有两个class：oe_button_box和oe_right，oe_right用来把它放置在form的右边。我们将会讨论buttons的细节在接下来的部分，所以我们会添加一个实际的buttons在这个box里。
 
 ##### Grouping content in a form
 
