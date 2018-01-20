@@ -1968,6 +1968,31 @@ HTML和CSS元素可以使title更好看。一般来说title应该在&lt;div&gt;�
 装buttons的容器是div，有两个class：oe_button_box和oe_right，oe_right用来把它放置在form的右边。我们将会讨论buttons的细节在接下来的部分，所以我们会添加一个实际的buttons在这个box里。
 
 ##### Grouping content in a form
+主要的内容用&lt;group&gt;来组织，它在区域中插入两列，一列值，一列label，所以往里添加字段的时候会从上到下摞起来显示。如果使用嵌套的&lt;group&gt;，就会显示四列，但是经实验单纯使用嵌套不会超过四列，我们添加如下代码：
+```xml
+           <group name="top_group">
+              <group name="left_group">
+                <field name="date_deadline" />
+                <field name="effort_estimate" />
+                <separator string="References" />
+                <field name="refers_to" />
+              </group>
+              <group name="right_group">
+                <field name="tag_ids" widget="many2many_tags"/>
+              </group>
+            </group>
+```
+给group起个名字是不错的做法，方便在随后引用它们或者由自己或者他人扩展view。string属性也是可以使用的，用来显示section title
+
+在&lt;group&gt;里，&lt;newline&gt;元素将会强制新起一行，紧跟着的元素就会占据第一列
+
+另外section title可以使用&lt;separator&gt;元素来显示。
+
+> Deleloper 菜单 Toggle Form Layout Outline选项：在每个&lt;group&gt;部分画线，使我们更好的理解当前的布局。
+
+我们还可以使用col和colspan属性来控制group元素的布局
+* col属性可以控制&lt;group&gt;元素里面显示的列，偶数为佳
+* 在group里面的元素，包括&lt;field&gt;元素，可以使用colspan属性设置一个占用几列位置的数字，默认是1。
 
 ##### Tabbed notebooks
 
