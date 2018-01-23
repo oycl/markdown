@@ -1995,19 +1995,84 @@ HTML和CSS元素可以使title更好看。一般来说title应该在&lt;div&gt;�
 * 在group里面的元素，包括&lt;field&gt;元素，可以使用colspan属性设置一个占用几列位置的数字，默认是1。
 
 ##### Tabbed notebooks
+组织内容的另外一个方法是使用notebook元素，包含多个标签，称之为页面。这个功能可以保持视野内有很少的数据，直到需要的时候再调出来。还有一个用途是以主题来组织大量的字段。
+下面是示例代码
+```xml
+                <notebook>
+                    <page string="Whiteboard" name="whiteboard">
+                        <field name="docs"/>
+                    </page>
+                    <page>
+                        <!-- Second page content -->
+                    </page>
+                </notebook>
+```
 
 ### View semantic components
-
+我们已经看到怎样使用结构组件，例如header，group和notebook等在一个form里组织内容。下面我们继续看一下semantic组件，字段和按钮，看看有什么功能。
 #### Fields
+View 字段有一些属性。大部分的值可以从模型的定义得到，但是将被view里相同的属性改写。 **也就是说相同的属性最后还是要看视图中的字段怎么定义**。这些属性都是通用的，不依赖于字段类型
+* name: identifies the field database name.
+* string: is the label text, to be used if we want to override the label text provided by the model definition.
+* help: is a tooltip text shown when you hover the pointer over the field, and allows to override the help text provided by the model definition.
+* placeholder: is a suggestion text to display inside the field.没有实验出来
+* widget: allows us to override the default widget used for the field. We will explore the available widgets in a moment.
+* options: is a JSON data structure with additional options for the widget and depends on what each widget supports.
+* class: are the CSS classed to use for the field HTML rendering.
+* nolabel="True" prevents the automatic field label from being presented. It only makes sense for the fields inside a &lt;group&gt; element and is often used along with a &lt;label for="..."&gt; element.
+* invisible="True" makes the field not visible, but it's data is fetched from the server and is available on the form.
+* readonly="True" makes the field non-editable on the form.可以指定数据在界面层能否被编辑，这个应该也很有用。例如：&lt;field name="active" readonly="1"/&gt;
+* required="True" makes the field mandatory on the form.
+
+Attributes specific to some field types are:
+* password="True" is used for text fields. It is displayed as a password field, masking the characters typed in.
+* filename is used for binary fields, and it is the name of the model field to be used to store the name of the uploaded file.
+* mode is used for one-to-many fields. It specifies the view type to use to display the records. By default, it is tree, but can also be form, kanban, or graph.
+
 
 ##### Labels for fields
+&lt;label&gt;元素可以被用于更好的显示一个字段标题。一个情况是只当form处于编辑模式的时候，用于显示标题。
+&lt;label for="name" class="oe_edit_only" /&gt;
+当使用了这条语句，如果字段在&lt;group&gt;里面，我们通常希望设置nolabel="True"
 
 ##### Relational fields
+在相关字段，在用户的行为上我们可以有一些额外的控制。默认情况，用户可以从这些字段（也叫quick create）建立新的记录，然后打开相关记录。如果禁止这种行为，我们使用options属性：
+options="{'no_open': True, 'no_create': True}"
+在关联字段里，context和domain也非常有用。context可以对相关记录定义默认值，domain可以限制选择的记录数。一个通用的例子是在使用一个字段得到记录列表是依赖于当前记录的另一个字段。domain可以在模型定义，然后在视图中被改写。
 
 ##### Field widgets
+每一个字段类型，在form中会使用合适的默认widget。但是还有一些widgets可以使用。
+对于text字段
+* email用于e-mail text一个可以使用电子邮件发送的地址
+* url用于格式化text作为一个可以点击的URL
+* html用于显示HTML内容，在编辑模式下，作为一个WYSIWYG编辑器来格式化内容，并不需要懂html语法
+
+对于数字字段
+* handle指定序列字段在list里的设计，显示了一个handle，允许放置lines到一个custom order
+* float_time 格式化一个浮点字段，使用小时和分钟等时间量
+* monetary 显示一个浮点字段作为货币量。它需要一个货币ID配合字段，但是另一个字段名可以使用下面提供 option="{'currency_field':'currency_id'}"
+* progressbar 显示一个浮点数作为 进程百分比，可以用于表示一个完成度
+
+对于关联字段和选择字段
+* many2many_tags显示值作为按钮样子标题的list
+* selection 使用selection字段widget，对many-to-one字段
+* radio显示selection字段选项，使用radio 按钮
+* kanban_state_selection 对kanban状态selection列表显示了一个信号灯。通常状态是灰色，完成后是绿色，其它状态显示为红色
+* priority 显示了selection字段作为一个可点击的星状列表。selection选项通常是一个数字的
 
 #### Buttons
-
+button支持下列属性
+* icon  is for icon image to use in the button to display; unlike smart buttons, the icons available for regular buttons are limited to the ones available in addons/web/static/src/img/icons .
+* string  is the button text label, or the HTML alt text when an icon is used.
+* type is the type of the action to perform. Possible values are:
+ * workflow  is used to trigger a workflow engine signal;
+ * object  is used for calling a Python method;
+ * action  is used to run a window action.
+* name  identifies the specific action to perform, according to the chosen type: either a workflow signal name, a model method name, or the database ID of window action to run. The %(xmlid)d formula can be used to translate the XML ID into the required Database ID.
+* args  is used when the type is object , to pass additional parameters to the method.
+* context  adds values to the context, that can have effects after the windows action is run, or in the Python code methods called.
+* confirm  displays a confirmation message box, with the text assigned to this attribute.
+* special="cancel"  is used on wizards, to cancel and close the wizard form.
 #### Smart buttons
 
 ### Dynamic views
@@ -2030,8 +2095,7 @@ HTML和CSS元素可以使title更好看。一般来说title应该在&lt;div&gt;�
 ### Summary
 
 
-可以指定数据在界面层能否被编辑，这个应该也很有用
-<field name="active" readonly="1"/>
+
 
 ## 7,ORM Application Logic – Supporting Business Processes
 
