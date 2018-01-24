@@ -2074,13 +2074,84 @@ button支持下列属性
 * confirm  displays a confirmation message box, with the text assigned to this attribute.
 * special="cancel"  is used on wizards, to cancel and close the wizard form.
 #### Smart buttons
+在设计了form结构的时候，我们在右上空间包含了一个smart buttons。让我们添加一个button
+
+对于我们的app，我们实现一个显示所有者当前正在to-do的总数量，然后点击它就会导航到具体条目的list
+
+首先我们需要添加相应的计算字段给models/todo_model.py
+```python
+    # Chapter 06 Smart Button statistic
+    def compute_user_todo_count(self):
+        for task in self:
+            task.user_todo_count = task.search_count(
+                [('user_id', '=', task.user_id.id)])
+
+    user_todo_count = fields.Integer(
+        'User To-Do Count',
+        compute='compute_user_todo_count')
+```
+接下来，我们添加button，在oe_title div后面加入
+```xml
+               <button class="oe_stat_button"
+                        type="action" icon="fa-tasks"
+                        name="%(action_todo_task_button)d"
+                        context="{'default_user_id': user_id}"
+                        string=""
+                        help="Other to-dos for this user" >
+                    <field string="User To-dos" name="user_todo_count"
+                           widget="statinfo"/>
+                </button>
+```
+这个按钮显示了todo tasks相关负责人在整个task里所有任务的总数，是使用user_todo_count计算出来的。
+
+下面这些属性我们用于添加smart buttons
+* class="oe_stat_button" renders a rectangle instead of a regular button.
+* icon sets the icon to use, chosen from the Font Awesome set. Available icons can be browsed at http://fontawesome.io.
+* type and name are the button type and the name of the action to trigger. For smart buttons the type will usually be action, for a window action, and name will be the ID of the action to execute. It expects an actual database ID, so we have to use a formula to convert an XML ID into a database ID: "%(action-external-id)d" . This action should open a view with the related records.
+* string adds label text to the button. We have not used it here because the contained field already provides a text for it.
+* context should be used to set default values on the target view, to be used on new records created on the view after clicking through the button.
+* help adds a help tooltip displayed when the mouse pointer is over the button.
+
+button元素自己是一个container，拥有字段显示统计数字。这些普通的字段使用的widget是statinfo。这个字段应该是在模型中定义的计算字段。在button里面也可以使用静态文本，例如
+```xml
+<div>User's To-dos</div>
+```
+当点击按钮时，看到了一个list，只显示当前负责用户的task。这个行为是由action_todo_task_button实现的，所以就需要知道当前的responsible user,我们是使用button的context属性来存储这个值的。
+
+我们必须把这个action放到XML文件的前面，以便后面的form使用它。
+```xml
+<act_window id="action_todo_task_button"
+  name="To-Do Tasks"
+  res_model="todo.task"
+  view_mode="tree,form,calendar,graph,pivot"
+  domain="[('user_id','=',default_user_id)]"
+/>
+```
+注意我们在domain里使用 default_user_id context key。通过点击这个smart button进入的列表，当建立新task时，这个特别key将会设置默认值在user_id字段。
 
 ### Dynamic views
+View 元素也支持一些动态属性，依赖字段值以允许视图动态改变行为和表现。我们有on change events，在一个form里，改变一个字段值可以使其它字段值改变。或者当一些条件满足的时候，使字段必填或者可见。
 
 #### On change events
+On change机制允许我们当一个指定的字段改变时，改变其它字段值。例如，当产品改变时，可以设置默认的价格。
+
+在旧版本中，on change事件定义在view级别，但是从8.0开始，直接在模型层定义，就不需要在视图里使用特别的标记。实现机制的方法是，建立一个方法来计算，使用@api.onchange('field1','field2')来绑定字段。这些onchange方法的细节更多在Chapter 7 , ORM Application Logic - Supporting Business Processes
 
 #### Dynamic attributes
+为了马上响应用户输入，on change机制依赖于计算字段的重新计算。使用前面的例子，如果改变商品则价格字段改变，一个计算总价的字段也会使用新价格自动更新。动态属性：一些属性提供了一个容易的办法来控制特别用户界面元素的可见性。
+* groups可以使用当前用户依赖的群组来决定元素的可见。多用户组可以使用逗号分隔符
+* states可以依赖记录的State字段决定元素的可见。多State值可以使用逗号分隔符
+* 还有一个方法是依赖客户端动态计算表达式来决定元素的可见。方法是使用attrs指定属性，使用一个字典映射可见属性的值给表达式的结果。例如，为了是除了draft状态的refers_to字段可见，我们使用
 
+```xml
+自用
+<field name="refers_to" attrs="{'invisible':[('state','in',['draft'])]}" />
+书中
+<field name="refers_to" attrs="{'invisible':state=='draft'}" />
+```
+这个invisible属性对任何元素来说都是有效的，而不仅仅是字段。例如，我们也可以用在notebook pages和group元素上
+
+attrs也可以给两个属性设置值：readonly和required。这些也对数据字段有意义，使他们不可编辑或者必填。这可以允许我们实现一些简单客户端逻辑。比如使一个字段根据State的状态来表现是否必填。
 
 ### List views
 
