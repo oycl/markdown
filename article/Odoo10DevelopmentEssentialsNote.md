@@ -2154,8 +2154,88 @@ On change机制允许我们当一个指定的字段改变时，改变其它字�
 attrs也可以给两个属性设置值：readonly和required。这些也对数据字段有意义，使他们不可编辑或者必填。这可以允许我们实现一些简单客户端逻辑。比如使一个字段根据State的状态来表现是否必填。
 
 ### List views
+在这一点上，list view不需要介绍很多，但是我们仍然讨论一些能被使用的属性。这是一个我们使用list view的例子
+```xml
+    <!-- To-Do Task List view -->
+    <record id="todo_app.view_tree_todo_task" model="ir.ui.view">
+    <field name="model">todo.task</field>
+      <field name="arch" type="xml">
+
+        <tree decoration-muted="is_done"
+          decoration-bf="state=='open'"
+          delete="false">
+          <field name="name"/>
+          <field name="user_id"/>
+          <field name="is_done"/>
+          <field name="state" invisible="1"/>
+        </tree>
+
+      </field>
+    </record>
+```
+行文本颜色和字体依赖python表达式计算的结果可以动态改变。用decoration–NAME属性带着一个建立在字段属性的表达式。Name部分可以使用bf或者it，对应粗体和斜体字，或者使用Bootstrap文本情景颜色：danger,info,muted,primary,success,或者warning。[参考文档](http://getbootstrap.com/css/#helper-classes-colors)
+
+> color和fonts属性在8.0版本生效，到9.0取消。现在应该使用新的装饰属性。
+
+还有就是注意前面提到过的，表达式用的字段值也要写进来，如果不想显示使用invisible="1"隐藏。
+
+其他和tree视图相关的属性
+* `default_order` allows to override the model's default sort order, and its value follows the same format as in order attribute used in model definitions.
+* `create , delete` , and `edit` , if set to false (in lowercase) disables the corresponding action on the list view.
+* `editable` makes records editable directly on the list view. Possible values are top and
+bottom, the location where the new records will be added.
+
+list视图可以包含字段和按钮，大部分form视图的属性在这里也有效。
+
+在list视图里，数字字段可以显示列的总和。为了实现这个功能，我们要在字段里加入聚合属性，sum,avg,min或者max，然后指定一个总和值的标题，例如
+&lt;field name="amount" sum="Total Amount" /&gt;
+
+觉得直接在tree视图里这样用不太靠谱，在网上找了两个例子，认为在模型里的字段应该加入group_operator="sum",。后来经验证不需要修改模型里的字段，只要像上面一样直接在视图里数字字段后面加入sum,avg,min或者max就可以了。
 
 ### Search views
+search 选项的有效值在&lt;search&gt;里定义。但我们在搜索框内输入的时候，我们可以选择自动搜索的字段。我们也可以在list视图里提供一个预定义的filter，或者预定义一个分组选项，这些都可以通过点击使用。下面是一个例子
+```xml
+    <record id="todo_app.view_filter_todo_task" model="ir.ui.view">
+      <field name="model">todo.task</field>
+      <field name="arch" type="xml">
+
+        <search>
+          <field name="name"/>
+          <field name="user_id"/>
+
+          <filter name="filter_not_done" string="Not Done"
+                  domain="[('is_done','=',False)]"/>
+          <filter name="filter_done" string="Done"
+                  domain="[('is_done','!=',False)]"/>
+
+          <separator/>
+          <filter name="group_user" string="By User"
+                  context="{'group_by': 'user_id'}"/>
+        </search>
+
+     </field>
+    </record>
+```
+我们可以看到搜索使用两个字段：name和user_id。当用户在搜索框打字的时候，一个可用搜索字段的下拉列表就会出现。如果用户直接输入回车，第一个搜索字段就会使用。
+
+接下来是两个filter。这两个filter可以独立使用，也可以同时点击做OR逻辑。如果filter之间使用了&lt;separator/&gt;，那选择两边的filter会使用AND逻辑。
+
+第三个filter是通过context设置了一个组选项。这个高速视图分组使用哪个字段，这个例子中是user_id
+
+字段元素还可以使用下列属性
+* `name` identifies the field to use.
+* `string` is a label text which is used instead of the default.
+* `operator` is used to change the operator from the default one (= for numeric fields and ilike for the other field types).
+* `filter_domain` sets a specific domain expression to use for the search, providing one flexible alternative to the operator attribute. The searched text string is referred in the expression as self. A trivial example is: filter_domain="[('name', 'ilike', self)]" .
+* `groups` makes the search on the field available only for users belonging to some security Groups. Expects a comma separated list of XML IDs.
+这里留一个疑问：如果供应商，partner，user都在一个联系人里面出现，那么如何限制其他组不能看到供应商。
+
+对于filter元素，这些属性是可用的
+* `name` is an identifier to use by inheritance or to enable it through window actions. Not mandatory, but it is a good practice to always provide it.
+* `string` is the label text to display for the filter. Required.
+* `domain` is the domain expression to be added to the current domain.
+* `context` is a context dictionary to add to the current context. Usually sets a group_id key with the name of the field to group records.
+* `groups` makes the search on the field available only for a list of security Groups (XML IDs).
 
 ### Calendar views
 

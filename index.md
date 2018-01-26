@@ -18,6 +18,8 @@
 
 [008，搭建Samba和Ftp文件服务](/article/OdooSambaFtp.md)
 
+[009，Odoo运行问题汇总](/article/OdooRunningProblem.md)
+
 
 ## 软件开发
 [001，ultraV3.0的实现](/article/OdooUltra.md)
@@ -28,3 +30,4 @@
 ## ERP原理
 [001，ERP原理](/article/ERP.md)
 
+[002，Odoo使用](/article/OdooERPOperation.md)
