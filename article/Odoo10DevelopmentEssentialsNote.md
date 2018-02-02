@@ -2228,7 +2228,7 @@ search 选项的有效值在&lt;search&gt;里定义。但我们在搜索框内�
 * `operator` is used to change the operator from the default one (= for numeric fields and ilike for the other field types).
 * `filter_domain` sets a specific domain expression to use for the search, providing one flexible alternative to the operator attribute. The searched text string is referred in the expression as self. A trivial example is: filter_domain="[('name', 'ilike', self)]" .
 * `groups` makes the search on the field available only for users belonging to some security Groups. Expects a comma separated list of XML IDs.
-这里留一个疑问：如果供应商，partner，user都在一个联系人里面出现，那么如何限制其他组不能看到供应商。
+这里留一个疑问：如果供应商，客户，partner，user都在一个联系人里面出现，那么如何限制其他组不能看到供应商。
 
 对于filter元素，这些属性是可用的
 * `name` is an identifier to use by inheritance or to enable it through window actions. Not mandatory, but it is a good practice to always provide it.
@@ -2238,17 +2238,192 @@ search 选项的有效值在&lt;search&gt;里定义。但我们在搜索框内�
 * `groups` makes the search on the field available only for a list of security Groups (XML IDs).
 
 ### Calendar views
+就像名字所写，这种视图类型在日历上呈现记录，日历可以按月，星期，或者天显示。下面是个todotasks例子
+```xml
+    <record id="view_calendar_todo_task" model="ir.ui.view">
+        <field name="model">todo.task</field>
+        <field name="arch" type="xml">
+
+            <calendar date_start="date_deadline"
+                      color="user_id"
+                      display="[name], Stage [stage_id]">
+                <!-- Fields used for the display text -->
+                <field name="name"/>
+                <field name="stage_id"/>
+            </calendar>
+
+        </field>
+    </record>
+
+```
+日历视图属性有
+* `date_start` is the field for the start date. Mandatory.
+* `date_end` is the field for the end date. Optional.
+* `date_delay` is the field with the duration in days, that can be used instead of `date_end`.
+* `all_day` provides the name of a Boolean field that is to be used to signal full day events. In these events, the duration is ignored.
+* `color` is the field used to group color the calendar entries. Each distinct value in this field will be assigned a color, and all its entries will have the same color.
+* `display` is the display text for each calendar entry. It can user record values using the field names between square brackets, such as [name]. These fields must be declared as child of the calendar element, an in the preceding example.就是说，想display，必须先声明。
+* `mode` is the default display mode for the calendar, either day, week, or month.
+
 
 ### Graph and pivot views
+Graph视图提供了数据的图形，是一个图表的form。当前的字段没有太适合图表展示的，我们会新加一个字段。
+
+effort_estimate = fields.Integer('Effort Estimate')
+
+把这个字段添加到form视图里，我们就能给这个字段添加值了。下面我们添加graph视图
+```xml
+    <record id="view_graph_todo_task" model="ir.ui.view">
+        <field name="model">todo.task</field>
+        <field name="arch" type="xml">
+
+            <graph type="bar">
+                <field name="stage_id"/>
+                <field name="effort_estimate" type="measure"/>
+            </graph>
+
+        </field>
+    </record>
+```
+图表视图元素有一个类型属性：bar，pie或者line。在bar这个例子里，附加的stacked="True"可以使其成为一个可堆放的图表，没试验出来。
+
+这个数据也可以使用pivot表格展示，一种动态分析矩阵。从9.0开始引入pivot table，在8.0中也有效。但是在9.0中，拥有了自己的视图类型。同时还改进了UI特性和优化了获取pivot列表中的数据，下面是例子
+
+```xml
+    <record id="view_pivot_todo_task" model="ir.ui.view">
+        <field name="model">todo.task</field>
+        <field name="arch" type="xml">
+
+            <pivot>
+                <field name="stage_id" type="col"/>
+                <field name="user_id"/>
+                <field name="date_deadline" interval="week"/>
+                <field name="effort_estimate" type="measure"/>
+            </pivot>
+
+        </field>
+    </record>
+```
+图表和旋转视图应该包含字段元素，用来描述轴和使用的措施。大部分有效的属性已经在view类型中说过了：
+
+* `name` identifies the field to use in the graph, just like in other views
+* `type` is how the field will be used, as a `row` group (default), a `measure`, or as `col` (only for pivot tables, use for column groups)
+* `interval` is meaningful for date fields, and is the time interval used to group time data by `day`, `week`, `month`, `quarter`, or `year`
+
+默认情况下，聚合使用的是总和属性。也可以在python字段定义中使用group_operator属性，可选项为avg,max和min。
 
 ### Other view types
+你还需要注意的是，我们还没有介绍三种视图；kanban，gantt和diagram
+
+kanban将会在Chapter 9 , QWeb and Kanban Views.里面介绍
+
+gantt在8.0里面有效，但是到9.0被放到企业版里面了
+
+最后，diagram被用在很少的情况，附加模块很到会用到它们。只是你应该知道这两种视图的官方文档在哪里能找到：[文档链接](https://www.odoo.com/documentation/10.0/reference/views.html)
+
+### Summary
+Summary In this chapter, we learned more about Odoo views in order to build the user interface, covering the most important view types. In the next chapter, we will learn more about adding business logic to our applications.
+
+
+## 7,ORM Application Logic – Supporting Business Processes
+使用Odoo programming API，我们可以写下复杂的逻辑和向导，以便我们的app可以提供很好的用户交互体验。在这一章，我们将会看到在模型中怎样编程来完成复杂的事物逻辑，还会学习在事件和用户动作里怎么调用事物逻辑。
+
+我们可以在事件中执行计算和校验，例如建立或者写一条记录，或者当一个按钮点击的时候执行一些逻辑。例如，我们给todo task完成的按钮，触发Is Done标志，清除所有标志为done的tasks
+
+另外，我们可以使用向导和用户进行非常复杂的交互，在交互期间允许输入并且提供反馈。马上看一个例子
+
+### Creating a wizard
+假设我们的todo app用户经常需要对大量的tasks来设置deadlines和responsible。他们应该使用向导来完成任务。向导要让用户选择想要更新的tasks，然后选择deadline和responsible user来设置它们
+
+向导是一种form视图，用来从用户那里得到输入信息，然后使用信息进行下一步处理。可以用作简单的任务，例如询问一小部分参数，然后返回一个报告。也可以用于复杂的数据处理，例如刚才描述的用例。下面是我们向导的例子
+
+我们还是从新建一个模块todo_wizard开始。在todo_wizard/__manifest__.py里面添加如下代码：
+```xml
+{
+    'name': 'To-do Tasks Management Assistant',
+    'description': 'Mass edit your To-Do backlog.',
+    'author': 'Daniel Reis',
+    'depends': ['todo_user'],
+    'data': ['views/todo_wizard_view.xml'],
+}
+在todo_wizard/__init__.py文件里只有一行
+from . import models
+```
+接下来我们描述数据模型
+
+#### The wizard model
+向导对用户显示了一个form视图，通常是一个Windows对话框，里面有一些字段需要填充。这些信息一会儿向导逻辑会用到。
+和前面一样，也是使用模型/视图架构，但是继承的模型从models.Model变成models.TransientModel。这种类型的模型也会在数据库里生成表，但是只会用到向导完成工作。一个定期的任务会从向导数据库表里面清除旧的数据。
+在models/todo_wizard_model.py文件里定义我们需要和用户交互的字段：需要更新的task列表，负责人，和截止日期
+
+首先在models/__init__.py里面添加 from .import todo_wizard_model 然后建立models/todo_wizard_model.py加入如下代码
+```python
+# -*- coding: utf-8 -*-
+from odoo import models, fields, api
+
+class TodoWizard(models, firlds, api)
+    _name = 'todo.wizard'
+	_description = 'To-do Mass Assignment'
+	task_ids = fields.Many2many('todo.task', string='Tasks')
+	new_deadline = fields.Date('Deadline to Set')
+	new_user_id = fields.Many2one('res.users', string='Responsible to Set')
+```
+值得一提的是在transient模型里不能使用对普通models的one-to-many关系。原因是那将要求普通模型对transient模型有反转的many-to-one关系，但这是不允许的，因为这会引起普通模型记录和transient模型记录一起进行废料收集。
+
+#### The wizard form
+
+#### The wizard business logic
+
+#### Logging
+
+#### Raising exceptions
+
+#### Helper actions in wizards
+
+
+
+### Working with the ORM API
+
+#### Method decorators
+
+#### Overriding the ORM default methods
+
+#### Methods for RPC and web client calls
+
+#### The shell command
+
+#### The server environment
+
+#### Modifying the execution environment
+
+#### Transactions and low-level SQL
+
+
+
+### Working with recordsets
+
+#### Querying models
+
+#### Singletons
+
+#### Writing on records
+
+#### Working with time and dates
+
+#### Operations on recordsets
+
+#### Manipulating recordsets
+
+#### Using relational fields
+
+#### Working with relational fields
+
+
+
 
 ### Summary
 
 
-
-
-## 7,ORM Application Logic – Supporting Business Processes
 
 
 [back](../)
