@@ -2361,19 +2361,113 @@ from . import models
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
-class TodoWizard(models, firlds, api)
+class TodoWizard(models.TransientModel):
     _name = 'todo.wizard'
-	_description = 'To-do Mass Assignment'
-	task_ids = fields.Many2many('todo.task', string='Tasks')
-	new_deadline = fields.Date('Deadline to Set')
-	new_user_id = fields.Many2one('res.users', string='Responsible to Set')
+    _description = 'To-do Mass Assignment'
+    task_ids = fields.Many2many('todo.task', string='Tasks')
+    new_deadline = fields.Date('Set Deadline')
+    new_user_id = fields.Many2one('res.users', string='Set Responsible')
 ```
 值得一提的是在transient模型里不能使用对普通models的one-to-many关系。原因是那将要求普通模型对transient模型有反转的many-to-one关系，但这是不允许的，因为这会引起普通模型记录和transient模型记录一起进行废料收集。
 
 #### The wizard form
+向导视图和普通的模型没什么区别，除了下面两个元素
+* &lt;footer/&gt;部分可以用来放置action buttons
+* 一个特别的type=“cancel”按钮来中断向导，而不用进行任何操作。
+
+下面是views/todo_wizard_view.xml文件的内容
+```xml
+<odoo>
+
+    <record id="view_form_todo_wizard" model="ir.ui.view">
+        <field name="name">view_form_todo_wizard</field>
+        <field name="model">todo.wizard</field>
+        <field name="arch" type="xml">
+
+            <form>
+                <div class="oe_right">
+                    <button type="object" name="do_count_tasks" string="Count"/>
+                    <button type="object" name="do_populate_tasks" string="Get All"/>
+                </div>
+
+                <field name="task_ids">
+                    <tree>
+                        <field name="name"/>
+                        <field name="user_id"/>
+                        <field name="date_deadline"/>
+                    </tree>
+                </field>
+
+                <group>
+                    <field name="new_user_id"/>
+                    <field name="new_deadline"/>
+                </group>
+
+                <footer>
+                    <button type="object" name="do_mass_update"
+                            string="Mass Update" class="oe_highlight"
+                            attrs="{'invisible': [
+                        ('new_deadline','=',False),
+                        ('new_user_id','=',False)
+                        ]}"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+
+        </field>
+    </record>
+
+    <!-- More button Action -->
+    <act_window id="todo_app.action_todo_wizard"
+                name="To-Do Tasks Wizard"
+                src_model="todo.task"
+                res_model="todo.wizard"
+                view_mode="form"
+                target="new"
+    />
+
+</odoo>
+
+```
+form和action添加完成后，我们并没有添加menu，而是使用了src_model属性，把菜单添加到todo.task的form视图的action视图里面了。
+
+你还会注意到Mass Update按钮是隐藏的，除非你选择了负责人或者结束时间。
+
+
 
 #### The wizard business logic
+接下来，我们需要实现在form上button的动作。除了cancel按钮，我们有三个button要实现，现在我们看看Mass Update按钮。
 
+button的name属性是do_mass_update，就是模型中的方法名，在models/todo_wizard_model.py文件里添加如下代码：
+```python
+from odoo import exceptions
+
+import logging
+_logger = logging.getLogger(__name__)
+
+   @api.multi
+    def do_mass_update(self):
+        self.ensure_one()
+        if not self.new_deadline and not self.new_user_id:
+            raise exceptions.ValidationError('No data to update!')
+        _logger.debug('Mass update on Todo Tasks %s' % self.task_ids)
+        # Values to Write
+        vals = {}
+        if self.new_deadline:
+            vals['date_deadline'] = self.new_deadline
+        if self.new_user_id:
+            vals['user_id'] = self.new_user_id
+        # Mass write values on all selected tasks
+        if vals:
+            self.task_ids.write(vals)
+        return True
+
+```
+我们的code应该一次处理一个向导实例，所以我们使用self.ensure_one()来保证。这里self代表在向导form里面浏览记录的数据。
+
+方法开始于对用户是否给出新的结束日期或者负责人进行检验，如果没给就会引发一个错误。紧挨着就是我们如何在log记录里写一条消息。
+
+然后我们建立了一个vals字典，用来使用其中的值来设置批量更新：the new date,new responsible,或者两者都有。然后在一个记录上使用写方法
 #### Logging
 
 #### Raising exceptions
