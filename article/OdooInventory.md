@@ -106,16 +106,17 @@ OpenERP的库存管理采取了独特的复式库存（Double-Entry Stock Manage
 系统中，复式库存是通过记录库存移动（stock move）来实现的。例如，前面的卖10辆自行车给客户，系统记录的是：
 
 ```xml
-产品   |数量 | 源库位 | 目标库位
-自行车 | 10  | stock  | Partner Locations > Customers
+产品   |数量 |源库位 |目标库位
+自行车 |10   |stock  |Partner Locations > Customers
 ```
 
 这条记录的意思是，有10辆自行车从自己的库位（stock）转移到了客户的库位（Partner Locations > Customers）。任何一笔库存变动，系统中都记录了一笔如此形式的库存移动。在OE中，“库存变动”的概念非常广泛，如库存盘点发现盘亏了2辆自行车，系统记录的是：
 
 ```xml
-产品   |数量 | 源库位 | 目标库位
-自行车 | 2   | stock  | Virtual Locations > Inventory Loss
+产品   |数量 |源库位 |目标库位
+自行车 |2    |stock  |Virtual Locations > Inventory Loss
 ```
+
 这条记录的意思是，有2辆自行车从自己的库位（stock）转移到了“盘点库位”（Virtual Locations > Inventory Loss）。反之，盘盈的话，就是从盘点库位转移到了stock。又如生产，生产领料系统记录库存移动：从原料库位转移到生产库位（Produce Location）。成品入库系统记录库存移动：从生产库位（Produce Location）转移到成品库位。
 
 二、实际库存（REAL STOCK）和虚拟库存（VIRTUAL STOCK OR FUTURE STOCK）
