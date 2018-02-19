@@ -18,7 +18,6 @@
 
 [008，搭建Samba和Ftp文件服务](/article/OdooSambaFtp.md)
 
-[009，Odoo运行问题汇总](/article/OdooRunningProblem.md)
 
 
 ## 软件开发
@@ -27,7 +26,11 @@
 [002，Odoo 10 Development Essentials读书笔记](/article/Odoo10DevelopmentEssentialsNote.md)
 
 
-## ERP原理
+## ERP原理及实施
 [001，ERP原理](/article/ERP.md)
 
 [002，Odoo使用](/article/OdooERPOperation.md)
+
+[003，Odoo运行问题汇总](/article/OdooRunningProblem.md)
+
+[004，Odoo仓库管理相关](/article/OdooInventory.md)
