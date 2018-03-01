@@ -34,3 +34,5 @@
 [003，Odoo运行问题汇总](/article/OdooRunningProblem.md)
 
 [004，Odoo仓库管理相关](/article/OdooInventory.md)
+
+[005，Odoo财务相关](/article/OdooAccounting.md)
