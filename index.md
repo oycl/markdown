@@ -25,6 +25,11 @@
 
 [002，Odoo 10 Development Essentials读书笔记](/article/Odoo10DevelopmentEssentialsNote.md)
 
+[003，Odoo表格解析](/article/OdooTable.md)
+
+[004，Odoo小技巧](/article/OdooTips.md)
+
+
 
 ## ERP原理及实施
 [001，ERP原理](/article/ERP.md)
@@ -36,3 +41,5 @@
 [004，Odoo仓库管理相关](/article/OdooInventory.md)
 
 [005，Odoo财务相关](/article/OdooAccounting.md)
+
+
