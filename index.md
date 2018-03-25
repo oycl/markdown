@@ -18,6 +18,8 @@
 
 [008，搭建Samba和Ftp文件服务](/article/OdooSambaFtp.md)
 
+[009，库房系统安装配置](/article/invkuSetup.md)
+
 
 
 ## 软件开发

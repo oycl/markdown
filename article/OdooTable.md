@@ -1,5 +1,10 @@
 # Odoo 表格解析
 
+## 从删除demo数据得到的表关系
+
+
+
+
 ## 一，财务
 欢迎
 这条向导将会帮你开启Odoo的会计，一旦你完成，你将会获益于：
@@ -51,7 +56,7 @@ Your outstanding invoices, payments, and undeposited funds.
 			account_account_template里的第一条记录“其他货币资金”，这个值就是在“会计”设置里“银行间转账科目”
     </record>
 ```
-然后在account.account.template里面添加66个会计科目，这些科目的chart_template_id字段关联到表account_chart_template的这个“id="l10n_chart_china_small_business"”
+然后在account.account.template里面添加64个会计科目，这些科目的chart_template_id字段关联到表account_chart_template的这个“id="l10n_chart_china_small_business"”
 
 
 最后又修改了属性，添加了税
@@ -109,7 +114,18 @@ Your outstanding invoices, payments, and undeposited funds.
 ```
 
 
-我们直接把execl文件导入系统观察，所有数据进入account_account，account_account_template里面没有数据，account_chart_template里面也没有数据
+我们直接把excel文件导入系统观察，所有数据进入account_account，account_account_template里面没有数据，account_chart_template里面也没有数据。为了使会计仪表板显示内容，我们使用改写应用的方法，先把导入account_account这部分数据删除，删除还好在数据里使用DELETE FROM public.account_account;。如果供应商客户或者公司引用其中的数据，删除时就会变得很麻烦。
+
+一直没找到account_account_template里面的数据是如何复制到account_account里面的，留个疑问。
+
+#### 改写步骤
+1，把l10n_cn_small_business文件夹复制一份到custom-addons文件夹里面，改small为yto，不管文件夹还是扩展ID，原则是把small都改成yto
+2，改写__manifest__.py，修改一些描述不是很重要，主要是data域里面把small改成yto
+3，改写data/l10n_cn_yto_business_chart_data.xml
+
+
+4，改写data/account_chart_template_data.yml
+
 
 
 #### 分析
