@@ -1,6 +1,142 @@
 # Odoo 表格解析
 
 ## 从删除demo数据得到的表关系
+1，从采购开始,可以考虑加上一个合同编号
+
+采购-》采购订单：purchase_order表
+外键有下面几个
+res_company (id)             company_id  指向自己公司，购买方
+res_currency (id)            currency_id 使用的货币
+res_partner (id)             dest_address_id 解释为Drop Ship Address，demo中为空，猜想和多地址收货有关
+account_fiscal_position (id) fiscal_position_id 解释Fiscal Position，demo中为空，翻译过来叫财政状况，在供应商/客户处可以选择，在订单处可以选择。在会计处可以设置：设置用来替代的税和科目，
+这里多说两句：
+如果在供应商/客户处选择了财务状况，Odoo将把这一特定财务状况分配给客户记录的任何订单/发票
+如果在销售订单或发票中手动设置了财务状况，则其只会应用到这一个文件，而不会应用到同一客户的未来订单/发票
+在会计科目表中也设置了默认税，留个疑问。
+procurement_group (id)       group_id 解释为-- Procurement Group，任何采购单和销售单都会在其中产生记录
+stock_incoterms (id)         incoterm_id 解释为-- Incoterm贸易术语，专门有一个表存放，demo中为空
+res_partner (id)             partner_id 解释为-- Vendor ，这个是真正的供应商
+account_payment_term (id)    payment_term_id，付款条款，对应的表应该给财务管理，只有提示作用，并无特殊功能。demo中有3，4和空，3代表30净天，4代表下月的最后
+stock_picking_type (id)      picking_type_id，解释为Deliver To，就是来货的时候入哪个仓库，在demo中为21，继续在stock_picking_type里追踪21，这一条代表收货，采购单对应到收货上了
+
+
+
+配置-》作业类型：stock_picking_type表
+目前知道对于每个仓库都会建立收货，打包，捡货，发货，内部调拨等类型，以21收货为例
+stock_location (id)     default_location_dest_id默认目的地89为WH/Stock主库位
+stock_location (id)     default_location_src_id默认源位置，为空，其实是供应商库位，但是没有给每个供应商建立库位，统一使用一个库位，这里为空。
+stock_picking_type (id) return_picking_type_id 返回操作，如果是发货就会指定收货，反之亦然。
+ir_sequence (id)        sequence_id，根据公司指定了前缀WH/IN/，WH/PACK/，WH/PICK/等等
+stock_warehouse (id)    warehouse_id，指仓库，5为WH,6为CHIC
+
+
+
+做一个确认订单的操作会先在Stock_picking表产生记录，然后stock_move表，stock_move表会引用stock_packing表
+A stock picking represents an operation, let's say, you taking some goods from location A to location B. You move 10 item A and 10 item B. 
+A stock move represents the action of moving 10 items A from location A to location B. Another stock move is the action of moving 10 item B from location A to location B.
+
+A stock picking may contain several stock moves. The stock picking is the moving operation. Stock moves represent individual stock movement.
+
+
+
+作业-》所有调拨：Stock_picking表
+在库存作业里面有19条记录，对应这个表
+stock_picking (id)  backorder_id  指向自己，在欠单的情况下使用
+res_company (id)    company_id    demo中，都指向一拖
+procurement_group (id) group_id   任何采购单和销售单都会在其中产生记录，包含采购/销售单号和供应商/客户信息
+stock_location (id)   location_dest_id  目的地，只要是发货给客户的其值都是Partner Locations/Customers，同理收货的也应该是Partner Locations/Vendors，
+stock_location (id)   location_id       源地址，代表从自己的哪个仓库发出
+这两个地址都在stock_location表里面，如果是多公司，每个公司的库位都会在里面，注意这个表使用location_id这个字段指定库位的上级，而顶级库位只有三个Physical Locations，Partner Locations，Virtual Locations
+res_partner (id)      owner_id  解释-- Owner，demo数据为空
+res_partner (id)      partner_id 解释-- Partner，就是我们的客户或者供应商等
+stock_picking_type (id) picking_type_id  我们称之为捡货类型，非空，参照上面
+
+
+
+报告-》库存移动：stock_move表
+res_company (id)          company_id一拖
+procurement_group (id)    group_id按采购单/销售单号分组
+stock_inventory (id)      inventory_id没填
+stock_location (id)       location_dest_id目的地83代表Partner Locations/Customers
+stock_location (id)       location_id源地址89代表WH主库存Stock，82代表供应商
+stock_move (id)           move_dest_id，采购单和销售单刚建立时为空，实际指向自己表的一条记录
+stock_move (id)           origin_returned_move_id，采购单和销售单刚建立时为空，实际指向自己表的一条记录
+res_partner (id)          partner_id，销售单为8代表客户，采购单为空
+stock_picking (id)        picking_id，指向stock_picking里的一个具体操作，一个操作对多个移动
+stock_picking_type (id)   picking_type_id，操作类型，收货和发货等
+procurement_order (id)    procurement_id，销售单关联procurement_order，采购单为空
+product_product (id)      product_id，产品
+product_packaging (id)    product_packaging，目前为空
+product_uom (id)          product_uom，单位
+purchase_order_line (id)  purchase_line_id，采购订单项表
+stock_location_path (id)  push_rule_id，空不知道作用
+stock_production_lot (id) restrict_lot_id，批次相关，目前无用
+res_partner (id)          restrict_partner_id，空
+procurement_rule (id)     rule_id，补货规则，销售单有17代表WH: Stock -> Customers，几个仓库都建有补货规则在表procurement_rule
+stock_move (id)           split_from，空
+stock_warehouse (id)      warehouse_id，5代表WH，一拖仓库
+
+
+库存管理-》库存调整：stock_inventory表及stock_inventory_line表
+
+
+
+1，首先删除stock_inventory_line表和stock_inventory表，这两个表在“库存管理-》库存调整”菜单里面可以直接删除
+
+2，报告-》库存移动：所有的库存移动，stock_move表，但是提示只能删除草稿，去数据库删除
+DELETE FROM public.stock_move;执行成功
+
+3，作业-》所有调拨：Stock_picking表，发现不能删除stock_pack_operation里面有指向这个表的引用
+先使用DELETE FROM public.stock_pack_operation;成功
+然后到作业-》所有调拨：里面去删除所有记录
+
+在这个时候，库存仪表板下面的所有待办事项全部变成0，
+
+
+4，库存管理-》重订货规则：stock_warehouse_orderpoint表
+里面有四条记录，在web页面就可以全部删除
+
+5，stock_route_warehouse表，删除另外两个公司共6条数据，只保留一拖warehouse_id
+使用DELETE FROM public.stock_route_warehouse WHERE warehouse_id != 5;
+stock_location_route (id)    route_id
+stock_warehouse (id)         warehouse_id
+继续顺藤摸瓜试验，stock_location_route只保留一拖名称和BUY MTO
+DELETE FROM public.stock_location_route WHERE id between 20 AND 25;
+
+6，stock_route_product表，这个表对应产品页面里面库存里面的路线，如果点选购买，则该产品对应route_id为BUY，
+product_template (id)      product_id
+stock_location_route (id)  route_id
+全部删除应该没有关系 DELETE FROM public.stock_route_product;
+
+7，报告-》库存计价：stock_quant表
+全部删除：DELETE FROM public.stock_quant;
+
+8，stock_production_lot
+删除：DELETE FROM public.stock_production_lot;
+
+
+9，purchase_order(purchase_order_line)，和sale_order(sale_order_line)，如果删除收货单，采购单也应该能删除
+DELETE FROM public.sale_order_line;
+DELETE FROM public.sale_order;
+DELETE FROM public.procurement_order;
+DELETE FROM public.procurement_group;
+DELETE FROM public.purchase_order_line;
+DELETE FROM public.purchase_order;
+
+10，stock_picking_type和一拖无关的移动
+DELETE FROM public.stock_picking_type where warehouse_id between 6 and 7;
+失败，在procurement_rule中有引用
+继续处理procurement_rule
+DELETE FROM public.procurement_rule WHERE id between 21 and 28;
+DELETE FROM public.procurement_rule WHERE id=30;
+回头继续
+DELETE FROM public.stock_picking_type where warehouse_id between 6 and 7;
+成功
+
+
+11，在配置-》仓库：stock_warehouse里面，可以删除Chicago Warehouse下面那个子仓库和Chicago Warehouse
+
+12，但是还没有处理stock_location，如果不放心，把active设置成false就行了
 
 
 
