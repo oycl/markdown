@@ -20,6 +20,8 @@
 
 [009，库房系统安装配置](/article/invkuSetup.md)
 
+[010，Odoo手册笔记](/article/OdooManual.md)
+
 
 
 ## 软件开发

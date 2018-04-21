@@ -28,17 +28,23 @@ tar -zcvf addons_c_bruno.tar.gz addons/
 5. 删除页面 “表名-Odoo”里面的Odoo，仅限Odoo10
    D:\odoo\odoo10\addons\web\static\src\js\abstract_web_client.js    54行
    this.set('title_part', {"zopenerp": "Odoo"});删除odoo 或者改成想要的文字
-6. 企业版D:\odoo\custom-addons\web_enterprise\static\src\xml\base.xml   
+6. 更改ultra应用每页显示记录数量从80到150，包括one2many字段使用的page页面。
+找到D:\odoo\odoo10\addons\web\static\src\js\views\list_view.js 
+第144行 80改成150，重启服务，升级模块。
+改过后发现这不是一个全局设定，在“应用”菜单里面其值是40，在“外部标识”里面，其值为80
+这也就是在windows action里面使用limit限制了数目
+
+7. 企业版D:\odoo\custom-addons\web_enterprise\static\src\xml\base.xml
     第59行改为"欢迎使用查询系统V3.0"
-7. 公司信息：把YTO图标更换，填写网址，地址等等。加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
-8. 使用企业版，有时候安装讨论模块会使数据库到期。就想恢复到社区版。
+8. 公司信息：把YTO图标更换，填写网址，地址等等。加载语言中文：在Translations菜单里点击 LoadTranslation 选简体中文，确定。
+9. 使用企业版，有时候安装讨论模块会使数据库到期。就想恢复到社区版。
 使用云模拟运行系统做测试，放入所有模块变成企业版，系统会初始化一个数据库，然后导入群组，安装ultra，删除整个数据库，用运行系统备份数据恢复回来，这样云和运行系统就一样了。做一次快照备份防止出现问题。
 
 * 测试：直接安装库房，再安装质量观察效果，结果是装完库房就提示过期。
 * 方案：实际上在目前情况下只安装了企业版的web_enterprise，web_gantt，web_mobile，grid，依次在应用中卸载。把企业版所有模块从硬盘移除，只保留质量quality模块。重启系统看看。安装库房和质量模块再做一次快照备份防止出现问题。
 * 测试：社区版的backend主题能调出搜索框看到很多不该看到的内容，目前修改还很费事（后来发现web_responsive-10.0.1.2.1这个版本好用，升级web_responsive-10.0.1.2.2后反倒有问题）。
 
-9. 在社区版最小模块状态下，也可以安装库房Inventory和质量Quality模块，然后再装主题。
+10. 在社区版最小模块状态下，也可以安装库房Inventory和质量Quality模块，然后再装主题。
 
 
 ### 2，配置各个工作组，需要详细记录
