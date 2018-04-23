@@ -255,13 +255,41 @@ Your outstanding invoices, payments, and undeposited funds.
 一直没找到account_account_template里面的数据是如何复制到account_account里面的，留个疑问。
 
 #### 改写步骤
-1，把l10n_cn_small_business文件夹复制一份到custom-addons文件夹里面，改small为yto，不管文件夹还是扩展ID，原则是把small都改成yto
-2，改写__manifest__.py，修改一些描述不是很重要，主要是data域里面把small改成yto
-3，改写data/l10n_cn_yto_business_chart_data.xml
+1，把l10n_cn_small_business文件夹复制一份到custom-addons文件夹里面，改small_business为yto，不管文件夹还是扩展ID，原则是把small_business都改成yto
+2，改写__manifest__.py，修改一些描述不是很重要，主要是data域里面把small_business改成yto
+3，改写data/l10n_cn_yto_chart_data.xml
+把其它1012其他货币资金前（36行前）的small_business都用yto代替
+把1012用1009其他货币资金代替，在一拖会计科目中是1009
+注意：cash_account_code_prefix和bank_account_code_prefix如果指定代码会自动生成两个科目（使用100，就会自动生成1001Cash和1002Bank）
+也就是说在下面的会计科目主体中不用再出现“现金”和“银行存款”两个科目的代码
+
+编写会计科目的主体：
+01拿到具体的会计科目表01ChartOfAccounts.xls
+02改写最后的样子02ChartOfAccountsTest.csv
+注意几点：
+id就是一个会计科目的扩展id，注意如果出现点.分隔符，就代表点前面是一个模块，如果没有这个意思就不能使用点，可以使用下划线_代替（如果不方便可以单拿一列出来在VIM中批量替换）。这个规则全ODOO的扩展标识符都适用。
+reconcile里面大小写敏感，使用False和True，不能使用FALSE和TRUE，应收和应付一定为True
+chart_template_id里指向l10n_chart_china_yto，下面会说明
+user_type_id_exid指的是科目类型具体参照ChartTypeExternalIdentifier.xls
+
+
+03把02ChartOfAccountsTest.csv用记事本打开另存为03ChartOfAccountsTestUtf8.csv，注意选编码为UTF-8
+04在https://www.freeformatter.com/csv-to-xml-converter.html做转换
+选择03ChartOfAccountsTestUtf8.csv并使用下面的模板
+       <record id="##1##" model="##2##">
+            <field name="code">##3##</field>
+            <field eval="##7##" name="reconcile"/>
+            <field name="name">##4##</field>
+            <field name="user_type_id" ref="##6##"/>
+            <field name="chart_template_id" ref="##8##"/>
+        </record>
+然后把转换后的xml格式文件复制出来04FinalXML.txt，替换原会计科目表的主体部分
+
+最后把会计科目表的一些默认科目改写完，把税改写完
 
 
 4，改写data/account_chart_template_data.yml
-
+只有一个small_business改成yto，变成l10n_chart_china_yto，注意这个ID代表我们要安装的这个会计科目表，在表account.chart.template里面存储，还指定了几个默认的会计科目（在上面科目表的尾部指定）
 
 
 #### 分析
