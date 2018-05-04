@@ -30,7 +30,7 @@ tar -zcvf addons_c_bruno.tar.gz addons/
    this.set('title_part', {"zopenerp": "Odoo"});删除odoo 或者改成想要的文字
 6. 更改ultra应用每页显示记录数量从80到150，包括one2many字段使用的page页面。
 找到D:\odoo\odoo10\addons\web\static\src\js\views\list_view.js 
-第144行 80改成150，重启服务，升级模块。
+第144行 80改成150，重启服务，升级模块。（这次升级可能导致原有模块的安装错误，需要谨慎。）
 改过后发现这不是一个全局设定，在“应用”菜单里面其值是40，在“外部标识”里面，其值为80
 这也就是在windows action里面使用limit限制了数目
 
