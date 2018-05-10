@@ -20,8 +20,7 @@
 #### 开发阶段
 1. 创建一个空白的数据库invbase，不要选中“装入演示数据”检查框（Load Demonstration data）,因为我们要创建的是一个空白数据库，而不是演示数据库，这一步非常重要，很多人都在此出了问题。
 
-注：曾经出现过在web端建完库后，页面不显示主要数据的现象，有时用恢复文件恢复后也不能正常工作。曾经怀疑是备份方法的问题，后来发现是改动源码惹得祸（列表条目从80到150）。
-使用配置文件建立数据库，把配置文件改为db_name = invbase，加入without_demo = all。数据库存档00invbaseInit.backup
+注：如果使用配置文件建立数据库，把配置文件改为db_name = invbase，加入without_demo = all。数据库存档00invbaseInit.backup
 
 2. 首先安装“会计与财务”模块，先装中国会计科目表
 信息设置：手写公司信息，公司图标指定。
@@ -40,11 +39,15 @@ Email：info@yto.com
 4. 然后再安装质量(库存)，销售，采购，模块。安装上述模块后，部分菜单可能为英文，你应该点击菜单“设置→翻译→加载翻译”，把自己的语言改为简体中文（重启Odoo服务）。这样，你就得到了一个能实现本章需求的最小系统
 数据库存档03InvbaseMini.backup
 
-5. 安装ultra，安装invku，安装主题界面，数据库存档04InvbaseUltraInvkuWeb.backup
+5. 安装主题界面，安装hide_inbox，数据库存档04InvbaseWeb.backup
 
-6. 对invku进行开发并测试；导入群组和测试用户信息，给用户分配权限，测试其能进行的操作。
+6. 在04InvbaseWeb.backup基础上测试安装制造，如果成功存档05InvbaseWebMrp.backup
 
-7. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
+7. 退回04InvbaseWeb.backup，导入测试群组和测试用户信息，给用户分配角色，批量统一设置密码为1。数据库存档06InvbaseWebUser.backup
+
+8. 安装ultra，安装invku，对invku进行开发并测试，使其满足要求
+
+9. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
 上面这三个模块如果需要测试，可以从03InvbaseMini.backup出发安装测试
 
 

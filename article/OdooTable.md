@@ -430,7 +430,7 @@ chart_template_id 模板 关联account_chart_template，这里面只有一行
 reconcile boolean 
 
 2. 类型
-。
+
 
 
 ## 二，物料
@@ -646,7 +646,20 @@ class ProductProduct(models.Model):
 ```
 
 
+## 三，菜单和组
+菜单和用户组是多对多的关系，存储在ir_ui_menu_group_rel里
+对菜单的讨论，凡是系统用户都会进入Employee组，而如果把一个菜单给Employee组则会变成所有用户可见
+当我们使用下面语句给某个菜单赋值的时候
+    <record id="mail.mail_channel_menu_root_chat" model="ir.ui.menu">
+            <field name="groups_id" eval="[(6,0,[ref('base.group_no_one')])]"/>
+    </record>
+系统会在ir_ui_menu_group_rel里搜索所有该菜单的记录删除，然后再加入一条把该菜单关联到Technical Features里面
 
+财务配置account.menu_finance_configuration
+质量配置quality.menu_quality_configuration
+库存配置stock.menu_stock_config_settings
+销售配置sales_team.menu_sale_config
+采购配置purchase.menu_purchase_config
 
 
 ### And an ordered list:
