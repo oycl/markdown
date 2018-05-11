@@ -45,10 +45,48 @@ Nginx 502 错误，跟Nginx 无关，修改odoo.conf 里的limit_time_real 即�
 1. 为了简化程序，并没有安装仪表板
 2. 激活“开发者”模式后，在“群组”中，既可以设置访问权限，又可以管理菜单。所有用户都有权限查看的菜单在这里不显示
 3. 发票的编码方法可以通过菜单中“设置→技术→序列与标识符→序列”来修改，默认情况下使用“INV/年/序号”
-9. 测试每种用户原生能进行的操作
+
+4. 测试每种用户原生能进行的操作
 如果库存是管理员：则强制质量是用户，会计及财务是开单
 如果库存是用户：则强制质量是用户
+
+财务中，顾问的权限涵盖会计师，会计师的权限涵盖开单
+
+#### 客户/供应商信息管理部分 res.partner
+原始权限
+在销售和采购中，只有管理员有权限增加客户和供应商信息，普通用户没有
+仓库管理员也有权限增加信息
+财务中即使顾问也没有权限增加客户和供应商信息。
+
+应对策略
+取消库存管理员对res.partner的创建和写权限
+stock.access_product_group_res_partner_stock_manager,res_partner group_stock_manager,base.model_res_partner,stock.group_stock_manager,1,0,0,0
+
+取消销售管理员对res.partner的创建和写权限
+sale.access_res_partner_sale_manager,res.partner.sale.manager,base.model_res_partner,sales_team.group_sale_manager,1,0,0,0
+sale.access_product_group_res_partner_sale_manager,res_partner group_sale_manager,base.model_res_partner,sales_team.group_sale_manager,1,0,0,0
+
+取消采购管理员对res.partner的创建和写权限
+purchase.access_res_partner_purchase_manager,res.partner.purchase.manager,base.model_res_partner,purchase.group_purchase_manager,1,0,0,0
+purchase.access_product_group_res_partner_purchase_manager,res_partner group_purchase_manager,base.model_res_partner,purchase.group_purchase_manager,1,0,0,0
+
+这样把上面5个可以创建和写的权限取消后，就剩下一个群组：额外的权利/联系人创建，对res.partner有创建和写的权利。
+公司决定让哪个用户有这个权利就把这个用户添加到该群组中。
+
+
+
+产品信息权限
+invku_sale_order_read,sale order read,sale.model_sale_order,base.group_jingying,1,0,0,0
+invku_sale_order_line_read,sale order line read,sale.model_sale_order_line,base.group_jingying,1,0,0,0
+invku_purchase_order_read,purchase order read,purchase.model_purchase_order,base.group_jingying,1,0,0,0
+invku_purchase_order_line_read,purchase order line read,purchase.model_purchase_order_line,base.group_jingying,1,0,0,0
+invku_product_all,product all,product.model_product_product,base.group_chanpin,1,1,1,1
+invku_product_temp_all,product temp all,product.model_product_template,base.group_chanpin,1,1,1,1
+
 ## 第二部分 从财务管理开始
+
+
+
 ### 第4章收据和付款
 ### 第5章从发票到支付
 ### 第6章财务分析
