@@ -56,7 +56,7 @@ Nginx 502 错误，跟Nginx 无关，修改odoo.conf 里的limit_time_real 即�
 原始权限
 在销售和采购中，只有管理员有权限增加客户和供应商信息，普通用户没有
 仓库管理员也有权限增加信息
-财务中即使顾问也没有权限增加客户和供应商信息。
+财务中即使顾问也没有权限增加客户/供应商信息。
 
 应对策略
 取消库存管理员对res.partner的创建和写权限
@@ -71,11 +71,24 @@ purchase.access_res_partner_purchase_manager,res.partner.purchase.manager,base.m
 purchase.access_product_group_res_partner_purchase_manager,res_partner group_purchase_manager,base.model_res_partner,purchase.group_purchase_manager,1,0,0,0
 
 这样把上面5个可以创建和写的权限取消后，就剩下一个群组：额外的权利/联系人创建，对res.partner有创建和写的权利。
-公司决定让哪个用户有这个权利就把这个用户添加到该群组中。
+需要让哪个用户有这个权利就把这个用户添加到该群组中。
+
+上面只是解决了谁有权限增删的问题，下面修改各看各的信息
+```xml
+        <record id="base.action_partner_supplier_form" model="ir.actions.act_window">
+            <field name="domain">[('supplier','=',True)]</field>
+        </record>
+
+        <!-- 这里面要注意这个action不是和supplier对应的action_partner_customer_form，而是action_partner_form"-->
+        <!-- action_partner_customer_form有什么用处还不知道-->
+        <record id="base.action_partner_form" model="ir.actions.act_window">
+            <field name="domain">[('customer','=',True)]</field>
+        </record>
+```
 
 
 
-产品信息权限
+产品信息权限(先不用，待仔细考虑)
 invku_sale_order_read,sale order read,sale.model_sale_order,base.group_jingying,1,0,0,0
 invku_sale_order_line_read,sale order line read,sale.model_sale_order_line,base.group_jingying,1,0,0,0
 invku_purchase_order_read,purchase order read,purchase.model_purchase_order,base.group_jingying,1,0,0,0
