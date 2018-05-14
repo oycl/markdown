@@ -86,6 +86,49 @@ purchase.access_product_group_res_partner_purchase_manager,res_partner group_pur
         </record>
 ```
 
+#### 产品信息管理部分 product_product，product_template
+#####财务角色
+在测试过程中，作为财务顾问，虽然有权限去写上面这两个模型，但是在界面中点击已经存在的产品时会弹出这个提示框：
+
+对不起，您没有访问此文档的权限。 只有以下访问等级的用户可才做这:
+- Inventory/User
+- Inventory/Manager
+- Sales/User: Own Documents Only
+- Other Extra Rights/Portal
+- Purchases/User
+
+(单据模型: stock.warehouse.orderpoint)
+
+
+解决方法一是把Other Extra Rights/Portal组中增加财务顾问（还需要具体关注这个Other Extra Rights/Portal的具体权限不能过大，因为工艺想用这个组来创建，编辑和修改产品模型），不推荐使用
+解决方法二从stock.warehouse.orderpoint入手，如果把这个模型加入到财务开单的可访问的模型中，也可以解决问题，个人认为财务有必要访问具体的产品信息，所以添加如下访问规则
+access_stock_warehouse_orderpoint,stock.warehouse.orderpoint,stock.model_stock_warehouse_orderpoint,account.group_account_invoice,1,0,0,0
+
+取消财务顾问对产品的创建和删除权限，保留读和写权限，而默认会计师和开单只有读权限，不能修改
+account.access_product_product_account_manager,product.product.account.manager,product.model_product_product,account.group_account_manager,1,1,0,0
+account.access_product_template_account_manager,product.template.account.manager,product.model_product_template,account.group_account_manager,1,1,0,0
+
+#####库房角色
+库房用户，只保留读权限
+stock.access_product_product_stock_user,product_product_stock_user,product.model_product_product,stock.group_stock_user,1,0,0,0
+stock.access_product_template_stock_user,product.template stock user,product.model_product_template,stock.group_stock_user,1,0,0,0
+
+库房管理员，只保留读权限
+stock.access_product_product_stock_manager,product.product stock_manager,product.model_product_product,stock.group_stock_manager,1,0,0,0
+stock.access_product_template_stock_manager,product.template stock_manager,product.model_product_template,stock.group_stock_manager,1,0,0,0
+
+#####销售角色
+销售管理员，只保留读权限
+sale.access_product_product_sale_manager,product.product salemanager,product.model_product_product,sales_team.group_sale_manager,1,0,0,0
+sale.access_product_template_sale_manager,product.template salemanager,product.model_product_template,sales_team.group_sale_manager,1,0,0,0
+
+
+#####采购角色
+采购管理员，只保留读权限
+purchase.access_product_product_purchase_manager,product.product purchase_manager,product.model_product_product,purchase.group_purchase_manager,1,0,0,0
+purchase.access_product_template_purchase_manager,product.template purchase_manager,product.model_product_template,purchase.group_purchase_manager,1,0,0,0
+
+
 
 
 产品信息权限(先不用，待仔细考虑)
@@ -95,6 +138,9 @@ invku_purchase_order_read,purchase order read,purchase.model_purchase_order,base
 invku_purchase_order_line_read,purchase order line read,purchase.model_purchase_order_line,base.group_jingying,1,0,0,0
 invku_product_all,product all,product.model_product_product,base.group_chanpin,1,1,1,1
 invku_product_temp_all,product temp all,product.model_product_template,base.group_chanpin,1,1,1,1
+
+
+
 
 ## 第二部分 从财务管理开始
 
