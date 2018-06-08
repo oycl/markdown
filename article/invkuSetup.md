@@ -1,7 +1,7 @@
-# 库房系统安装配置
+# 库房系统安装及开发
 
-## 一，模块安装
-### 以框架+ultra+现用用户为基础，进一步安装各个模块的方法（不打算使用）
+## 一，安装
+### 以框架+ultra+现用用户为基础，进一步安装各个模块的方法（不使用，因为删除演示数据未必能删干净）
 1. 在PgAdmin中新建一个空数据库，改名为Odoo10，使用从运行系统最新备份中拷贝出的odoo10.custom恢复回去，
 
 > 如果使用原数据库名字odoo10，则不会出现丢失图标的问题，如果换一个新的数据库名字如forchart则图标不能正确显示，重新安装一遍应用，应用涉及的图标会变正常，但是系统图标“设置”，“应用”还是不行。 解决方法：重新安装base模块后系统图标正常。
@@ -53,30 +53,185 @@ Email：info@yto.com
 
 
 
-####测试阶段
+#### 测试阶段
 在192.168.4.5:80上测试，编码，改进，和财务和其它部门确认，无误后进行培训
 
 
-####试运行阶段
-1. 5.55生产环境整个数据库自动备份保存好，导出m.part和m.assemble
-2. invku和yto科目表download到5.55生产环境中，直接把干净的数据库恢复到5.55上
-3. 安装ultra，导入m.part和m.assemble，运行数据库函数（验证m.part和m.assemble还有m.bom和1中保存的数据是否一致），无缝过度
-4. 如果密码不能迁移，则重置一次所有人的密码
-
-
-问题1，如何把数据库里面的几个表迁移到另一个数据库里。如果不用导入和导出恐怕不行。但没试验过密码如何导出？
-
-
-
-
-
-
-
+#### 试运行阶段
+选一个周末加班，在1.55生产环境上部署试运行环境，因为1.55已经有完备的每日备份计划（数据库继续使用odoo10）可以充分利用
+1. 把前一天的数据库自动备份拿到开发环境上测试一下，看有没有问题。没有问题后封存，防止本次搭建失败，正常上班后没有系统可用。
+2. 导出m.part和m.assemble。m_designer,m_important,m_sheet,m_type
+3. ultra，invku和yto科目表的最新版download到1.55生产环境中，
+4. 按照上面的方法在1.55上重新安装一遍系统模块。
+5. 安装ultra，导入m.part和m.assemble，运行数据库函数（验证m.part和m.assemble还有m.bom和1中保存的数据是否一致），无缝过度。
+6. 安装invku
+7. 重置一次所有人的密码为1，如果已经拿到实际的权限列表，挨个人员进行权限分配和测试，如果没有就都设置成员工。
+8. 在其他人的电脑测试系统页面是否显示正常。
+9. 当日的系统备份作为一个原始存档，除ultra外无运行数据。以后可以用来做各种测试
+10. 整个系统可以一直运行，等到了下一个财政年度会自动重新开始编码，在年终可以配合盘点输入一次数据。
 
 
 
 
-### 三，标题
+## 二，开发
+### 权限配置
+
+1. 每种用户原生能进行的操作如下：
+如果库存是管理员：则强制质量是用户，会计是开单
+如果库存是用户：则强制质量是用户
+会计中，顾问的权限涵盖会计师，会计师的权限涵盖开单
+
+#### 客户/供应商信息管理部分 res.partner
+原始权限：
+在销售和采购中，只有管理员有权限增加客户和供应商信息，普通用户没有
+仓库管理员也有权限增加信息
+财务中即使顾问也没有权限增加客户/供应商信息。
+
+目标：
+客户/供应商信息的创建分别归销售和采购的管理员，只取消他们删除的权限就行
+仓库管理员取消创建，修改和删除权限，只保留读权限
+增加财务顾问修改信息的权利，比如销售和采购创建的名称错误可以修改
+
+使用方法：
+权限配置的格式是
+扩展ID，名称，模型ID，群组ID，读，写，创建，删除
+
+下面这段xml仅存档用，因为系统的设置和下面的写法是一样的
+```xml
+下面应该是一条就可以解决问题，怎么使用了两条，待恢复数据库后仔细观察一下，实际在系统模块中就存在两条数据，只有都改才行。
+取消销售管理员对res.partner的删除权限
+sale.access_res_partner_sale_manager,res.partner.sale.manager,base.model_res_partner,sales_team.group_sale_manager,1,1,1,0
+sale.access_product_group_res_partner_sale_manager,res_partner group_sale_manager,base.model_res_partner,sales_team.group_sale_manager,1,1,1,0
+
+取消采购管理员对res.partner的删除权限
+purchase.access_res_partner_purchase_manager,res.partner.purchase.manager,base.model_res_partner,purchase.group_purchase_manager,1,1,1,0
+purchase.access_product_group_res_partner_purchase_manager,res_partner group_purchase_manager,base.model_res_partner,purchase.group_purchase_manager,1,1,1,0
+```
+
+取消库存管理员对res.partner的创建和写权限
+stock.access_product_group_res_partner_stock_manager,res_partner group_stock_manager,base.model_res_partner,stock.group_stock_manager,1,0,0,0
+
+取消额外的权利/联系人创建 的删除权限
+base.access_res_partner_group_partner_manager,res_partner group_partner_manager,base.model_res_partner,base.group_partner_manager,1,1,1,0
+
+取消制造管理员的res.partner的创建和写权限
+mrp.access_product_group_res_partner_mrp_manager,res_partner group_mrp_manager,base.model_res_partner,mrp.group_mrp_manager,1,0,0,0
+
+增加财务顾问的修改权利
+account.access_res_partner_group_account_manager,res_partner group_account_manager,base.model_res_partner,account.group_account_manager,1,1,0,0
+
+方案A
+把上面5个可以创建和写的权限取消后，就剩下一个群组：额外的权利/联系人创建，对res.partner有创建和写的权利。需要让哪个用户有这个权利就把这个用户添加到该群组中。
+
+方案B
+取消库存和制造管理员的创建和写的权利后，销售和采购管理员和额外的权利/联系人创建三种人具有创建和写的权利,财务顾问具有写权利。
+
+
+上面只是解决了谁有权限增删的问题，下面修改各看各的信息
+```xml
+        <record id="base.action_partner_supplier_form" model="ir.actions.act_window">
+            <field name="domain">[('supplier','=',True)]</field>
+        </record>
+
+        <!-- 这里面要注意这个action不是和supplier对应的action_partner_customer_form，而是action_partner_form"-->
+        <!-- action_partner_customer_form有什么用处还不知道-->
+        <record id="base.action_partner_form" model="ir.actions.act_window">
+            <field name="domain">[('customer','=',True)]</field>
+        </record>
+```
+
+#### 产品信息部分 product_product，product_template
+##### 普通用户
+因为需要普通用户（base.group_user）查看库存的在手数量，所以单独建立了一个菜单“技术”调用“产品”页面
+
+一个普通用户进入这个“产品”页面首先遇到的问题：提示stock.move这个模型没有权限所以看不了，这就需要给stock.move这个模型添加普通用户的读权限。
+access_stock_move_group_user,stock_move group_user,stock.model_stock_move,base.group_user,1,0,0,0
+
+添加完毕后，可以看到产品页面，但是点击无法进入（stock.warehouse.orderpoint的权限原因），这正好符合需要，隐藏里面的信息。
+
+注意这里面的在手数量，专指WH/库存里面的数量，分配到生产库存的的不能称作在手数量，这种计算方式正好符合我们的需要。
+
+在这个tree view中想隐藏销售价格，和成本字段，因为使用“实际价格”来计库存，所以销售价格和成本都不使用。
+
+
+#####财务角色
+在测试过程中，作为财务顾问，虽然有权限去写上面这两个模型，但是在界面中点击已经存在的产品时会弹出这个提示框：
+
+对不起，您没有访问此文档的权限。 只有以下访问等级的用户可才做这:
+- Inventory/User
+- Inventory/Manager
+- Sales/User: Own Documents Only
+- Other Extra Rights/Portal
+- Purchases/User
+(单据模型: stock.warehouse.orderpoint)
+
+解决方法从stock.warehouse.orderpoint入手，如果把这个模型加入到财务开单的可访问的模型中，也可以解决问题，个人认为财务有必要访问具体的产品信息，所以添加如下访问规则
+access_stock_warehouse_orderpoint,stock.warehouse.orderpoint,stock.model_stock_warehouse_orderpoint,account.group_account_invoice,1,0,0,0
+
+取消财务顾问对产品的创建和删除权限，保留读和写权限，而默认会计师和开单只有读权限，不能修改
+account.access_product_product_account_manager,product.product.account.manager,product.model_product_product,account.group_account_manager,1,1,0,0
+account.access_product_template_account_manager,product.template.account.manager,product.model_product_template,account.group_account_manager,1,1,0,0
+
+#####库房角色
+库房用户，只保留读权限
+stock.access_product_product_stock_user,product_product_stock_user,product.model_product_product,stock.group_stock_user,1,0,0,0
+stock.access_product_template_stock_user,product.template stock user,product.model_product_template,stock.group_stock_user,1,0,0,0
+
+库房管理员，只保留读权限
+stock.access_product_product_stock_manager,product.product stock_manager,product.model_product_product,stock.group_stock_manager,1,0,0,0
+stock.access_product_template_stock_manager,product.template stock_manager,product.model_product_template,stock.group_stock_manager,1,0,0,0
+
+#####销售角色
+销售管理员，只保留读权限
+sale.access_product_product_sale_manager,product.product salemanager,product.model_product_product,sales_team.group_sale_manager,1,0,0,0
+sale.access_product_template_sale_manager,product.template salemanager,product.model_product_template,sales_team.group_sale_manager,1,0,0,0
+
+
+#####采购角色
+采购管理员，只保留读权限
+purchase.access_product_product_purchase_manager,product.product purchase_manager,product.model_product_product,purchase.group_purchase_manager,1,0,0,0
+purchase.access_product_template_purchase_manager,product.template purchase_manager,product.model_product_template,purchase.group_purchase_manager,1,0,0,0
+
+按照上面的方法只保留两个模型的读权限，那么在product_supplierinfo模型，也就是“产品”-》“库存”页面里面的供应商信息将不能添加，只有放开product_template里面的写权限，才能针对产品添加供应商信息。也许会把这个权限放给采购。
+
+#### 供应商价格部分 product_supplierinfo
+取消库存管理员的创建，写和删除权限
+stock.access_product_supplierinfo_stock_manager,product.supplierinfo stock_manager,product.model_product_supplierinfo,stock.group_stock_manager,1,0,0,0
+
+取消销售管理员的创建，写和删除权限
+sale.access_product_supplierinfo_sale_manager,product.supplierinfo salemanager,product.model_product_supplierinfo,sales_team.group_sale_manager,1,0,0,0
+
+取消采购管理员的删除权限
+purchase.access_product_supplierinfo_purchase_manager,product.supplierinfo purchase_manager,product.model_product_supplierinfo,purchase.group_purchase_manager,1,1,1,0
+
+取消制造用户的创建，写和删除权限
+mrp.access_product_supplierinfo_user,product.supplierinfo user,product.model_product_supplierinfo,mrp.group_mrp_user,1,0,0,0
+
+
+产品的几维属性
+1，来源，供货方式：购买或者自制
+2，存在形式：服务或者可以库存
+3，用途：可用于销售，可用于采购（简单起见，所有零件都勾选这两个选项）
+4，会计属性：成本及销售价格，收入科目，费用科目，销项税，进项税
+
+
+产品分类定义收入和费用科目作为大的全局设定，具体产品如果指定科目就可以代替默认产品分类中指定的科目
+销项税和进项税在会计科目表安装的时候也会指定默认值。供应商中定义了税率，则使用供应商税率，如果在产品中也指定了税率，则使用产品的税率。
+
+
+
+
+
+产品信息权限(先不用，待仔细考虑)
+invku_sale_order_read,sale order read,sale.model_sale_order,base.group_jingying,1,0,0,0
+invku_sale_order_line_read,sale order line read,sale.model_sale_order_line,base.group_jingying,1,0,0,0
+invku_purchase_order_read,purchase order read,purchase.model_purchase_order,base.group_jingying,1,0,0,0
+invku_purchase_order_line_read,purchase order line read,purchase.model_purchase_order_line,base.group_jingying,1,0,0,0
+invku_product_all,product all,product.model_product_product,base.group_chanpin,1,1,1,1
+invku_product_temp_all,product temp all,product.model_product_template,base.group_chanpin,1,1,1,1
+
+
+
 
 ### And an ordered list:
 1.  Item one

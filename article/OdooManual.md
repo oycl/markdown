@@ -45,117 +45,7 @@ Nginx 502 错误，跟Nginx 无关，修改odoo.conf 里的limit_time_real 即�
 1. 为了简化程序，并没有安装仪表板
 2. 激活“开发者”模式后，在“群组”中，既可以设置访问权限，又可以管理菜单。所有用户都有权限查看的菜单在这里不显示
 3. 发票的编码方法可以通过菜单中“设置→技术→序列与标识符→序列”来修改，默认情况下使用“INV/年/序号”
-
-4. 测试每种用户原生能进行的操作
-如果库存是管理员：则强制质量是用户，会计及财务是开单
-如果库存是用户：则强制质量是用户
-
-财务中，顾问的权限涵盖会计师，会计师的权限涵盖开单
-
-#### 客户/供应商信息管理部分 res.partner
-原始权限
-在销售和采购中，只有管理员有权限增加客户和供应商信息，普通用户没有
-仓库管理员也有权限增加信息
-财务中即使顾问也没有权限增加客户/供应商信息。
-
-应对策略
-取消库存管理员对res.partner的创建和写权限
-stock.access_product_group_res_partner_stock_manager,res_partner group_stock_manager,base.model_res_partner,stock.group_stock_manager,1,0,0,0
-
-取消销售管理员对res.partner的创建和写权限
-sale.access_res_partner_sale_manager,res.partner.sale.manager,base.model_res_partner,sales_team.group_sale_manager,1,0,0,0
-sale.access_product_group_res_partner_sale_manager,res_partner group_sale_manager,base.model_res_partner,sales_team.group_sale_manager,1,0,0,0
-
-取消采购管理员对res.partner的创建和写权限
-purchase.access_res_partner_purchase_manager,res.partner.purchase.manager,base.model_res_partner,purchase.group_purchase_manager,1,0,0,0
-purchase.access_product_group_res_partner_purchase_manager,res_partner group_purchase_manager,base.model_res_partner,purchase.group_purchase_manager,1,0,0,0
-
-这样把上面5个可以创建和写的权限取消后，就剩下一个群组：额外的权利/联系人创建，对res.partner有创建和写的权利。
-需要让哪个用户有这个权利就把这个用户添加到该群组中。
-
-上面只是解决了谁有权限增删的问题，下面修改各看各的信息
-```xml
-        <record id="base.action_partner_supplier_form" model="ir.actions.act_window">
-            <field name="domain">[('supplier','=',True)]</field>
-        </record>
-
-        <!-- 这里面要注意这个action不是和supplier对应的action_partner_customer_form，而是action_partner_form"-->
-        <!-- action_partner_customer_form有什么用处还不知道-->
-        <record id="base.action_partner_form" model="ir.actions.act_window">
-            <field name="domain">[('customer','=',True)]</field>
-        </record>
-```
-
-#### 产品信息管理部分 product_product，product_template
-#####财务角色
-在测试过程中，作为财务顾问，虽然有权限去写上面这两个模型，但是在界面中点击已经存在的产品时会弹出这个提示框：
-
-对不起，您没有访问此文档的权限。 只有以下访问等级的用户可才做这:
-- Inventory/User
-- Inventory/Manager
-- Sales/User: Own Documents Only
-- Other Extra Rights/Portal
-- Purchases/User
-
-(单据模型: stock.warehouse.orderpoint)
-
-
-解决方法一是把Other Extra Rights/Portal组中增加财务顾问（还需要具体关注这个Other Extra Rights/Portal的具体权限不能过大，因为工艺想用这个组来创建，编辑和修改产品模型），不推荐使用
-解决方法二从stock.warehouse.orderpoint入手，如果把这个模型加入到财务开单的可访问的模型中，也可以解决问题，个人认为财务有必要访问具体的产品信息，所以添加如下访问规则
-access_stock_warehouse_orderpoint,stock.warehouse.orderpoint,stock.model_stock_warehouse_orderpoint,account.group_account_invoice,1,0,0,0
-
-取消财务顾问对产品的创建和删除权限，保留读和写权限，而默认会计师和开单只有读权限，不能修改
-account.access_product_product_account_manager,product.product.account.manager,product.model_product_product,account.group_account_manager,1,1,0,0
-account.access_product_template_account_manager,product.template.account.manager,product.model_product_template,account.group_account_manager,1,1,0,0
-
-#####库房角色
-库房用户，只保留读权限
-stock.access_product_product_stock_user,product_product_stock_user,product.model_product_product,stock.group_stock_user,1,0,0,0
-stock.access_product_template_stock_user,product.template stock user,product.model_product_template,stock.group_stock_user,1,0,0,0
-
-库房管理员，只保留读权限
-stock.access_product_product_stock_manager,product.product stock_manager,product.model_product_product,stock.group_stock_manager,1,0,0,0
-stock.access_product_template_stock_manager,product.template stock_manager,product.model_product_template,stock.group_stock_manager,1,0,0,0
-
-#####销售角色
-销售管理员，只保留读权限
-sale.access_product_product_sale_manager,product.product salemanager,product.model_product_product,sales_team.group_sale_manager,1,0,0,0
-sale.access_product_template_sale_manager,product.template salemanager,product.model_product_template,sales_team.group_sale_manager,1,0,0,0
-
-
-#####采购角色
-采购管理员，只保留读权限
-purchase.access_product_product_purchase_manager,product.product purchase_manager,product.model_product_product,purchase.group_purchase_manager,1,0,0,0
-purchase.access_product_template_purchase_manager,product.template purchase_manager,product.model_product_template,purchase.group_purchase_manager,1,0,0,0
-
-按照上面的方法只保留两个模型的读权限，那么在product_supplierinfo模型，也就是“产品”-》“库存”页面里面的供应商信息将不能添加，只有放开product_template里面的写权限，才能针对产品添加供应商信息。也许会把这个权限放给采购。
-
-
-产品的几维属性
-1，来源，供货方式：购买或者自制
-2，存在形式：服务或者可以库存
-3，用途：可用于销售，可用于采购（简单起见，所有零件都勾选这两个选项）
-4，会计属性：成本及销售价格，收入科目，费用科目，销项税，进项税
-
-
-产品分类定义收入和费用科目作为大的全局设定，具体产品如果指定科目就可以代替默认产品分类中指定的科目（需要测试）
-销项税和进项税在会计科目表安装的时候也会指定默认值。供应商中定义了税率，则使用供应商税率，如果在产品中也指定了税率，则使用产品的税率。
-
-
-
-
-
-产品信息权限(先不用，待仔细考虑)
-invku_sale_order_read,sale order read,sale.model_sale_order,base.group_jingying,1,0,0,0
-invku_sale_order_line_read,sale order line read,sale.model_sale_order_line,base.group_jingying,1,0,0,0
-invku_purchase_order_read,purchase order read,purchase.model_purchase_order,base.group_jingying,1,0,0,0
-invku_purchase_order_line_read,purchase order line read,purchase.model_purchase_order_line,base.group_jingying,1,0,0,0
-invku_product_all,product all,product.model_product_product,base.group_chanpin,1,1,1,1
-invku_product_temp_all,product temp all,product.model_product_template,base.group_chanpin,1,1,1,1
-
-
-
-
+4. 权限配置参照invkuSetup.md里面的开发部分
 
 ## 第二部分 从财务管理开始
 
@@ -723,7 +613,107 @@ Odoo 将从包含订购产品的仓库中发送货物。当产品在多个仓库
 为了满足复杂的仓库管理环境，你需要通过菜单“仓库→设置→设置”勾选“库位和仓库”一节的“使用规则的产品高级路线”。
 
 
+#### 推式流
+在 Odoo 中，库位之间可以进行连接来确定产品的流转路径。推式流定义了一个库位怎么与另一个库位相关联，包括相关的参数。当给定数量的产品移至源库位时，一个库位移动动作将自动按照设置的流程参数执行（目的库位、延期时间、货运类型、科目等）。根据参数的定义，这个新的移动动作可以自动完成或手工确认。
+
+当产品到达一个库位的时候，Odoo 能够自动建议将产品移动到其相关的库位，系统提供了三种内部调拨类型：
+>>自动调拨
+>>手动操作
+>>自动，但不增加
+自动调拨模式将在不等待用户确认情况下自动执行移动操作。产品将自动发送到相关的库存位而不产生任何内部的手动操作。相对应的情况下，简单来说，就是用户免去过程中的手动步骤，设置自动操作移动过程。
+手动操作模式将在产品抵达库位的时候自动创建一个移动到相关库位的内部移动单。在物料真正移动前，这个移动单需要操作人员确认。
+“自动，但不增加”操作模式没有相关库存位置移动,但是会将产品直接改变目的地，分配到相关的库存位置，你可以设置一个产品到达仓库时的目标库位。仓库管理员可以更改收货信息。
+
+有些内部调拨操作在实际执行前需一个特定的时间。为了考虑这个提前期，你需要在字段“延迟”中设定一个天数。原始移动发生后，额外的产品移动将在设定的天数后执行（自动或者手动），如果你采用的是“自动，但不增加”操作，这个提前时间将自动插入初始订单交付时间之后。通过这种方法，你可以在仓库库存控制点设置安全的提前期。
+
+推式流的一个典型应用：假设当原材料到达收货库位时，为了保证货品质量，它首先要搬去质检库位做质量检查。
+为实现这个需求，使用菜单“仓库→设置→路线”，点击“新建”按钮，来创建名称为“卸货-->质检-->入库”的路线，注意在“适用于”一节勾选仓库，并选择相关的仓库。在推式流一节，点击“添加一个项目”，然后进行如下图的配置，“保存并关闭”此推式流，最后“保存”此路线。
+
+推式流在路线里面测试成功，“全局的推式规则”没有测试成功。另外自动调拨的“自动，但不增加”也没有测试出来，手动成功。
+
+
+#### 补货规则（拉式流）
+拉式流跟推式流不同，拉式流操作的是需求，而不是直接的产品。它不处理产品的移动，而是处理需求和补货单。推式流应用于移动的目标库位，而拉式流应用于移动的源库位。
+当一个库存移动被确认，而它的补货方法被设为“高级：应用补货规则”时，为了实现这个移动，它将在源库位创建一个补货。为了满足这个补货，在这个补货上需要创建一个补货规则。补货规则有多个产生不同结果的补货类型: 从另一个库位移动产品至源库位、采购产品到源库位、生产产品到源库位。
+补货单不需要被库存移动创建。用户可人工创建补货单，或者当我们确认了一个销售订单后，Odoo 将在客户库位为每一个销售订单行创建补货单。事实上，这个补货系统、库存移动和补货规则在整个 Odoo 中都得到了广泛使用。即便在最简单的仓库设置中，当我们运行从销售订单产生的补货单时，这些补货规则将产生发货单。
+在正常状态下，补货单将依次通过下列状态：
+>>确认: 补货单创建后被人工确认。
+>>运行: 一个补货规则被成功应用（比如创建了一个移动、询价单或一个生产单）
+>>完成:补货规则被应用并且产品被移动到了补货库位。
+
+
+当仓库移动没有找到补货规则或不可能应用补货规则（如产品未定义供应商）时将出现补货异常。当产品不再需要时，你可以取消补货。
+如果安装了“procurement_jit”模块，当补货被确认时，系统将立即检查补货。如果导致了性能问题，你可以卸载此模块。这样系统将仅仅立即运行由销售订单产生的补货（其结果是产生发货单），但发货单的库存移动产生的补货将不马上运行，而是按“计划运行”中设置的运行频次来进行。
+相对于推式流，拉式流享有较高的优先级，当一个规则从拉式流被创建后，推式流将不能再被应用。
+例如：对于按订单补货的产品，当销售订单确认后，产品就需要“库存库位→客户库位”的发货操作，对于“库存库位”，就需要通过拉式流从质检库位来进行补货，以满足这个销售订单的发货要求。为此，应用到此产品的的路线中的补货规则（拉式流）设置如下：
+
+
+#### 库存保留
+如果一个移动不是入库，那么当其被确认后，，就需要保留必要的库存供此次移动使用。
+保留库存时，我们要考虑下述因素:
+>>如果有初始移动的话，要保留的库存就来自这个移动。
+>>如果没有初始移动，要保留的库存可以来自源库位（如果这个库存没有被其它移动保留）。如果用户想从其它移动保留产品，也可以不保留源库位的库存。
+>>对于退货的移动，系统将检查被退货的源移动是否执行了移动。
+当选择了“从库存补货”，我们需要考虑出库策略。出库策略决定了仓库保留库存的顺序。默认的出库策略是先进先出（FIFO）。
+你可以使用产品分类的“强制调拨策略”和库位的“出库策略”字段定义不同的出库策略，例如：后入先出（LIFO）、先进先出（FIFO）。
+
+
+#### 打包
+库存移动本身并不能告诉到哪个包装、库位、批次去取货，放置产品到哪个库位或包装，这是打包的工作内容。有两种类型的打包操作。:
+>>取整个包装
+>>从特定的包装取货，或不在一个包装中取货。
+
+
+#### 退货和取消
+退货：
+对于一个已完成的分拣，你可以创建退货。系统将建议你退回所有仍在目标库位的产品。如果在初始移动中找不到库存，将创建负的数量份。
+取消：
+当你取消一个补货单，它将在反方向取消所有相关。当你取消一个移动时，它将在后续方向上取消所有相关。
+
+#### 库存计价方法
+存库计价方法的选择是制订企业会计政策的一项重要内容。选择不同的存货计价方法将会导致不同的报告利润和存货估值，并对企业的税收负担、现金流量产生影响。
+Odoo 采用 4 种计价方法：标准价格、平均价格、先进先出(FIFO)、后进先出 (LIFO)（国际会计准则 IFRS 和中国会计准则均已不允许使用后进先出，所以本文就不再介绍）。 Odoo 默认的计价方法为标准价格法。
+
+系统默认的库存计价方法是标准价格法，要使用平均价格法和先进先出法，需要通过“采购→采购→设置”，在“采购单”一节点选“使用“固定”、“实时”或“平均”价格成本计算方法，这样系统就会自动安装“stock_account”模块。实际上装了会计模块会自动安装这个stock_account模块。
+
+1. 标准价格法
+标准成本一般一年重新评估一次。使用的标准成本管理的产品的价格在一年内很少变化。采购入库时候，总是按产品上设定的成本价格记入库成本（系统的库存调拨和波次上记录的是采购价格，系统创建入库会计凭证时候取的是成本价格），实际采购成本和标准成本价格的差异记入科目“材料成本差异”。销售出库时候，系统也按产品上设定的成本价格计算发货成本。期末，需要手工将“材料成本差异”科目余额结转到当期发出产品成本。
+
+我们在产品类别里面做测试，实际上总类的改变不影响计价的方法，在子类里面设置“成本计算方法”才会生效
+如果选择标准价格法，库存中的产品会取产品页面的成本来计算，所有的产品都是用一个价格，即标准价格。
+
+
+2. 实际价格
+把产品类别里面的“成本计算方法”改成“实际价格”，则库存计价时会按照采购的价格重新计算。如果出库会依据先进先出的顺序出库，然后计算剩余的价格。
+
+
+
+#### 到岸成本
+如果想在 Odoo 中分配到岸成本（包括运输过程的成本、所有关税、手续费等）到产品的成本计算中，你需要参照以下步骤设置 Odoo。
+通过“仓库→配置→设置”，“在会计”一节，勾选“在产品成本计算时包含到岸成本”和“永续库存估值（库存调拨生成会计凭证）”。
+
+通过“采购→设置→设置”，在采购单一节勾选“使用‘固定’、‘实时’或‘平均’价格成本计算方法”。
+
+
+#### 入库单和发货单不小心取消后如何改回来
+在已取消的入库单或发货单窗体中，从“动作”下拉单中选择“复制”就可以快速创建一个新的入库单。
+然后，你可以编辑并确认这个入库单或发货单。
+对已取消的单据，你可以从“动作”下拉单中选择“删除”。
+
+
+#### 产品的导入和导出
+
+#### 产品盘点的导入和导出
+
+#### 仓库管理权限设定
+具体见手册，最好能做出区分，但时间不够可以以后再弄。同时注意库存计价的时候，各部门的仓库管理员能不能看到价格这一个敏感字段。
+
+
+
 ### 第12章生产
+在本章你将接触到两个方面内容：第一部分将讨论产品，第二部分将讨论工艺。产品管理基于分类的概念，操作管理基于工艺路线和工作中心的概念。
+
+
 
 
 
