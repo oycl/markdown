@@ -190,6 +190,20 @@ For each group, add user you want to determine a warehouse.
 
 Bye
 
+### 在打印“会计-报告-业务伙伴分类账”的时候出错
+[文章地址](https://github.com/odoo/odoo/issues/24881)
+提到解决方法：在odoo10/addons/account/report/account_partner_ledger.py的第38行
+r['date'] = datetime.strptime(r['date'], DEFAULT_SERVER_DATE_FORMAT).strftime(date_format'))
+
+修改成
+r['date'] = datetime.strptime(r['date'], DEFAULT_SERVER_DATE_FORMAT).strftime(date_format.encode('utf-8'))
+
+但是经过实际测试，改完后在windows环境下会直接引起python的崩溃，在linux下没有试验
+
+还有另一个解决方法就是在“设置-翻译-语言”里面，选择“Chinese (CN) / 简体中文”，在“日期格式 %Y年%m月%d日”里面，把年月日三个字删除掉
+
+不知道此bug在github上后续还有没有fix
+
 
 
 1.  Item one

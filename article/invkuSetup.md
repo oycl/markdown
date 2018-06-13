@@ -151,7 +151,8 @@ access_stock_move_group_user,stock_move group_user,stock.model_stock_move,base.g
 
 注意这里面的在手数量，专指WH/库存里面的数量，分配到生产库存的的不能称作在手数量，这种计算方式正好符合我们的需要。
 
-在这个tree view中想隐藏销售价格，和成本字段，因为使用“实际价格”来计库存，所以销售价格和成本都不使用。
+在这个tree view中想隐藏销售价格，和成本字段，因为使用“实际价格”来计算库存估值，所以销售价格和成本都不使用。
+使用了视图的继承属性，结果怎么试验都有错误，还怀疑原始视图被别的视图继承后不能再继承，实际上是__manifest__.py里面的依赖没有加上，加上依赖   'depends':['base','product','sale','account','purchase'],解决问题
 
 
 #####财务角色
@@ -230,7 +231,14 @@ invku_purchase_order_line_read,purchase order line read,purchase.model_purchase_
 invku_product_all,product all,product.model_product_product,base.group_chanpin,1,1,1,1
 invku_product_temp_all,product temp all,product.model_product_template,base.group_chanpin,1,1,1,1
 
+#### 解决库存是管理员：则强制质量是用户 和 库存是用户：则强制质量是用户
+在质量用户中删除库存管理员和库存用户，进行测试
+目前看要解决quality.check模型的访问问题
+quality.access_quality_check_stock_user,quality.check,quality.model_quality_check,stock.group_stock_user,1,1,1,0
 
+
+#### 解决库存是管理员：则强制会计是开单
+在会计-开单用户中删除库存管理员，进行测试，目前还没发现报错的情况，有了再解决。
 
 
 ### And an ordered list:
