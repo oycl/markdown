@@ -45,12 +45,31 @@ Email：info@yto.com
 
 7. 退回04InvbaseWeb.backup，导入测试群组和测试用户信息，给用户分配角色，批量统一设置密码为1。数据库存档06InvbaseWebUser.backup
 
-8. 安装ultra，安装invku，对invku进行开发并测试，使其满足要求
+8. 继续安装mrp（新方案带mrp），安装ultra，调整群组和用户的关系，
 
-9. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
+修改前缀
+“设置→技术→序列与标识符→序号” 里面
+INV改成发票
+BILL改成账单
+PO改成采购单
+SO改成销售单
+MO改成制造单
+BNK改成银行
+CSH改成现金
+
+把会计改成财务,不用改代码,在开发者模式下,选择翻译->已翻译术语，搜索“翻译值：会计”，找到“已翻译字段”为 ir.ui.menu,name，改第二个翻译值为财务。
+
+9. 完成后存档07InvbaseAll.backup
+
+10. 安装stock_analytic模块
+
+11. 安装invku，对invku进行开发并测试，使其满足要求
+
+12. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
 上面这三个模块如果需要测试，可以从03InvbaseMini.backup出发安装测试
 
-
+附备份命令（windows）
+pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\backups\name.backup" "invbase"
 
 
 #### 测试阶段
@@ -74,6 +93,27 @@ Email：info@yto.com
 
 
 ## 二，开发
+### 模块配置
+#### 采购
+
+
+
+
+#### 销售
+通过菜单“销售→配置→设置”，在“产品”一节，勾选“一些产品可使用不同的销售 / 采购单位 ( 高级 )”，这时在采购和销售的订单行里面就会有计量单位一栏。注意这个设置在采购和销售里面都可以设定
+
+取消库存，销售，采购，制造管理员对产品计量单位和产品类别的创建，写和删除访问，具体见下面产品
+
+
+#### 库房
+
+
+#### 财务
+
+
+
+
+
 ### 权限配置
 
 1. 每种用户原生能进行的操作如下：
@@ -98,7 +138,7 @@ Email：info@yto.com
 
 下面这段xml仅存档用，因为系统的设置和下面的写法是一样的
 ```xml
-下面应该是一条就可以解决问题，怎么使用了两条，待恢复数据库后仔细观察一下，实际在系统模块中就存在两条数据，只有都改才行。
+下面应该是一条就可以解决问题，实际在系统模块中就存在两条数据，只有都改才行。
 取消销售管理员对res.partner的删除权限
 sale.access_res_partner_sale_manager,res.partner.sale.manager,base.model_res_partner,sales_team.group_sale_manager,1,1,1,0
 sale.access_product_group_res_partner_sale_manager,res_partner group_sale_manager,base.model_res_partner,sales_team.group_sale_manager,1,1,1,0
@@ -219,17 +259,39 @@ mrp.access_product_supplierinfo_user,product.supplierinfo user,product.model_pro
 产品分类定义收入和费用科目作为大的全局设定，具体产品如果指定科目就可以代替默认产品分类中指定的科目
 销项税和进项税在会计科目表安装的时候也会指定默认值。供应商中定义了税率，则使用供应商税率，如果在产品中也指定了税率，则使用产品的税率。
 
+#### 产品信息之计量单位和类别
+取消库存，销售，采购，制造管理员对产品计量单位和产品类别的创建，写和删除访问
+stock.access_product_uom_categ_stock_manager,product.uom.categ stock_manager,product.model_product_uom_categ,stock.group_stock_manager,1,0,0,0
+stock.access_product_uom_stock_manager,product.uom stock_manager,product.model_product_uom,stock.group_stock_manager,1,0,0,0
 
+sale.access_product_uom_categ_sale_manager,product.uom.categ salemanager,product.model_product_uom_categ,sales_team.group_sale_manager,1,0,0,0
+sale.access_product_uom_sale_manager,product.uom salemanager,product.model_product_uom,sales_team.group_sale_manager,1,0,0,0
 
+purchase.access_product_uom_categ_purchase_manager,product.uom.categ purchase_manager,product.model_product_uom_categ,purchase.group_purchase_manager,1,0,0,0
+purchase.access_product_uom_purchase_manager,product.uom purchase_manager,product.model_product_uom,purchase.group_purchase_manager,1,0,0,0
 
+mrp.access_product_uom_categ_mrp_manager,product.uom.categ mrp_manager,product.model_product_uom_categ,mrp.group_mrp_manager,1,0,0,0
+mrp.access_product_uom_mrp_manager,product.uom mrp_manager,product.model_product_uom,mrp.group_mrp_manager,1,0,0,0
 
-产品信息权限(先不用，待仔细考虑)
+#### 产品信息之类别
+stock.access_product_category_stock_manager,product.category stock_manager,product.model_product_category,stock.group_stock_manager,1,0,0,0
+sale.access_product_category_sale_manager,product.category salemanager,product.model_product_category,sales_team.group_sale_manager,1,0,0,0
+purchase.access_product_category_purchase_manager,product.category purchase_manager,product.model_product_category,purchase.group_purchase_manager,1,0,0,0
+mrp.access_product_category_mrp_manager,product.category mrp_manager,product.model_product_category,mrp.group_mrp_manager,1,0,0,0
+
+#### 销售单信息部分
+增加领导的访问权
 invku_sale_order_read,sale order read,sale.model_sale_order,base.group_jingying,1,0,0,0
 invku_sale_order_line_read,sale order line read,sale.model_sale_order_line,base.group_jingying,1,0,0,0
+
+#### 采购单信息部分
+增加领导的访问权
 invku_purchase_order_read,purchase order read,purchase.model_purchase_order,base.group_jingying,1,0,0,0
 invku_purchase_order_line_read,purchase order line read,purchase.model_purchase_order_line,base.group_jingying,1,0,0,0
-invku_product_all,product all,product.model_product_product,base.group_chanpin,1,1,1,1
-invku_product_temp_all,product temp all,product.model_product_template,base.group_chanpin,1,1,1,1
+
+#### 物料清单有权增加修改，给base.group_chanpin群组
+invku_product_all,product all,product.model_product_product,base.group_chanpin,1,1,1,0
+invku_product_temp_all,product temp all,product.model_product_template,base.group_chanpin,1,1,1,0
 
 #### 解决库存是管理员：则强制质量是用户 和 库存是用户：则强制质量是用户
 在质量用户中删除库存管理员和库存用户，进行测试
