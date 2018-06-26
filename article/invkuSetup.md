@@ -91,22 +91,47 @@ pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --
 
 
 
-
+在“”一节，""选项里面，选择“”
 ## 二，开发
 ### 模块配置
 #### 采购
+通过菜单“采购→配置→设置”
+1. 供应商价格管理方式
+在“采购订单”一节，"供应商价格"选项里面，选择“允许使用和导入供应商价格表”
 
+2. 修改订单是否允许
+在“物流”一节，"采购订单修改"选项里面，选择“允许修改采购订单”
 
+3. 库存计价采用实际价格法
+在“采购订单”一节，“成本方法”选项里面，点选“使用'固定价','实际价'或者'平均价'成本定价方法”
 
+我们在产品类别里面做测试，实际上总类的改变不影响计价的方法，在子类里面设置“成本计算方法”才会生效
+
+4. 翻译修改
+可以把采购单的“供应商参照”改为“供应商合同”，提高利用率
+在翻译中搜索“供应商参照”，改第三个为“供应商合同”
 
 #### 销售
-通过菜单“销售→配置→设置”，在“产品”一节，勾选“一些产品可使用不同的销售 / 采购单位 ( 高级 )”，这时在采购和销售的订单行里面就会有计量单位一栏。注意这个设置在采购和销售里面都可以设定
+通过菜单“销售→配置→设置”
+1. 计量单位配置
+在“产品”一节，"供应商价格"选项里面，勾选“一些产品可使用不同的销售/采购单位(高级)”，这时在采购和销售的订单行里面就会有计量单位一栏。注意这个设置在采购和销售里面都可以设定
 
-取消库存，销售，采购，制造管理员对产品计量单位和产品类别的创建，写和删除访问，具体见下面产品
+2. 修改销售单是否允许
+在“报价单 & 销售”一节，"销售订单修改"选项里面，选择“允许在“销售订单”菜单中编辑销售订单(不通过报价单菜单)”
 
 
 #### 库房
+通过菜单“库房→配置→设置”
+1. 仓库位置设置
+在“位置和仓库”一节，"仓库和位置使用水平"选项里面，选择“管理 由多个库存位置组成的仅仅1个仓库”
 
+2. 入库和出库自动在日记账分录中记录
+在两个位置设置
+1，在“库存会计”一节，"库存计价"选项里面，选择“永续库存计价（库存移动生成会计分录）”
+2，采购或者库存应用里-》配置-》产品类别里面 “库存计价”里面的库存计价选择永续（自动）
+会计库存属性里面的科目表配置好
+
+如果不使用这种方法，在入库确认和出库确认时不会自动产生日记账分录。需要点击开”供应商账单“或者”客户发票“时才能产生日记账分录。
 
 #### 财务
 
@@ -182,6 +207,7 @@ account.access_res_partner_group_account_manager,res_partner group_account_manag
 
 #### 产品信息部分 product_product，product_template
 ##### 普通用户
+
 因为需要普通用户（base.group_user）查看库存的在手数量，所以单独建立了一个菜单“技术”调用“产品”页面
 
 一个普通用户进入这个“产品”页面首先遇到的问题：提示stock.move这个模型没有权限所以看不了，这就需要给stock.move这个模型添加普通用户的读权限。
@@ -259,8 +285,9 @@ mrp.access_product_supplierinfo_user,product.supplierinfo user,product.model_pro
 产品分类定义收入和费用科目作为大的全局设定，具体产品如果指定科目就可以代替默认产品分类中指定的科目
 销项税和进项税在会计科目表安装的时候也会指定默认值。供应商中定义了税率，则使用供应商税率，如果在产品中也指定了税率，则使用产品的税率。
 
-#### 产品信息之计量单位和类别
-取消库存，销售，采购，制造管理员对产品计量单位和产品类别的创建，写和删除访问
+
+取消库存，销售，采购，制造管理员对产品计量单位和产品类别的创建，写和删除访问。
+#### 产品信息之计量单位
 stock.access_product_uom_categ_stock_manager,product.uom.categ stock_manager,product.model_product_uom_categ,stock.group_stock_manager,1,0,0,0
 stock.access_product_uom_stock_manager,product.uom stock_manager,product.model_product_uom,stock.group_stock_manager,1,0,0,0
 
@@ -273,7 +300,7 @@ purchase.access_product_uom_purchase_manager,product.uom purchase_manager,produc
 mrp.access_product_uom_categ_mrp_manager,product.uom.categ mrp_manager,product.model_product_uom_categ,mrp.group_mrp_manager,1,0,0,0
 mrp.access_product_uom_mrp_manager,product.uom mrp_manager,product.model_product_uom,mrp.group_mrp_manager,1,0,0,0
 
-#### 产品信息之类别
+#### 产品信息之产品类别
 stock.access_product_category_stock_manager,product.category stock_manager,product.model_product_category,stock.group_stock_manager,1,0,0,0
 sale.access_product_category_sale_manager,product.category salemanager,product.model_product_category,sales_team.group_sale_manager,1,0,0,0
 purchase.access_product_category_purchase_manager,product.category purchase_manager,product.model_product_category,purchase.group_purchase_manager,1,0,0,0
@@ -292,6 +319,8 @@ invku_purchase_order_line_read,purchase order line read,purchase.model_purchase_
 #### 物料清单有权增加修改，给base.group_chanpin群组
 invku_product_all,product all,product.model_product_product,base.group_chanpin,1,1,1,0
 invku_product_temp_all,product temp all,product.model_product_template,base.group_chanpin,1,1,1,0
+invku_product_enter,product enter,stock.model_stock_warehouse_orderpoint,base.group_chanpin,1,1,1,0
+
 
 #### 解决库存是管理员：则强制质量是用户 和 库存是用户：则强制质量是用户
 在质量用户中删除库存管理员和库存用户，进行测试

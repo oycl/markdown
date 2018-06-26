@@ -645,6 +645,51 @@ class ProductProduct(models.Model):
 
 ```
 
+### 采购过价格自动添加功能探讨
+发现问题是用admin用户可以添加，但是采购的管理员和用户都不可以，于是想追查问题
+1，通过反复下订单，确认是在把“询价单”转变为“采购单”的“确认订单”按钮执行的添加价格操作，在开发者模式下看到这个button对应的方法为button_confirm
+2，在pycharm中purchase模块里搜索button_confirm，定位到337行
+```python
+    def button_confirm(self):
+        for order in self:
+            if order.state not in ['draft', 'sent']:
+                continue
+            order._add_supplier_to_product()
+```
+3，打断点后下采购单发现根本不停止到断点，在网上找到进入pycharm的debug模式的方法：就是点击run按钮后面那个debug
+4，_add_supplier_to_product(self)函数里面单步运行F8
+```python
+   @api.multi
+    def _add_supplier_to_product(self):
+        # Add the partner in the supplier list of the product if the supplier is not registered for
+        # this product. We limit to 10 the number of suppliers for a product to avoid the mess that
+        # could be caused for some generic products ("Miscellaneous").
+        for line in self.order_line:
+            # Do not add a contact as a supplier
+            partner = self.partner_id if not self.partner_id.parent_id else self.partner_id.parent_id
+            if partner not in line.product_id.seller_ids.mapped('name') and len(line.product_id.seller_ids) <= 10:
+                currency = partner.property_purchase_currency_id or self.env.user.company_id.currency_id
+                supplierinfo = {
+                    'name': partner.id,
+                    'sequence': max(line.product_id.seller_ids.mapped('sequence')) + 1 if line.product_id.seller_ids else 1,
+                    'product_uom': line.product_uom.id,
+                    'min_qty': 0.0,
+                    'price': self.currency_id.compute(line.price_unit, currency),
+                    'currency_id': currency.id,
+                    'delay': 0,
+                }
+                vals = {
+                    'seller_ids': [(0, 0, supplierinfo)],
+                }
+                try:
+                    line.product_id.write(vals)
+                except AccessError:  # no write access rights -> just ignore
+                    break
+```
+5，最后的时候发现在执行 line.product_id.write(vals)的时候，admin能顺利执行，采购的用户和管理员会引发异常。基本确定无写入权限
+6，回想之前曾取消销售的用户和管理员的product.product和product.template两个模型的写权限，恢复后一切正常
+7，这样就开通了下采购单后的自动记录功能，引发的副作用是采购的用户和管理员有编辑产品的权限
+
 
 ## 三，菜单和组
 菜单和用户组是多对多的关系，存储在ir_ui_menu_group_rel里
