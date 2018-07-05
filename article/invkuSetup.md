@@ -18,36 +18,36 @@
 
 ### 先安装框架，然后各个模块，最后自有模块（ultra+invku）
 #### 开发阶段
-1. 创建一个空白的数据库invbase，不要选中“装入演示数据”检查框（Load Demonstration data）,因为我们要创建的是一个空白数据库，而不是演示数据库，这一步非常重要，很多人都在此出了问题。
+1. 创建一个空白的数据库odoo10，不要选中“装入演示数据”检查框（Load Demonstration data）,因为我们要创建的是一个空白数据库，而不是演示数据库，这一步非常重要，很多人都在此出了问题。
 
-注：如果使用配置文件建立数据库，把配置文件改为db_name = invbase，加入without_demo = all。数据库存档00invbaseInit.backup
+注：如果使用配置文件建立数据库，把配置文件改为db_name = odoo10，加入without_demo = all。数据库
 
-2. 首先安装“会计与财务”模块，先装中国会计科目表
-信息设置：手写公司信息，公司图标指定。
+使用admin：admin登录系统后，菜单为英文，你应该点击菜单“设置→翻译→加载翻译”，加载：Chinese (CN) / 简体中文，然后在自己的首选项里把语言改为简体中文，密码改成1，时区改成上海。先安装翻译的好处是可以把之后的模块翻译的更彻底。
+
+存档00Init.backup
+
+2. 首先安装“会计和财务”模块，再安装中国会计科目表，主要想使用里面的省份数据
+
+安装完后出问题，去ir_attachment里面把11项删除
+
+3.  信息设置：公司图标指定，手写公司信息：
 公司名称：一拖（黑龙江）东方红工业园有限公司
 公司标语：新的生活从东方红开始
 街道：建华区北苑开发区东方红路1号
 国家：china（选择）省份：黑龙江（选择）城市：齐齐哈尔市 邮编：161000
 网站：http://www.ythlj.com.cn
-电话：0452-2380345
+电话：0452-2380279
 传真：0452-2380066
-Email：info@yto.com
+Email：information@yto.com
 
-数据库存档01invbaseCaiwuNoChart.backup
+4. 再装一拖会计科目表。然后再安装质量(库存)，销售，采购和制造模块。这样，你就得到了一个能实现本章需求的最小系统。
 
-3. 再装一拖会计科目表。数据库存档02invbaseCaiwu.backup
-4. 然后再安装质量(库存)，销售，采购，模块。安装上述模块后，部分菜单可能为英文，你应该点击菜单“设置→翻译→加载翻译”，把自己的语言改为简体中文（重启Odoo服务）。这样，你就得到了一个能实现本章需求的最小系统
-数据库存档03InvbaseMini.backup
+5. 安装主题界面Web Responsive和Backend Theme，安装hide_inbox，
 
-5. 安装主题界面，安装hide_inbox，数据库存档04InvbaseWeb.backup
+存档01Mini.backup
 
-6. 在04InvbaseWeb.backup基础上测试安装制造，如果成功存档05InvbaseWebMrp.backup
-
-7. 退回04InvbaseWeb.backup，导入测试群组和测试用户信息，给用户分配角色，批量统一设置密码为1。数据库存档06InvbaseWebUser.backup
-
-8. 继续安装mrp（新方案带mrp），安装ultra，调整群组和用户的关系，
-
-修改前缀
+6. 修改系统
+前缀：
 “设置→技术→序列与标识符→序号” 里面
 INV改成发票
 BILL改成账单
@@ -57,19 +57,54 @@ MO改成制造单
 BNK改成银行
 CSH改成现金
 
-把会计改成财务,不用改代码,在开发者模式下,选择翻译->已翻译术语，搜索“翻译值：会计”，找到“已翻译字段”为 ir.ui.menu,name，改第二个翻译值为财务。
+RO改成路线
+QC改成质检
+QCP改成质检点，序列大小改6
 
-9. 完成后存档07InvbaseAll.backup
+翻译：
+把会计改成财务,不用改代码,在开发者模式下,选择翻译->已翻译术语，搜索“翻译值：会计”，找到“已翻译字段”为 ir.ui.menu,name，改第二个翻译值为财务。搜索菜单的翻译值“顾问”，改为“管理”
 
-10. 安装stock_analytic模块
+把报价单的“客户参照”改为“客户合同编号”，提高利用率
+在翻译中搜索“客户参照”，找到后直接改为“客户合同编号”
 
-11. 安装invku，对invku进行开发并测试，使其满足要求
+可以把采购单的“供应商参照”改为“供应商合同编号”，提高利用率
+在翻译中搜索“供应商参照”，改第三个为“供应商合同编号”
 
-12. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
-上面这三个模块如果需要测试，可以从03InvbaseMini.backup出发安装测试
+把菜单的“库存计价”改为“查看库存”，更符合我们的目的
+
+
+7. 安装stock_analytic模块，安装ultra模块，安装invku，对invku进行开发并测试，使其满足要求，
+
+存档02All.backup
+
+8. 导入测试用户信息，信息里自带了主要的角色，根据公司需要，删减几个权限
+在质量的用户中删除库存的管理员和用户，
+在会计的开单组中删除库存的管理员
+把YTOEbom，YTOLeader，YTOMbom的三个员工加上员工权限
+
+批量统一设置密码为1。
+
+设置供应商和客户的默认国家为中国，语言为简体中文
+销售仪表板中删除“网站销售”，
+
+“采购订单”和“出库单”的打印的格式从PDF调整到HTML，方便复制
+
+通过菜单“销售→配置→设置”：计量单位配置
+在“产品”一节，"供应商价格"选项里面，勾选“一些产品可使用不同的销售/采购单位(高级)”，这时在采购和销售的订单行里面就会有计量单位一栏。注意这个设置在采购和销售里面都可以设定
+
+存档03User.backup
+9. 导入产品类别product.category1.xls
+库存计价采用实际价格法
+在“采购订单”一节，“成本方法”选项里面，点选“使用'固定价','实际价'或者'平均价'成本定价方法”
+设置完成后，产品类别页面才会出现成本方法。
+
+导入产品
+
+10. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
+上面这三个模块如果需要测试，可以从01Mini.backup出发安装测试
 
 附备份命令（windows）
-pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\backups\name.backup" "invbase"
+pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\custom-addons\invku\basedata\01Accounts\backup\name.backup" "invbase"
 
 
 #### 测试阶段
@@ -107,17 +142,13 @@ pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --
 
 我们在产品类别里面做测试，实际上总类的改变不影响计价的方法，在子类里面设置“成本计算方法”才会生效
 
-4. 翻译修改
-可以把采购单的“供应商参照”改为“供应商合同”，提高利用率
-在翻译中搜索“供应商参照”，改第三个为“供应商合同”
+4. 
 
 #### 销售
-通过菜单“销售→配置→设置”
-1. 计量单位配置
-在“产品”一节，"供应商价格"选项里面，勾选“一些产品可使用不同的销售/采购单位(高级)”，这时在采购和销售的订单行里面就会有计量单位一栏。注意这个设置在采购和销售里面都可以设定
-
-2. 修改销售单是否允许
+1. 修改销售单是否允许
 在“报价单 & 销售”一节，"销售订单修改"选项里面，选择“允许在“销售订单”菜单中编辑销售订单(不通过报价单菜单)”
+
+2. 
 
 
 #### 库房
@@ -133,10 +164,15 @@ pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --
 
 如果不使用这种方法，在入库确认和出库确认时不会自动产生日记账分录。需要点击开”供应商账单“或者”客户发票“时才能产生日记账分录。
 
+3. 
+
+
+
 #### 财务
 
 
-
+#### 生产
+如果库存到生产库需要计价，那把“制造”的用户给生产负责生产定额核算的人，并赋予其“产品“模型的修改权限，无创建和删除权限。同时其价格字段price也需要保密处理，就像处理供应商价格一样。
 
 
 ### 权限配置
@@ -147,6 +183,10 @@ pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --
 会计中，顾问的权限涵盖会计师，会计师的权限涵盖开单
 
 #### 客户/供应商信息管理部分 res.partner
+初始化
+在导入客户/供应商信息时，注意客户/供应商的语言设置为：Chinese (CN) / 简体中文，否则打印询价单的时候会出现很多英文字符。
+
+
 原始权限：
 在销售和采购中，只有管理员有权限增加客户和供应商信息，普通用户没有
 仓库管理员也有权限增加信息
@@ -235,9 +275,9 @@ access_stock_move_group_user,stock_move group_user,stock.model_stock_move,base.g
 解决方法从stock.warehouse.orderpoint入手，如果把这个模型加入到财务开单的可访问的模型中，也可以解决问题，个人认为财务有必要访问具体的产品信息，所以添加如下访问规则
 access_stock_warehouse_orderpoint,stock.warehouse.orderpoint,stock.model_stock_warehouse_orderpoint,account.group_account_invoice,1,0,0,0
 
-取消财务顾问对产品的创建和删除权限，保留读和写权限，而默认会计师和开单只有读权限，不能修改
-account.access_product_product_account_manager,product.product.account.manager,product.model_product_product,account.group_account_manager,1,1,0,0
-account.access_product_template_account_manager,product.template.account.manager,product.model_product_template,account.group_account_manager,1,1,0,0
+取消财务顾问对产品的创建和删除和写权限，保留读权限，而默认会计师和开单只有读权限，不能修改
+account.access_product_product_account_manager,product.product.account.manager,product.model_product_product,account.group_account_manager,1,0,0,0
+account.access_product_template_account_manager,product.template.account.manager,product.model_product_template,account.group_account_manager,1,0,0,0
 
 #####库房角色
 库房用户，只保留读权限
@@ -268,8 +308,12 @@ stock.access_product_supplierinfo_stock_manager,product.supplierinfo stock_manag
 取消销售管理员的创建，写和删除权限
 sale.access_product_supplierinfo_sale_manager,product.supplierinfo salemanager,product.model_product_supplierinfo,sales_team.group_sale_manager,1,0,0,0
 
-取消采购管理员的删除权限
-purchase.access_product_supplierinfo_purchase_manager,product.supplierinfo purchase_manager,product.model_product_supplierinfo,purchase.group_purchase_manager,1,1,1,0
+取消采购管理员的创建，写和删除权限
+purchase.access_product_supplierinfo_purchase_manager,product.supplierinfo purchase_manager,product.model_product_supplierinfo,purchase.group_purchase_manager,1,0,0,0
+
+取消采购用户的删除权限
+purchase.access_product_supplierinfo_purchase_manager,product.supplierinfo purchase_manager,product.model_product_supplierinfo,purchase.group_purchase_manager,1,0,0,0
+
 
 取消制造用户的创建，写和删除权限
 mrp.access_product_supplierinfo_user,product.supplierinfo user,product.model_product_supplierinfo,mrp.group_mrp_user,1,0,0,0

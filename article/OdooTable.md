@@ -283,6 +283,7 @@ user_type_id_exid指的是科目类型具体参照ChartTypeExternalIdentifier.xl
             <field name="user_type_id" ref="##6##"/>
             <field name="chart_template_id" ref="##8##"/>
         </record>
+使用这种转换方法要注意最后有部分科目的code最后一位为0被无理由删除，比如2101.020变成2101.02，需要手动检查
 然后把转换后的xml格式文件复制出来04FinalXML.txt，替换原会计科目表的主体部分
 
 最后把会计科目表的一些默认科目改写完，把税改写完
