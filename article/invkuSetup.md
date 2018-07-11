@@ -86,7 +86,7 @@ QCP改成质检点，序列大小改6
 8. 导入测试用户信息，信息里自带了主要的角色，根据公司需要，删减几个权限
 在质量的用户中删除库存的管理员和用户，
 在会计的开单组中删除库存的管理员
-把YTOEbom，YTOLeader，YTOMbom的三个员工加上员工权限
+把YTOEbom，YTOLeader，YTOMbom的三个员工加上员工权限，手动取消没必要的权限（目前无法直接删除）
 
 批量统一设置密码为1。
 
@@ -115,18 +115,22 @@ QCP改成质检点，序列大小改6
 10. 建仓库，
 仓库选项设置：通过菜单“库房→配置→设置”，在“位置和仓库”一节，"仓库和位置使用水平"选项里面，选择“管理 由多个库存位置组成的仅仅1个仓库”
 
-WH下面建三包备件库，成品库，研发成品库
+WH下面建成品库，研发（成品库）（导入的时候，需要手动调整其上级）
 虚拟位置/生产下面建 结构件仓库，研发结构件仓库，总装仓库，研发总装仓库
 
-建立了一个采购单：测试了入库，挂账到支付的会计科目无误
+把发货仓库改成成品库：在仓库-》一拖（黑龙江）东方红工业园有限公司-》路线里面-》一拖（黑龙江）东方红工业园有限公司: Ship Only-》补货规则里面的 来源位置改成“成品库”
 
 存档05Warehouse.backup
+
+导入作业类型stock.picking.type.xls
+导入质量控制点quality.point.xls
+
 
 11. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
 上面这三个模块如果需要测试，可以从01Mini.backup出发安装测试
 
 附备份命令（windows）
-pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\custom-addons\invku\basedata\01Accounts\backup\name.backup" "invbase"
+pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\custom-addons\invku\basedata\00backup\05Warehouse.backup" "odoo10"
 
 
 #### 测试阶段
