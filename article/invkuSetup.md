@@ -122,9 +122,14 @@ WH下面建成品库，研发（成品库）（导入的时候，需要手动调
 
 存档05Warehouse.backup
 
-导入作业类型stock.picking.type.xls
+导入作业类型stock.picking.type.xls 把作业类型的颜色在仪表板里设置了一下
 导入质量控制点quality.point.xls
 
+存档06Show.backup
+安装模块stock_inventory_revaluation，发现菜单里的翻译需要重启服务才能生效
+注意这个模块如果get到两个记录，有可能引发错误把两个记录的进货价格重置成0，还要改stock_quant里的cost字段。
+
+存档07Show01.backup
 
 11. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
 上面这三个模块如果需要测试，可以从01Mini.backup出发安装测试
@@ -330,9 +335,6 @@ sale.access_product_supplierinfo_sale_manager,product.supplierinfo salemanager,p
 取消采购管理员的创建，写和删除权限
 purchase.access_product_supplierinfo_purchase_manager,product.supplierinfo purchase_manager,product.model_product_supplierinfo,purchase.group_purchase_manager,1,0,0,0
 
-取消采购用户的删除权限
-purchase.access_product_supplierinfo_purchase_manager,product.supplierinfo purchase_manager,product.model_product_supplierinfo,purchase.group_purchase_manager,1,0,0,0
-
 
 取消制造用户的创建，写和删除权限
 mrp.access_product_supplierinfo_user,product.supplierinfo user,product.model_product_supplierinfo,mrp.group_mrp_user,1,0,0,0
@@ -394,6 +396,8 @@ quality.access_quality_check_stock_user,quality.check,quality.model_quality_chec
 #### 解决库存是管理员：则强制会计是开单
 在会计-开单用户中删除库存管理员，进行测试，目前还没发现报错的情况，有了再解决。
 
+#### 解决给采购看收付款模型权限的问题
+invku_access_account_payment,account payment purchase,account.model_account_payment,purchase.group_purchase_user,1,0,0,0
 
 ### And an ordered list:
 1.  Item one

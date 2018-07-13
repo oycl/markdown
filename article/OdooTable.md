@@ -707,6 +707,13 @@ class ProductProduct(models.Model):
 销售配置sales_team.menu_sale_config
 采购配置purchase.menu_purchase_config
 
+## 库存
+库存的产品数量计算在stock模块里面的product.py里面
+库存进货或者出货都在stock_quant里面有记录，其中的cost字段用来记录记录入库价格。
+模块stock_inventory_revaluation用来“合法”调整入库产品价格，以使发票和库存估值相同
+
+
+
 
 ### And an ordered list:
 1.  Item one
