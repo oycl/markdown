@@ -131,11 +131,15 @@ WH下面建成品库，研发（成品库）（导入的时候，需要手动调
 
 存档07Show01.backup
 
+把生产成本的类型从“业务成本”改到“流动负债”，通过修改l10n_cn_yto_chart_data.xml并不能生效，把其文件顶部的 <data noupdate >里的noupdate删除，等重新布置系统时再观察。实际上在“外部标识”里面有一项“不可更新”，据说把这个取消了就能更新。
+最后在会计模块里的科目表里面手动修改42条记录，存档07Show02.backup
+
+
 11. 日历是一个模块，可以进入日历视图；联系人也是一个模块；仪表板是一个应用，也需要安装，也可以定制
 上面这三个模块如果需要测试，可以从01Mini.backup出发安装测试
 
 附备份命令（windows）
-pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\custom-addons\invku\basedata\00backup\05Warehouse.backup" "odoo10"
+pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\custom-addons\invku\basedata\00backup\07Show02.backup" "odoo10"
 
 
 #### 测试阶段
