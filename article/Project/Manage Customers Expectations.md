@@ -1,8 +1,5 @@
 # The Key to Implementation Projects: Manage Customers Expectations
 
- 一，标题
-### 三，标题
-
 I am a developer. I like to develop; it's fun and intellectually challenging.
 
 But, as the CEO of Odoo, I also know that, for ERP implementation projects, custom developments should be avoided as much as possible.
@@ -120,17 +117,17 @@ Of course, you cannot switch from one day to another; changing a company mindset
 
 My recommendation would be to:
 
-Work on your implementation methodology (start with ours if you don't have one).
+1. Work on your implementation methodology ([start with ours if you don't have one](https://www.odoo.com/openerp_portal/static/src/pdf/odoo_implementation.pdf)).
 
-Keep your team, but progressively recruit a few extra business analysts or project managers who do not have developer profile. 
+2. Keep your team, but progressively recruit a few extra business analysts or project managers who do not have developer profile. 
 
 Things to keep in mind:
 
-Avoid developers who do project management too. Becoming an expert developer is hard and takes years of practice. Being a great project manager also takes time and experience. If you promote developers into project managers, you will have people average in both roles, not excellent in one; and having average project managers will be detrimental to your implementations. 
+1. Avoid developers who do project management too. Becoming an expert developer is hard and takes years of practice. Being a great project manager also takes time and experience. If you promote developers into project managers, you will have people average in both roles, not excellent in one; and having average project managers will be detrimental to your implementations. 
 
-Avoid using developers in the customer relationship. Developers can do everything; they easily find solutions to technical problems. As a result, it’s easy for them to say “Yes” for a custom development, as they don’t feel the pain of having to manage it. When Odoo only had 10 employees (mostly developers), that was the move that allowed me to grow faster: I started to recruit project managers without development knowledge and better structure everyone’s role.
+2. Avoid using developers in the customer relationship. Developers can do everything; they easily find solutions to technical problems. As a result, it’s easy for them to say “Yes” for a custom development, as they don’t feel the pain of having to manage it. When Odoo only had 10 employees (mostly developers), that was the move that allowed me to grow faster: I started to recruit project managers without development knowledge and better structure everyone’s role.
 
-If the customer chose Odoo, isn't it because they want all these customizations? 
+## If the customer chose Odoo, isn't it because they want all these customizations? 
 Odoo is an amazing software. Just by using Odoo standard, the customer’s company will be massively transformed, for the better. Most departments will be more efficient, and employees will have a tool to boost their productivity. This is where the value is; the custom developments will be only 5% to 10% of the features the customer will use from the platform.
 
 You should manage customer expectations, even before making an offer, and the customer will thank you for challenging their requests; this is what they usually expect from great project managers. This will allow you to reduce the initial budget and be more competitive, while limiting costly developments to focus on high margins associated with business services.
@@ -139,17 +136,18 @@ Once the customer is in production and happy, they will be much more likely to b
 
 Most companies think they are unique, and special, and feel justified in their desire to customize. This is the wrong mindset for a successful project. It’s up to you to steer the project in a value-focused direction that helps the customer, not just fulfilling requests. They will reward you in the long-term for such an approach. Odoo isn't just a platform, it is "best business practices" coded into the software. These are practices distilled from a huge amount of experience during many years working with customer implementations.
 
-Is it worth developing custom features, if it can be reused on several 'future' customer projects?
+## Is it worth developing custom features, if it can be reused on several 'future' customer projects?
 In the past, we have tried several times to develop a custom feature for a customer, with the hope to reuse this feature for future customers. It failed in most cases:
 
-People always have the feeling that a feature is generic enough and a lot of people will want it. In reality, the others customers will want it slightly different and you end up managing different versions of your custom code.
+* People always have the feeling that a feature is generic enough and a lot of people will want it. In reality, the others customers will want it slightly different and you end up managing different versions of your custom code.
 
-This argument is often used for the customer to negotiate a way to “share” the cost of a custom feature, or for your internal team to justify an “unbilled” feature. In both cases, it’s not good for the margins of the company.
+* This argument is often used for the customer to negotiate a way to “share” the cost of a custom feature, or for your internal team to justify an “unbilled” feature. In both cases, it’s not good for the margins of the company.
+
 Developing features to sell to several customers is the business model of a software vendor (like Odoo SA), but it’s a completely different business model than a service company. It’s a model where you need 80% margins on your products to cover the very high R&D costs. It’s a model where >50% of your charges are developers in R&D, not billed to customers.
 
 An efficient service company will target a billing rate around 80%. That’s what you need to sustain healthy growth. You won’t reach that level of billing rate if you have a mixed business model of software development and services. 
 
-My Apologies
+## My Apologies
 I know such a blog post might not please everyone. My apologies. I certainly don’t want to hurt anyone. I just want to be helpful. And, to be helpful, I have to be direct and transparent.
 
 Please don’t read this blog as the point of view of a “Software Vendor”. These are actually things we have learned over the past year in our service department, focusing on project velocity and competitivity, doing what we think is good for the success of the project, not what key users ask us to do. It turns out this service department is now as disruptive and efficient as our product, to the point that it became a massive competitive advantage.
@@ -158,60 +156,5 @@ By sharing what we have learned, I hope it will help some partners to accelerate
 
 We have a large partner network of very smart people. Our only weakness; we are younger, less mature. If we succeed to grow in maturity, we will disrupt the market, faster than any product has ever done before. We transformed the way 3.7M users work in a few years. But to reach 100M users, a great product is not enough; we have to build the best partner network ever, together.
 
-
-
-
-### And an ordered list:
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### Here is an unordered list:
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-> 注释
-> **强调注释**
-
-内容
-
-```sh
-shell get 'var'
-```
-
-```yml
-show_downloads: ["true" or "false" to indicate whether to provide a download URL]
-google_analytics: [Your Google Analytics tracking ID]
-```
-
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
-
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
-
-内嵌代码`su root`
-
-[链接](http://123.com/art/abc.htm)
-
-### Small image
-
-![](https://assets-cdn.github.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![](https://guides.github.com/activities/hello-world/branching.png)
 
 [back](../)
