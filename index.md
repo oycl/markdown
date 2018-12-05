@@ -2,9 +2,7 @@
     
 ## [项目及实施](/article/Project/index.md)
 
-
-
-
+## [Odoo](/article/Odoo/index.md)
 
 
 ## 软件开发
@@ -15,7 +13,6 @@
 [003，Odoo表格解析](/article/OdooTable.md)
 
 [004，Odoo小技巧](/article/OdooTips.md)
-
 
 
 ## ERP原理及实施
