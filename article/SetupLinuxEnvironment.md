@@ -70,7 +70,7 @@ ClientAliveInterval指定了服务器端向客户端请求消息的时间间隔,
 
 4. 重启 openssh server
 ```sh
-# service ssh restart
+# service sshd restart
 ``` 
 
 ## 5，设置固定IP地址
