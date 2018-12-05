@@ -102,6 +102,8 @@ dns-nameservers 202.97.224.69
 最后一行加入
 ```sh
 TZ='Asia/Shanghai';export TZ
+然后退出，运行生效
+# source .profile
 ```
 安装ntpdate
 ```sh

@@ -1,12 +1,10 @@
-# 目录
-    
 ## 系统安装
 
 [001，Ubuntu分区方案](001UbuntuHardDiskPartition.md)
 
 [002，Linux系统环境配置](002SetupLinuxEnvironment.md)
 
-[003，Odoo安装](/article/OdooInstall.md)
+[003，Odoo安装](003OdooInstall.md)
 
 [004，Odoo项目配置](/article/OdooConfig.md)
 
