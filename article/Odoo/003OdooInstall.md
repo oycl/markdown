@@ -235,4 +235,4 @@ odoo@$ source venv/bin/activate
 > 与上面的安装方式不同，不再需要执行Setup步骤，odoo-bin 可以直接启动
 
 
-[back](../)
+[back](./)

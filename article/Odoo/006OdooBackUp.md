@@ -185,13 +185,15 @@ sudo apt-get remove pgagent
 
 ### 使用pgAgent运行脚本备份整个数据库
 
-1. 建立备份路径，发现无用，还是备份到/var/lib/postgres
+1. 建立备份路径，发现无用，还是备份到/var/lib/postgresql/
+
 ```sh
 # mkdir /home/odoo/backup/
 # chown odoo:odoo /home/odoo/backup/
 ```
 
 2. 放入数据库备份脚本
+在/home/odoo下面建立一个文件夹backup
 
 vim pg_backup.config
 ```sh
@@ -426,8 +428,8 @@ postgres=# alter database odoo10 owner to odoo;
 postgres=# \q
 ```
 ### pgAdmin 上运行相应任务
-1. 运算任务
-   1. 步骤：种类：sql；
+1. 运算任务名称：01clac
+   1. Steps：种类：sql；
    
    定义：
    ```sql
@@ -435,19 +437,22 @@ postgres=# \q
    SELECT m_g_bom();
    COMMIT;
    ```
-   2. 计划：每天12:30和22:30运行
-2. 备份任务
-   1. 步骤：
+
+   2. Schedules：每天12:30和21:20运行
+
+
+2. 备份任务名称：02backup
+   1. Steps：
    种类：批处理；
    
    定义：
    ```sh
    /home/odoo/backup/pg_backup.sh
    ```
-   2. 计划：每天23:30运行
+   2. Schedules：每天23:30运行
 
 参考文章
 [PostgreSQL中定时job执行](http://blog.csdn.net/sunbocong/article/details/77870205)
 
 
-[back](../)
+[back](./)
