@@ -1,30 +1,38 @@
 # Odoo公司定制
 
-## 一，模块取舍
+## 一，主体框架
+使用odoo10_c_bruno.tar.gz，整体考入server后解压
+解压
+```sh
+tar -zxvf odoo10_c_bruno.tar.gz
+```
+压缩
+```sh
+tar -zcvf odoo10_c_bruno.tar.gz odoo10/
+```
+
+## 二，模块取舍
 ### 公司内应用
 把E版文件拷贝进custom-addons
 
 ### 对外应用 
-精简社区版/home/odoo/odoo10/addons里面模块，目前使用addons_c_bruno.tar.gz
-解压
-```sh
-tar -zxvf addons_c_bruno.tar.gz
-```
-压缩
-```sh
-tar -zcvf addons_c_bruno.tar.gz addons/
-```
-把自己的模块拷贝进custom-addons
+精简社区版目前使用addons最小化模块40个含完整库存.rar，因为文件少，可以解压后传入
+/home/odoo/odoo10/addons
+
+把自己的模块拷贝进
+/home/odoo/odoo10/custom-addons
+
+注意自己的用户名为odoo，如果是root需要给权限
 
 ## 二，部署要点
 ### 1，个性配置
 1. 去掉登录页面的管理数据库D:\odoo\odoo10\addons\web\views\webclient_templates.xml 注释掉232-237行
    如果需要访问这个页面，可以访问http://192.168.137.1:8069/web/database/manager
-2. 更换D:\odoo\odoo10\addons\web\static\src\img\logo_inverse_white_206px.png为自己logo
+2. 企业版：更换D:\odoo\odoo10\addons\web\static\src\img\logo_inverse_white_206px.png为自己logo
    同时把D:\odoo\custom-addons\web_enterprise\static\src\less\app_switcher.less第130行 中的宽度改为适应logo大小，上面图标用192没问题
 3. 删除无用菜单“Documentation”“Support”“My Odoo.com account”
    D:\odoo\odoo10\addons\web\static\src\xml\base.xml  第1270行，注释掉前面三个菜单
-4. 如果是社区版 把主题的apps替换掉。方法： D:\odoo\custom-addons\web_responsive\views\web.xml 查找apps注释掉，位置在221行。企业版不需要。
+4. 如果是社区版（需要先安装web_responsive） 把主题的apps替换掉。方法： D:\odoo\custom-addons\web_responsive\views\web.xml 查找apps注释掉，位置在221行。企业版不需要。
 5. 删除页面 “表名-Odoo”里面的Odoo，仅限Odoo10
    D:\odoo\odoo10\addons\web\static\src\js\abstract_web_client.js    54行
    this.set('title_part', {"zopenerp": "Odoo"});删除odoo 或者改成想要的文字

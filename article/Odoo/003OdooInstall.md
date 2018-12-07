@@ -76,7 +76,7 @@
 # apt-get install postgresql-9.5 postgresql-server-dev-9.5
 ```
 
-> 安装完postgresql数据库后，数据库会自动创建postgres系统用户，密码为随机，设为pgyto1，home目录为/var/lib/postgresql
+> 安装完postgresql数据库后，数据库会自动创建postgres系统用户，密码为随机，设为pg***1，home目录为/var/lib/postgresql
 > 在数据库内也会创建postgres数据库用户，可以更改这个用户的密码，然后创建数据库用户odoo并设置密码
 
 
@@ -94,26 +94,6 @@ $ exit
 ```
 
 这里有一篇详细介绍postgresql安装的文章[点击查看](https://www.cnblogs.com/zhangpengshou/p/5464610.html)
-### pgAdmin登录遇到问题
-1，如果报错 could not connect to server: Connection refused (0x0000274D/10061) Is the server running on host "120.92.82.112" and accepting TCP/IP connections on port 5432?
-
-vim /etc/postgresql/9.3/main/postgresql.conf
-找到“#listen_addresses = 'localhost'”，把它改成“listen_addresses = '*'”。修改listen_addresses为对外的interface的ip地址似乎也可以
-这样，postgresql就可以监听所有ip地址的连接。
-
-2，接下来还会报错：
-FATAL: no pg_hba.conf entry for host "218.10.12.207", user "postgres", database "testdb", SSL off FATAL: no pg_hba.conf entry for host "218.10.12.207", user "postgres", database "testdb", SSL on
- 
-要解决这个问题，windows下只需要在PostgreSQL数据库的安装目录下找到/data/pg96/pg_hba.conf,
-linux下vim /etc/postgresql/9.3/main/pg_hba.conf
-找到
-\# IPv4 local connections:
-host all all 127.0.0.1/32 md5
-在其下加上请求连接的机器IP
-host all all 218.10.12.207/32 md5
-32是子网掩码的网段，用32表示该IP被固定，用24表示前3位固定，后面一位可以由自己设；md5是密码验证方法，
-例：如果为“host all all 192.168.91.1/24 md5” ，则前3位ip地址与该设定相同的计算机就可以访问postgresql数据库。
-
 
 ## 4，安装nodejs
 ```sh

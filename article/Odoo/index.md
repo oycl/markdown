@@ -6,11 +6,11 @@
 
 [003，Odoo安装](003OdooInstall.md)
 
-[004，Odoo项目配置](/article/OdooConfig.md)
+[004，Odoo项目配置](004OdooConfig.md)
 
-[005，Odoo公司定制](/article/OdooCompany.md)
+[005，Odoo公司定制](005OdooCompany.md)
 
-[006，Odoo数据库备份恢复及计划任务](/article/OdooBackUp.md)
+[006，Odoo数据库备份恢复及计划任务](006OdooBackUp.md)
 
 [007，Odoo数据迁移](/article/OdooDataMove.md)
 
