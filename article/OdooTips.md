@@ -1,7 +1,10 @@
 # 题目
 
 ## 一，标题
-### 三，标题
+### 进入开发者模式，只要在网址的web后面加入?debug就行，例如
+http://127.0.0.1:8080/web?debug#min=1&limit=80&view_type=list&model=m.part&menu_id=70&action=77
+http://127.0.0.1:8080/web?debug=assets#min=1&limit=80&view_type=list&model=m.part&menu_id=70&action=77
+后面这个多了一个assets
 
 ### How to remove the 'Add an Item' quick insert option from a tree conditionally?
 The 'Objective Group' tree belongs to a One2Many field linking the 'Objective Groups' model with the 'Job Plans' model that the view shows. Is there any way to disable this 'Add an Item' option conditionally?

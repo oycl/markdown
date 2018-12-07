@@ -113,8 +113,19 @@ C001采购，cg111
 
 
 ### 5，导入存储过程
+打开pgAdmin，选择server，右击Databases，选择Creat Scripts，把sql文件的内容复制进去，然后点击绿箭头运行，如果没有错误会提示
+Query returned successfully with no result in XX msec.
 
+右击数据库，刷新一下，就会看到 Schemas->public->Functions里面多了一个函数
 
+三个存储过程按顺序运行，类似函数的依赖关系
+1，m_g_next(integer, integer, integer, numeric).sql
+2，m_g_sale(integer).sql
+3，m_g_bom().sql
 
+我们可以使用SQL命令调用总函数m_g_bom()运行，生成大表
+SELECT m_g_bom();
 
-[back](../../)
+这样在导出表中就可以看到数据。
+
+[back](./)
