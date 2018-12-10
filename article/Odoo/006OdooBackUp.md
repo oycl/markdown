@@ -5,7 +5,9 @@
 ```sh
 pg_dump -Fc -h 120.92.82.112 -p 5432 -U postgres Harvest >back.dump
 ```
+
 2. 恢复一下
+
 ```sh
 C:\Users\fudonghai>pg_restore -h 192.168.1.35 -p 5432 -U postgres -C -d Harvest back.dump
 Password:
@@ -23,12 +25,14 @@ pg_restore: [archiver (db)] could not execute query: ERROR:  database "harvest1"
 
 WARNING: errors ignored on restore: 1
 ```
+
 3. 终极解决方法
 
 数据库在建立使选择对位置不敏感的C类型，模板选择template0
 参考这篇文章 http://blog.csdn.net/huguangshanse00/article/details/45865453
 备份和恢复加入-c清理命令，就再不报错了，实际我理解清理就是先删除表和关系等，然后再建立
 备份
+
 ```sh
 >pg_dump -Fc -h 192.168.1.35 -p 5432 -U postgres -c harvest1 >Harvest1.dump
 pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\backups\zuomian1.backup" "odoo"
@@ -39,6 +43,7 @@ pg_restore.exe --host localhost --port 5432 --username "postgres" --dbname "post
 ```
 
 4. 参考
+
 ```text
 i was using the following syntax for pg_dump and restore
 
@@ -112,6 +117,7 @@ postgres=# CREATE EXTENSION pgagent;
 ###  pgAgent开机自启动
 1. 建立脚本/etc/init.d/pgagent
 内容
+
 ```shell
 #!/bin/bash
 #
@@ -163,22 +169,31 @@ case "$1" in
 esac
 
 ```
+
 2. 改变可执行
+
 ```sh
 sudo chmod +x /etc/init.d/pgagent
 ```
+
 3. 添加启动
+
 ```sh
 sudo  update-rc.d pgagent defaults
 ```
+
 4. 命令使用
+
 ```sh
 /etc/init.d/pgagent start
 /etc/init.d/pgagent stop
 ```
+
 参考文章
 [How to take Automatic SQL Database Backup ](http://technobytz.com/automatic-sql-database-backup-postgres.html)
+
 5. 卸载pgAgent
+
 ```sh
 sudo apt-get remove pgagent
 ```
@@ -411,12 +426,15 @@ done
 echo -e "\nAll database backups complete!"
 
 ```
+
 3. 赋予执行权限
+
 ```sh
 # chmod +x /home/odoo/backup/pg_backup.sh
 ```
 
 4. 恢复
+
 ```sh
 # su postgres
 postgres=# psql
@@ -427,6 +445,7 @@ postgres$ pg_restore -d odoo10  odoo10.custom
 postgres=# alter database odoo10 owner to odoo;
 postgres=# \q
 ```
+
 ### pgAdmin 上运行相应任务
 1. 运算任务名称：01clac
    1. Steps：种类：sql；
