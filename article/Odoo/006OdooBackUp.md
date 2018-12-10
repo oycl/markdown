@@ -2,6 +2,7 @@
 
 ## 备份和恢复命令
 1. 备份一下
+
 ```sh
 pg_dump -Fc -h 120.92.82.112 -p 5432 -U postgres Harvest >back.dump
 ```
@@ -9,7 +10,6 @@ pg_dump -Fc -h 120.92.82.112 -p 5432 -U postgres Harvest >back.dump
 2. 恢复一下
 
 ```sh
-
 C:\Users\fudonghai>pg_restore -h 192.168.1.35 -p 5432 -U postgres -C -d Harvest back.dump
 Password:
 出现问题，但表结构和数据也都导入进来了
@@ -33,6 +33,7 @@ WARNING: errors ignored on restore: 1
 参考这篇文章 http://blog.csdn.net/huguangshanse00/article/details/45865453
 备份和恢复加入-c清理命令，就再不报错了，实际我理解清理就是先删除表和关系等，然后再建立
 备份
+
 ```sh
 >pg_dump -Fc -h 192.168.1.35 -p 5432 -U postgres -c harvest1 >Harvest1.dump
 pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\backups\zuomian1.backup" "odoo"
@@ -43,6 +44,7 @@ pg_restore.exe --host localhost --port 5432 --username "postgres" --dbname "post
 ```
 
 4. 参考
+
 ```text
 i was using the following syntax for pg_dump and restore
 
@@ -79,16 +81,19 @@ contab 没时间先不弄了。
 psql需要密码时有以下两种解决方法
 1. 将数据库密码写到名为PGPASSWORD的环境变量中，然后使用psql等工具就不会提示输入密码了。
 但要注意环境变量仅和用户及登录控制台相关。
+
 ```sh
  export PGPASSWORD='pgdbyto1'
 ```
 2. 使用文件
 
 Linux 环境下 /var/lib/postgresql/.pgpass
+
 ```sh
 127.0.0.1:5432:*:postgres:pgdbyto1
 ```
 windows 环境下 C:\Users\fudonghai\AppData\Roaming\postgresql\pgpass.conf
+
 ```text
 localhost:5432:*:postgres:pgdbyto1
 47.94.242.254:5432:*:postgres:pgdbyto1
@@ -116,7 +121,8 @@ postgres=# CREATE EXTENSION pgagent;
 ###  pgAgent开机自启动
 1. 建立脚本/etc/init.d/pgagent
 内容
-```shell
+
+```sh
 #!/bin/bash
 #
 # /etc/init.d/pgagent
@@ -169,16 +175,19 @@ esac
 ```
 
 2. 改变可执行
+
 ```sh
 sudo chmod +x /etc/init.d/pgagent
 ```
 
 3. 添加启动
+
 ```sh
 sudo  update-rc.d pgagent defaults
 ```
 
 4. 命令使用
+
 ```sh
 /etc/init.d/pgagent start
 /etc/init.d/pgagent stop
@@ -188,6 +197,7 @@ sudo  update-rc.d pgagent defaults
 [How to take Automatic SQL Database Backup ](http://technobytz.com/automatic-sql-database-backup-postgres.html)
 
 5. 卸载pgAgent
+
 ```sh
 sudo apt-get remove pgagent
 ```
@@ -195,6 +205,7 @@ sudo apt-get remove pgagent
 ### 使用pgAgent运行脚本备份整个数据库
 
 1. 建立备份路径，发现无用，还是备份到/var/lib/postgresql/
+
 ```sh
 # mkdir /home/odoo/backup/
 # chown odoo:odoo /home/odoo/backup/
@@ -204,6 +215,7 @@ sudo apt-get remove pgagent
 在/home/odoo下面建立一个文件夹backup
 
 vim pg_backup.config
+
 ```sh
 ##############################
 ## POSTGRESQL BACKUP CONFIG ##
@@ -255,6 +267,7 @@ WEEKS_TO_KEEP=5
 3. vim pg_backup.sh
 
 反复试验.pgpass文件无效，只好在脚本里面加入export环境变量了
+
 ```sh
 #!/bin/bash
 export PGPASSWORD='pgdbyto1';
@@ -420,11 +433,13 @@ echo -e "\nAll database backups complete!"
 ```
 
 3. 赋予执行权限
+
 ```sh
 # chmod +x /home/odoo/backup/pg_backup.sh
 ```
 
 4. 恢复
+
 ```sh
 # su postgres
 postgres=# psql
@@ -439,7 +454,6 @@ postgres=# \q
 ### pgAdmin 上运行相应任务
 1. 运算任务名称：01clac
    1. Steps：种类：sql；
-   
    定义：
    ```sql
    BEGIN;
@@ -453,7 +467,6 @@ postgres=# \q
 2. 备份任务名称：02backup
    1. Steps：
    种类：批处理；
-   
    定义：
    ```sh
    /home/odoo/backup/pg_backup.sh
