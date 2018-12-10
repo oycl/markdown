@@ -438,8 +438,18 @@ echo -e "\nAll database backups complete!"
 # chmod +x /home/odoo/backup/pg_backup.sh
 ```
 
-4. 恢复
+曾经出现了01clac任务运行成功，但是02backup运行不成功的情况。这两个任务的不同是02backup是执行脚本pg_backup.sh
+在linux系统中是以postgres用户执行这个脚本的，所以从下面几个方面来解决
+```text
+1，脚本是否有问题，拷贝成功运行的脚本过来
+2，脚本的目录/home/odoo/backup/,postgres是否有权限执行
+3，备份的目录/var/lib/postgresql,postgres是否有权限生成文件
+4，pg_backup.sh需要能运行
+```
 
+
+4. 恢复方式
+一种是通过命令行
 ```sh
 # su postgres
 postgres=# psql
@@ -450,8 +460,9 @@ postgres$ pg_restore -d odoo10  odoo10.custom
 postgres=# alter database odoo10 owner to odoo;
 postgres=# \q
 ```
+另一种通过pgAdmin，建立空数据库odoo10，然后恢复
 
-### pgAdmin 上运行相应任务
+### pgAdmin 上运行相应计划任务
 1. 运算任务名称：01clac
    1. Steps：种类：sql；
    定义：
@@ -460,7 +471,6 @@ postgres=# \q
    SELECT m_g_bom();
    COMMIT;
    ```
-
    2. Schedules：每天12:30和21:20运行
 
 
