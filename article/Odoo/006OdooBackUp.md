@@ -7,7 +7,9 @@ pg_dump -Fc -h 120.92.82.112 -p 5432 -U postgres Harvest >back.dump
 ```
 
 2. 恢复一下
+
 ```sh
+
 C:\Users\fudonghai>pg_restore -h 192.168.1.35 -p 5432 -U postgres -C -d Harvest back.dump
 Password:
 出现问题，但表结构和数据也都导入进来了
