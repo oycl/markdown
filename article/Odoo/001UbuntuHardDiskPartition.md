@@ -152,4 +152,9 @@ swap        8G(内存8G)
 /var        250G
 ```
 
+
+
+![](https://images.cnblogs.com/cnblogs_com/fudonghai/1523056/o_085000.jpg)
+
+
 [back](./)

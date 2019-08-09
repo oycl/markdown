@@ -2,6 +2,8 @@
 
 [001，Ubuntu分区方案](001UbuntuHardDiskPartition.md)
 
+[001a，Ubuntu安装](001aUbuntuInStall.md)
+
 [002，Linux系统环境配置](002SetupLinuxEnvironment.md)
 
 [003，Odoo安装](003OdooInstall.md)

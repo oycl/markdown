@@ -18,7 +18,7 @@
 
 还有一个网上的例子指定了key和crt，有空研究一下：./ngrokd -tlsKey=server.key -tlsCrt=server.crt -domain="imququ.com" -httpAddr=":8081" -httpsAddr=":8080
 
-如果想后台运行使用setsid ./ngrokd XXX
+如果想后台运行使用setsid ./ngrokd -domain="$NGROK_DOMAIN" -httpAddr=":6060" -httpsAddr=":6061" -tunnelAddr=":6062"
 
 ngrokd只提供了httpAddr，httpsAddr，tunnelAddr三个端口选项分别在ECS服务器上指定http，https和控制端口，第四个端口也就是远程桌面的连接端口无法指定，每次运行ngrokd程序系统都会随机指定一个高数字端口，如39128端口。这样在ECS上就会出现一个问题：随机端口被屏蔽，控制端对其无法连接。于是每次需要使用命令找出这个端口：
 netstat -ntlp |grep ngrokd
