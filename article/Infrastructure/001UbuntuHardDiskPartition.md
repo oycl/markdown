@@ -154,8 +154,6 @@ swap        8G(内存8G)
 
 贴一张实际分区图
 
-![](https://raw.githubusercontent.com/donghaifu/markdown/master/picture/Partition.png)
-
 ![](https://images.cnblogs.com/cnblogs_com/fudonghai/1523056/o_085000.png)
 
 [back](./)

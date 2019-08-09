@@ -1,18 +1,18 @@
-## 系统安装
+## 数据库安装及备份
 
-[001，Ubuntu分区方案](001UbuntuHardDiskPartition.md)
 
-[001a，Ubuntu安装](001aUbuntuInstall.md)
+[001，Postgresql数据库安装](001PostgresqlInstall.md)
 
-[002，Linux系统环境配置](002SetupLinuxEnvironment.md)
+[002，Odoo数据库备份恢复及计划任务](002OdooDbBackUp.md)
+
+
+## Odoo
 
 [003，Odoo安装](003OdooInstall.md)
 
 [004，Odoo项目配置](004OdooConfig.md)
 
 [005，Odoo公司定制](005OdooCompany.md)
-
-[006，Odoo数据库备份恢复及计划任务](006OdooBackUp.md)
 
 [007，Odoo数据迁移](/article/OdooDataMove.md)
 
