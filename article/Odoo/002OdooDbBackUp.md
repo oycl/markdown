@@ -1,4 +1,25 @@
-# Odoo数据库备份恢复及计划任务
+# Odoo数据库运行函数，备份恢复和计划任务
+
+## 在Odoo的数据库上运行函数
+打开pgAdmin，选择server，右击Databases，选择Creat Scripts，把sql文件的内容复制进去，然后点击绿箭头运行，如果没有错误会提示
+```text
+Query returned successfully with no result in XX msec.
+```
+右击数据库，刷新一下，就会看到 Schemas->public->Functions里面多了一个函数
+
+三个存储过程按顺序运行，类似函数的依赖关系
+1，m_g_next(integer, integer, integer, numeric).sql
+2，m_g_sale(integer).sql
+3，m_g_bom().sql
+
+我们可以使用SQL命令调用总函数m_g_bom()运行，生成大表
+```text
+SELECT m_g_bom();
+```
+这样在导出表中就可以看到数据。
+
+
+
 
 ## 备份和恢复命令
 1. 备份一下
@@ -74,7 +95,9 @@ before this i was trying to restore with out including -c(clean)
 even though -c is included in pg_dump it is not used in pg_restore unless we say to use...
 ```
 
-## Linux系统层面的crontab执行计划任务
+## 执行计划任务
+
+### Linux系统层面的crontab
 
 contab 没时间先不弄了。
 
@@ -100,8 +123,10 @@ localhost:5432:*:postgres:pgdbyto1
 192.168.5.55:5432:*:postgres:pgdbyto1
 ```
 
-## 数据库层面定时执行计划
-### 安装，并在`数据库名postgres`内创建相关表等
+### 数据库层面定时执行计划
+
+#### 安装，并在`数据库名postgres`内创建相关表等
+
 ```sh
 # apt-get install pgagent
 # su postgres
@@ -112,13 +137,14 @@ postgres=# CREATE EXTENSION pgagent;
 > 实际上对于pgAdmin来说，有一个maintenance database的概念，只有装在这个数据库上的pgagent extension
 > 才会显示jobs
 
-### 在有数据库的机器上运行pgAgent守护进程（windows就是服务）测试
+#### 在有数据库的机器上运行pgAgent守护进程（windows就是服务）测试
 
 ```sh
 # pgagent host=127.0.0.1 dbname=postgres user=postgres password=pgdbyto1
 ```
 
-###  pgAgent开机自启动
+#### pgAgent开机自启动
+
 1. 建立脚本/etc/init.d/pgagent
 内容
 
@@ -202,7 +228,7 @@ sudo  update-rc.d pgagent defaults
 sudo apt-get remove pgagent
 ```
 
-### 使用pgAgent运行脚本备份整个数据库
+#### 使用pgAgent运行脚本备份整个数据库
 
 1. 建立备份路径，发现无用，还是备份到/var/lib/postgresql/
 
@@ -462,7 +488,8 @@ postgres=# \q
 ```
 另一种通过pgAdmin，建立空数据库odoo10，然后恢复
 
-### pgAdmin 上运行相应计划任务
+#### pgAdmin 上运行相应计划任务
+
 1. 运算任务名称：01clac
    1. Steps：种类：sql；
    定义：

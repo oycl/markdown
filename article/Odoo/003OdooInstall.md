@@ -59,50 +59,23 @@
 ```sh
 # apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev -y
 ```
-### postgresql 依赖库
-```sh
-# apt-get install libpq-dev -y
-```
+
 ### virtualenv
 ```sh
 # pip install virtualenv
 ```
-## 3，安装postgresql数据库
-### 安装
-> ubuntu16.04的postgresql是9.5的, 建议开发和部署使用相同版本。
-> 需要安装不同版本的postgresql可以参考https://devecho.com/v/postgresql-basic/
-
-```sh
-# apt-get install postgresql-9.5 postgresql-server-dev-9.5
-```
-
-> 安装完postgresql数据库后，数据库会自动创建postgres系统用户，密码为随机，设为pg***1，home目录为/var/lib/postgresql
-> 在数据库内也会创建postgres数据库用户，可以更改这个用户的密码，然后创建数据库用户odoo并设置密码
 
 
-```sh
-# passwd postgres
-输入密码pg***1
-# su postgres 
-$ psql
-//修改密码
-postgres=# ALTER USER postgres WITH PASSWORD 'pgdb***1';
-//建立用户
-postgres=# create user "odoo" with password 'odoodb***1' createdb;
-postgres=# \q
-$ exit
-```
 
-这里有一篇详细介绍postgresql安装的文章[点击查看](https://www.cnblogs.com/zhangpengshou/p/5464610.html)
 
-## 4，安装nodejs
+## 3，安装nodejs
 ```sh
 # curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 # apt-get install -y nodejs
 # npm install -g less less-plugin-clean-css
 ```
 
-## 5，安装打印程序wkhtmltopdf和中文字体
+## 4，安装打印程序wkhtmltopdf和中文字体
 
 ### wkhtmltopdf
 
@@ -133,7 +106,7 @@ wkhtmltopdf  www.163.com 163.pdf
 如果出现cannot connect to X server错误，可以参考下面链接在linux服务上安装一个X环境
 https://stackoverflow.com/questions/9604625/wkhtmltopdf-cannot-connect-to-x-server
 
-## 6，安装odoo
+## 5，安装odoo
 
 安装方式为源码，按照来源不同可以分成两种安装方式
 第一种：使用nightly包安装

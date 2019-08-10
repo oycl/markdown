@@ -1,10 +1,8 @@
-## 数据库安装及备份
+## Postgresql
 
-
-[001，Postgresql数据库安装](001PostgresqlInstall.md)
+[001，Postgresql数据库安装和配置](001PostgresqlInstall.md)
 
 [002，Odoo数据库备份恢复及计划任务](002OdooDbBackUp.md)
-
 
 ## Odoo
 
@@ -13,6 +11,11 @@
 [004，Odoo项目配置](004OdooConfig.md)
 
 [005，Odoo公司定制](005OdooCompany.md)
+
+## Nginx
+
+[006，Nginx配置](/006NginxConfig.md)
+
 
 [007，Odoo数据迁移](/article/OdooDataMove.md)
 
