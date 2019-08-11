@@ -1,103 +1,10 @@
-# Odoo数据库运行函数，备份恢复和计划任务
+# Odoo数据库运行计划任务和进行备份恢复
 
-## 在Odoo的数据库上运行函数
-打开pgAdmin，选择server，右击Databases，选择Creat Scripts，把sql文件的内容复制进去，然后点击绿箭头运行，如果没有错误会提示
-```text
-Query returned successfully with no result in XX msec.
-```
-右击数据库，刷新一下，就会看到 Schemas->public->Functions里面多了一个函数
+## 计划任务
 
-三个存储过程按顺序运行，类似函数的依赖关系
-1，m_g_next(integer, integer, integer, numeric).sql
-2，m_g_sale(integer).sql
-3，m_g_bom().sql
+> 计划任务的实现方法有两种，具体的任务也有两个
 
-我们可以使用SQL命令调用总函数m_g_bom()运行，生成大表
-```text
-SELECT m_g_bom();
-```
-这样在导出表中就可以看到数据。
-
-
-
-
-## 备份和恢复命令
-1. 备份一下
-
-```sh
-pg_dump -Fc -h 120.92.82.112 -p 5432 -U postgres Harvest >back.dump
-```
-
-2. 恢复一下
-
-```sh
-C:\Users\fudonghai>pg_restore -h 192.168.1.35 -p 5432 -U postgres -C -d Harvest back.dump
-Password:
-出现问题，但表结构和数据也都导入进来了
-pg_restore: [archiver (db)] Error while PROCESSING TOC:
-pg_restore: [archiver (db)] Error from TOC entry 2248; 1262 16385 DATABASE Harvest postgres
-pg_restore: [archiver (db)] could not execute query: ERROR:  invalid locale name: "en_US.UTF-8"
-    Command was: CREATE DATABASE "Harvest" WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
-
-C:\Users\fudonghai>pg_restore -h 120.92.82.112 -p 5432 -U postgres -C -d harvest1 harvest1.dump
-pg_restore: [archiver (db)] Error while PROCESSING TOC:
-pg_restore: [archiver (db)] Error from TOC entry 2244; 1262 16732 DATABASE harvest1 postgres
-pg_restore: [archiver (db)] could not execute query: ERROR:  database "harvest1" already exists
-    Command was: CREATE DATABASE harvest1 WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'C' LC_CTYPE = 'C';
-
-WARNING: errors ignored on restore: 1
-```
-
-3. 终极解决方法
-
-数据库在建立使选择对位置不敏感的C类型，模板选择template0
-参考这篇文章 http://blog.csdn.net/huguangshanse00/article/details/45865453
-备份和恢复加入-c清理命令，就再不报错了，实际我理解清理就是先删除表和关系等，然后再建立
-备份
-
-```sh
->pg_dump -Fc -h 192.168.1.35 -p 5432 -U postgres -c harvest1 >Harvest1.dump
-pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\backups\zuomian1.backup" "odoo"
-pg_dump -Fc -h 192.168.137.1 -p 5432 -U postgres -c odoo >"D:\odoo\backups\20171103odoo.dump"
-恢复
->pg_restore -h 120.92.82.112 -p 5432 -U postgres -c -C -d harvest1 harvest1.dump
-pg_restore.exe --host localhost --port 5432 --username "postgres" --dbname "postgres" --no-password  --verbose "D:\odoo\backups\zuomian.backup"
-```
-
-4. 参考
-
-```text
-i was using the following syntax for pg_dump and restore
-
-pg_dump eval --inserts -b -c --encoding UTF8 -Fc -f eval.sql.tar.gz -x -U postgres
-createdb -T template0 test -U postgres
-pg_restore -d test eval.sql.tar.gz -e -U postgres
-the dump was successfull with no errors, but restore makes a some errors, i am dumping and restoring in same machine with same user and privilege all...
-
-i have tried out with other formats also, plain, tar, compressed all gets the same error..
-
-my version of pg is 8.4.11 and psql version is 8.4.11
-
-i am not sure what makes these errors.. can anyone help me
-报错
-pg_restore: [archiver (db)] Error while PROCESSING TOC:
-pg_restore: [archiver (db)] Error from TOC entry 4965; 0 138871 TABLE DATA ir_act_report_xml insigni
-pg_restore: [archiver (db)] could not execute query: ERROR:  invalid input syntax for integer: "purchase.order"
-LINE 1: ...st for Quotation', 'ir.actions.report.xml', NULL, 'purchase....
-                                                             ^
-    Command was: INSERT INTO ir_act_report_xml VALUES (350, 'Request for Quotation', 'ir.actions.report.xml', NULL, 'purchase.order', 'purcha...
-
-答
-this did the trick
-pg_dump database_name -c -Ft -f file_name.tar 
-pg_restore -d database_name -c file_name.tar
-before this i was trying to restore with out including -c(clean)
-even though -c is included in pg_dump it is not used in pg_restore unless we say to use...
-```
-
-## 执行计划任务
-
-### Linux系统层面的crontab
+### 方法一：Linux系统层面的crontab
 
 contab 没时间先不弄了。
 
@@ -123,9 +30,9 @@ localhost:5432:*:postgres:pgdbyto1
 192.168.5.55:5432:*:postgres:pgdbyto1
 ```
 
-### 数据库层面定时执行计划
+### 方法二：数据库层面定时执行计划pgagent
 
-#### 安装，并在`数据库名postgres`内创建相关表等
+#### 1，安装，并在`数据库名postgres`内创建相关表等
 
 ```sh
 # apt-get install pgagent
@@ -137,13 +44,13 @@ postgres=# CREATE EXTENSION pgagent;
 > 实际上对于pgAdmin来说，有一个maintenance database的概念，只有装在这个数据库上的pgagent extension
 > 才会显示jobs
 
-#### 在有数据库的机器上运行pgAgent守护进程（windows就是服务）测试
+#### 2，在有数据库的机器上运行pgAgent守护进程（windows就是服务）测试
 
 ```sh
 # pgagent host=127.0.0.1 dbname=postgres user=postgres password=pgdbyto1
 ```
 
-#### pgAgent开机自启动
+#### 3，pgAgent开机自启动
 
 1. 建立脚本/etc/init.d/pgagent
 内容
@@ -228,9 +135,28 @@ sudo  update-rc.d pgagent defaults
 sudo apt-get remove pgagent
 ```
 
-#### 使用pgAgent运行脚本备份整个数据库
+#### 4，任务一：运行函数完成计算功能01clac
 
-1. 建立备份路径，发现无用，还是备份到/var/lib/postgresql/
+打开pgAdmin，选择server，右击Databases，选择Creat Scripts，把sql文件的内容复制进去，然后点击绿箭头运行，如果没有错误会提示
+```text
+Query returned successfully with no result in XX msec.
+```
+右击数据库，刷新一下，就会看到 Schemas->public->Functions里面多了一个函数
+
+三个存储过程按顺序运行，类似函数的依赖关系
+1，m_g_next(integer, integer, integer, numeric).sql
+2，m_g_sale(integer).sql
+3，m_g_bom().sql
+
+我们可以使用SQL命令调用总函数m_g_bom()运行，生成大表
+```text
+SELECT m_g_bom();
+```
+这样在导出表中就可以看到数据。
+
+#### 5，任务二：运行脚本备份整个数据库02backup
+
+1. 建立备份路径，发现无用，实际上在脚本里面有路径，还是备份到/var/lib/postgresql/
 
 ```sh
 # mkdir /home/odoo/backup/
@@ -473,22 +399,7 @@ echo -e "\nAll database backups complete!"
 4，pg_backup.sh需要能运行
 ```
 
-
-4. 恢复方式
-一种是通过命令行
-```sh
-# su postgres
-postgres=# psql
-postgres=# create database odoo10;
-postgres=# \q
-postgres$ pg_restore -d odoo10  odoo10.custom
-# psql
-postgres=# alter database odoo10 owner to odoo;
-postgres=# \q
-```
-另一种通过pgAdmin，建立空数据库odoo10，然后恢复
-
-#### pgAdmin 上运行相应计划任务
+#### 6，pgAdmin 上建立这两个计划任务
 
 1. 运算任务名称：01clac
    1. Steps：种类：sql；
@@ -512,6 +423,101 @@ postgres=# \q
 
 参考文章
 [PostgreSQL中定时job执行](http://blog.csdn.net/sunbocong/article/details/77870205)
+
+## 备份和恢复
+
+### 恢复上面建立的odoo10.custom
+
+一种是通过命令行
+```sh
+# su postgres
+postgres=# psql
+postgres=# create database odoo10;
+postgres=# \q
+postgres$ pg_restore -d odoo10  odoo10.custom
+# psql
+postgres=# alter database odoo10 owner to odoo;
+postgres=# \q
+```
+
+另一种通过pgAdmin，建立空数据库odoo10，属于odoo用户
+测试一下能否恢复pgagent的系统表，计划任务的job，运行的函数
+
+### postgresql的备份和恢复命令
+
+1. 备份命令
+
+```sh
+pg_dump -Fc -h 120.92.82.112 -p 5432 -U postgres Harvest >back.dump
+```
+
+2. 恢复命令
+
+```sh
+C:\Users\fudonghai>pg_restore -h 192.168.1.35 -p 5432 -U postgres -C -d Harvest back.dump
+Password:
+出现问题，但表结构和数据也都导入进来了
+pg_restore: [archiver (db)] Error while PROCESSING TOC:
+pg_restore: [archiver (db)] Error from TOC entry 2248; 1262 16385 DATABASE Harvest postgres
+pg_restore: [archiver (db)] could not execute query: ERROR:  invalid locale name: "en_US.UTF-8"
+    Command was: CREATE DATABASE "Harvest" WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+
+C:\Users\fudonghai>pg_restore -h 120.92.82.112 -p 5432 -U postgres -C -d harvest1 harvest1.dump
+pg_restore: [archiver (db)] Error while PROCESSING TOC:
+pg_restore: [archiver (db)] Error from TOC entry 2244; 1262 16732 DATABASE harvest1 postgres
+pg_restore: [archiver (db)] could not execute query: ERROR:  database "harvest1" already exists
+    Command was: CREATE DATABASE harvest1 WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'C' LC_CTYPE = 'C';
+
+WARNING: errors ignored on restore: 1
+```
+
+3. 终极解决方法
+
+数据库在建立使选择对位置不敏感的C类型，模板选择template0
+参考这篇文章 http://blog.csdn.net/huguangshanse00/article/details/45865453
+备份和恢复加入-c清理命令，就再不报错了，实际我理解清理就是先删除表和关系等，然后再建立
+备份
+
+```sh
+>pg_dump -Fc -h 192.168.1.35 -p 5432 -U postgres -c harvest1 >Harvest1.dump
+pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format custom --blobs --verbose --file "D:\odoo\backups\zuomian1.backup" "odoo"
+pg_dump -Fc -h 192.168.137.1 -p 5432 -U postgres -c odoo >"D:\odoo\backups\20171103odoo.dump"
+恢复
+>pg_restore -h 120.92.82.112 -p 5432 -U postgres -c -C -d harvest1 harvest1.dump
+pg_restore.exe --host localhost --port 5432 --username "postgres" --dbname "postgres" --no-password  --verbose "D:\odoo\backups\zuomian.backup"
+```
+
+4. 参考
+
+```text
+i was using the following syntax for pg_dump and restore
+
+pg_dump eval --inserts -b -c --encoding UTF8 -Fc -f eval.sql.tar.gz -x -U postgres
+createdb -T template0 test -U postgres
+pg_restore -d test eval.sql.tar.gz -e -U postgres
+the dump was successfull with no errors, but restore makes a some errors, i am dumping and restoring in same machine with same user and privilege all...
+
+i have tried out with other formats also, plain, tar, compressed all gets the same error..
+
+my version of pg is 8.4.11 and psql version is 8.4.11
+
+i am not sure what makes these errors.. can anyone help me
+报错
+pg_restore: [archiver (db)] Error while PROCESSING TOC:
+pg_restore: [archiver (db)] Error from TOC entry 4965; 0 138871 TABLE DATA ir_act_report_xml insigni
+pg_restore: [archiver (db)] could not execute query: ERROR:  invalid input syntax for integer: "purchase.order"
+LINE 1: ...st for Quotation', 'ir.actions.report.xml', NULL, 'purchase....
+                                                             ^
+    Command was: INSERT INTO ir_act_report_xml VALUES (350, 'Request for Quotation', 'ir.actions.report.xml', NULL, 'purchase.order', 'purcha...
+
+答
+this did the trick
+pg_dump database_name -c -Ft -f file_name.tar 
+pg_restore -d database_name -c file_name.tar
+before this i was trying to restore with out including -c(clean)
+even though -c is included in pg_dump it is not used in pg_restore unless we say to use...
+```
+
 
 
 [back](./)

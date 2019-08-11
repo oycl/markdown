@@ -2,6 +2,10 @@
 
 ## 1，依赖安装
 
+进入postgresql的官网：
+http://www.postgresql.org/download/linux/ubuntu/
+它让我们如果使用开发的话，就安装，个人认为仅使用odoo应该不用装
+
 ```sh
 # apt-get install libpq-dev -y
 ```
@@ -13,6 +17,28 @@
 
 ```sh
 # apt-get install postgresql-9.5 postgresql-server-dev-9.5
+```
+
+> 在ubuntu18.04里面postgresql是9.6的，但是不能直接安装，需要按照下面的步骤来
+
+```sh
+root@webserver:~# sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list' 
+root@webserver:~# wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add - 
+root@webserver:~# apt-get update
+root@webserver:~# apt-get upgrade
+root@webserver:~# apt-get install postgresql-9.6
+```
+
+最后提示
+```sh
+Success. You can now start the database server using:
+
+    /usr/lib/postgresql/9.6/bin/pg_ctl -D /var/lib/postgresql/9.6/main -l logfile start
+
+Ver Cluster Port Status Owner    Data directory               Log file
+9.6 main    5432 down   postgres /var/lib/postgresql/9.6/main /var/log/postgresql/postgresql-9.6-main.log
+update-alternatives: using /usr/share/postgresql/9.6/man/man1/postmaster.1.gz to provide /usr/share/man/man1/postmaster.1.gz (postmaster.1.gz) in auto mode
+
 ```
 
 

@@ -2,7 +2,7 @@
 
 [001，Postgresql数据库安装和配置](001PostgresqlInstall.md)
 
-[002，Odoo数据库备份恢复及计划任务](002OdooDbBackUp.md)
+[002，Odoo数据库运行计划任务和进行备份恢复](002TaskSchedulerAndDbBackupRestore.md)
 
 ## Odoo
 
